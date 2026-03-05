@@ -22,10 +22,10 @@ const facilityUsage = [
 
 export const AdminPanel: React.FC = () => {
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="space-y-5  pb-12">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold" style={{color: '#F5F5F7'}}>Management Dashboard</h2>
+          <h2 className="text-xl font-bold" style={{color: '#F5F5F7'}}>Management Dashboard</h2>
           <p className="mt-2 text-lg" style={{color: '#B0B0B8'}}>Resource utilization overview and enforcement tracking.</p>
         </div>
         <button className="border px-6 py-3 rounded-xl font-bold text-sm transition-colors shadow-sm flex items-center gap-2" style={{backgroundColor: '#3D3B65', borderColor: '#4A4860', color: '#F5F5F7'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2D2B55'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3D3B65'}>
@@ -34,9 +34,9 @@ export const AdminPanel: React.FC = () => {
       </header>
 
       {/* Analytics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="p-8 rounded-[2.5rem] shadow-xl border hover:shadow-2xl transition-shadow duration-300" style={{backgroundColor: '#3D3B65', borderColor: '#4A4860', boxShadow: '0 10px 25px rgba(45, 43, 85, 0.2)'}}>
-          <div className="flex justify-between items-center mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="p-6 rounded-[2.5rem] shadow-xl border hover:shadow-sm transition-shadow duration-300" style={{backgroundColor: '#3D3B65', borderColor: '#4A4860', boxShadow: '0 10px 25px rgba(45, 43, 85, 0.2)'}}>
+          <div className="flex justify-between items-center mb-5">
             <div>
               <h3 className="text-xl font-bold" style={{color: '#F5F5F7'}}>Visitor Traffic</h3>
               <p className="text-sm font-medium" style={{color: '#B0B0B8'}}>Weekly Overview</p>
@@ -49,8 +49,8 @@ export const AdminPanel: React.FC = () => {
               <LineChart data={parkingData}>
                 <defs>
                   <linearGradient id="colorVisitor" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#E6B325" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#E6B325" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#C8FF00" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#C8FF00" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#4A4860" />
@@ -69,15 +69,15 @@ export const AdminPanel: React.FC = () => {
                   }}
                   itemStyle={{ padding: 0 }}
                 />
-                <Line type="monotone" dataKey="visitors" stroke="#E6B325" strokeWidth={4} dot={{ r: 4, fill: '#E6B325', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
+                <Line type="monotone" dataKey="visitors" stroke="#C8FF00" strokeWidth={4} dot={{ r: 4, fill: '#C8FF00', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
                 <Line type="monotone" dataKey="violations" stroke="#F5D547" strokeWidth={4} dot={{ r: 4, fill: '#F5D547', strokeWidth: 2, stroke: '#fff' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex justify-center gap-8 mt-6">
-             <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{backgroundColor: 'rgba(230, 179, 37, 0.15)', borderColor: '#E6B325', border: '1px solid'}}>
-               <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{backgroundColor: '#E6B325'}}></div>
-               <span className="text-xs font-bold uppercase tracking-wide" style={{color: '#E6B325'}}>Visitors</span>
+          <div className="flex justify-center gap-5 mt-6">
+             <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{backgroundColor: 'rgba(230, 179, 37, 0.15)', borderColor: '#C8FF00', border: '1px solid'}}>
+               <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{backgroundColor: '#C8FF00'}}></div>
+               <span className="text-xs font-bold uppercase tracking-wide" style={{color: '#C8FF00'}}>Visitors</span>
              </div>
              <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{backgroundColor: 'rgba(245, 213, 71, 0.1)', borderColor: '#F5D547', border: '1px solid'}}>
                <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{backgroundColor: '#F5D547'}}></div>
@@ -86,8 +86,8 @@ export const AdminPanel: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-8 rounded-[2.5rem] shadow-xl border hover:shadow-2xl transition-shadow duration-300" style={{backgroundColor: '#3D3B65', borderColor: '#4A4860', boxShadow: '0 10px 25px rgba(45, 43, 85, 0.2)'}}>
-          <div className="flex justify-between items-center mb-8">
+        <div className="p-6 rounded-[2.5rem] shadow-xl border hover:shadow-sm transition-shadow duration-300" style={{backgroundColor: '#3D3B65', borderColor: '#4A4860', boxShadow: '0 10px 25px rgba(45, 43, 85, 0.2)'}}>
+          <div className="flex justify-between items-center mb-5">
             <div>
               <h3 className="text-xl font-bold" style={{color: '#F5F5F7'}}>Facility Usage</h3>
               <p className="text-sm font-medium" style={{color: '#B0B0B8'}}>Hours per Week</p>
@@ -101,7 +101,7 @@ export const AdminPanel: React.FC = () => {
                 <XAxis dataKey="name" stroke="#B0B0B8" fontSize={12} tickLine={false} axisLine={false} dy={10} />
                 <YAxis stroke="#B0B0B8" fontSize={12} tickLine={false} axisLine={false} dx={-10} />
                 <Tooltip cursor={{fill: 'rgba(74, 72, 96, 0.5)'}} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 600, backgroundColor: '#2D2B55', color: '#F5F5F7' }} />
-                <Bar dataKey="hours" fill="#E6B325" radius={[8, 8, 8, 8]} barSize={48} />
+                <Bar dataKey="hours" fill="#C8FF00" radius={[8, 8, 8, 8]} barSize={48} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -110,7 +110,7 @@ export const AdminPanel: React.FC = () => {
 
       {/* Enforcement Table */}
       <div className="rounded-[2.5rem] shadow-xl border overflow-hidden" style={{backgroundColor: '#3D3B65', borderColor: '#4A4860', boxShadow: '0 10px 25px rgba(45, 43, 85, 0.2)'}}>
-        <div className="p-8 border-b flex justify-between items-center" style={{borderColor: '#4A4860', backgroundColor: 'rgba(230, 179, 37, 0.05)'}}>
+        <div className="p-6 border-b flex justify-between items-center" style={{borderColor: '#4A4860', backgroundColor: 'rgba(230, 179, 37, 0.05)'}}>
           <div>
             <h3 className="text-xl font-bold" style={{color: '#F5F5F7'}}>Recent Violations</h3>
             <p className="text-sm" style={{color: '#B0B0B8'}}>Action required items</p>
@@ -138,14 +138,14 @@ export const AdminPanel: React.FC = () => {
                   <td className="px-8 py-5">
                     <span className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wide border`} style={{
                       backgroundColor: v.status === 'paid' ? 'rgba(230, 179, 37, 0.15)' : 'rgba(245, 213, 71, 0.15)',
-                      color: v.status === 'paid' ? '#E6B325' : '#F5D547',
-                      borderColor: v.status === 'paid' ? '#E6B325' : '#F5D547'
+                      color: v.status === 'paid' ? '#C8FF00' : '#F5D547',
+                      borderColor: v.status === 'paid' ? '#C8FF00' : '#F5D547'
                     }}>
                       {v.status}
                     </span>
                   </td>
                   <td className="px-8 py-5 text-right">
-                    <button className="font-bold text-xs opacity-0 group-hover:opacity-100 transition-opacity" style={{color: '#E6B325'}}>View Details</button>
+                    <button className="font-bold text-xs opacity-0 group-hover:opacity-100 transition-opacity" style={{color: '#C8FF00'}}>View Details</button>
                   </td>
                 </tr>
               ))}

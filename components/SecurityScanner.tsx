@@ -96,17 +96,17 @@ export const SecurityScanner: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto text-center py-8 animate-fade-in">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold" style={{color: '#F5F5F7'}}>Access Control</h2>
+    <div className="max-w-lg mx-auto text-center py-8 ">
+      <div className="mb-5">
+        <h2 className="text-xl font-bold" style={{color: '#F5F5F7'}}>Access Control</h2>
         <p className="mt-2" style={{color: '#B0B0B8'}}>Scan visitor QR codes for entry verification.</p>
       </div>
 
-      <div className="rounded-[3rem] p-8 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden border-8 ring-1 min-h-[520px]"
+      <div className="rounded-[3rem] p-6 shadow-sm flex flex-col items-center justify-center relative overflow-hidden border-8 ring-1 min-h-[520px]"
         style={{backgroundColor: '#1A1A2E', borderColor: '#2D2B55', boxShadow: '0 25px 50px rgba(26, 26, 46, 0.4)'}}>
 
-        <div className="absolute top-8 left-8 w-12 h-12 border-l-4 border-t-4 rounded-tl-2xl" style={{borderColor: '#4A4860'}}></div>
-        <div className="absolute top-8 right-8 w-12 h-12 border-r-4 border-t-4 rounded-tr-2xl" style={{borderColor: '#4A4860'}}></div>
+        <div className="absolute top-6 left-8 w-12 h-12 border-l-4 border-t-4 rounded-tl-2xl" style={{borderColor: '#4A4860'}}></div>
+        <div className="absolute top-6 right-8 w-12 h-12 border-r-4 border-t-4 rounded-tr-2xl" style={{borderColor: '#4A4860'}}></div>
         <div className="absolute bottom-8 left-8 w-12 h-12 border-l-4 border-b-4 rounded-bl-2xl" style={{borderColor: '#4A4860'}}></div>
         <div className="absolute bottom-8 right-8 w-12 h-12 border-r-4 border-b-4 rounded-br-2xl" style={{borderColor: '#4A4860'}}></div>
 
@@ -117,12 +117,12 @@ export const SecurityScanner: React.FC = () => {
 
         {!scanning && !result && !cameraStarting && (
           <div className="z-20 flex flex-col items-center relative">
-            <div className="w-32 h-32 rounded-3xl flex items-center justify-center mb-8"
+            <div className="w-32 h-32 rounded-2xl flex items-center justify-center mb-5"
               style={{backgroundColor: 'rgba(230, 179, 37, 0.1)', border: '1px solid rgba(230, 179, 37, 0.3)', boxShadow: '0 0 50px rgba(230,179,37,0.2)'}}>
               <Camera className="w-16 h-16 animate-pulse" style={{color: '#E6B325'}} />
             </div>
             <p className="font-medium tracking-wide text-lg mb-2" style={{color: '#B0B0B8'}}>Ready to Scan</p>
-            <p className="text-sm mb-8" style={{color: '#4A4860'}}>Point camera at a booking QR code</p>
+            <p className="text-sm mb-5" style={{color: '#4A4860'}}>Point camera at a booking QR code</p>
             {errorMsg && (
               <p className="text-sm mb-4 px-4 py-2 rounded-xl" style={{color: '#F5D547', backgroundColor: 'rgba(245,213,71,0.1)'}}>{errorMsg}</p>
             )}
@@ -136,7 +136,7 @@ export const SecurityScanner: React.FC = () => {
 
         {cameraStarting && (
           <div className="z-20 flex flex-col items-center">
-            <div className="w-16 h-16 border-4 border-[#E6B325] border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div className="w-16 h-16 border-4 border-[#C8FF00] border-t-transparent rounded-full animate-spin mb-4"></div>
             <p className="font-mono text-sm tracking-[0.2em] animate-pulse font-bold" style={{color: '#E6B325'}}>STARTING CAMERA...</p>
           </div>
         )}

@@ -8,6 +8,7 @@ export const FACILITIES = [
   { id: FacilityType.PARTY_ROOM, name: 'Party Room', icon: 'PartyPopper', quota: 'Unlimited' },
   { id: FacilityType.TENNIS, name: 'Tennis Court', icon: 'Activity', quota: 'Unlimited' },
   { id: FacilityType.SQUASH_COURT, name: 'Squash Court', icon: 'Trophy', quota: 'Unlimited' },
+  { id: FacilityType.BASKETBALL_COURT, name: 'Basketball Court', icon: 'Activity', quota: 'Unlimited' },
   { id: FacilityType.MULTI_PURPOSE_COURT, name: '3-in-1 Sport Court', icon: 'LayoutGrid', quota: 'Unlimited' },
 ];
 

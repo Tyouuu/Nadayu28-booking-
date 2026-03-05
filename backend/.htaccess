@@ -1,0 +1,19 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^api/(.*)$ api/$1 [L]
+</IfModule>
+
+# CORS headers for all responses
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "*"
+  Header always set Access-Control-Allow-Methods "GET, POST, PATCH, DELETE, OPTIONS"
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
+# Handle OPTIONS preflight
+RewriteEngine On
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule .* - [R=200,L]

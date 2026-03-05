@@ -85,41 +85,41 @@ export const SmartAssistant: React.FC = () => {
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
       <div className={`pointer-events-auto transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0 translate-y-10 pointer-events-none'}`}>
         {isOpen && (
-          <div className="bg-white rounded-[2rem] shadow-2xl shadow-indigo-900/20 w-80 sm:w-96 flex flex-col overflow-hidden border border-white/20 mb-4 animate-fade-in-up" style={{ height: '520px' }}>
+          <div className="bg-white rounded-[2rem] shadow-2xl w-80 sm:w-96 flex flex-col overflow-hidden border border-white/20 mb-4 animate-fade-in-up" style={{ height: '520px', boxShadow: '0 20px 40px rgba(45, 43, 85, 0.2)' }}>
             {/* Header */}
-            <div className="bg-slate-900 p-5 flex justify-between items-center text-white relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 animate-gradient-x opacity-90"></div>
+            <div className="p-5 flex justify-between items-center text-white relative overflow-hidden" style={{ backgroundColor: '#3D3B65' }}>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#E6B325] via-[#D4A017] to-[#E6B325] animate-gradient-x opacity-90"></div>
               <div className="flex items-center space-x-3 relative z-10">
-                <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md shadow-inner border border-white/10">
+                <div className="p-2 rounded-xl backdrop-blur-md shadow-inner border border-white/10" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
                    <Bot size={20} className="text-white" />
                 </div>
                 <div>
                   <span className="font-bold text-sm block tracking-wide">Concierge AI</span>
-                  <span className="text-[10px] text-indigo-100 flex items-center gap-1.5 font-medium">
-                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span> Online
+                  <span className="text-[10px] flex items-center gap-1.5 font-medium" style={{ color: '#B0B0B8' }}>
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#E6B325', boxShadow: '0 0 8px rgba(230, 179, 37, 0.8)' }}></span> Online
                   </span>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-2 rounded-full transition-colors relative z-10 text-white/80 hover:text-white">
+              <button onClick={() => setIsOpen(false)} className="p-2 rounded-full transition-colors relative z-10" style={{ color: 'rgba(245, 245, 247, 0.8)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                 <X size={18} />
               </button>
             </div>
   
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-6 bg-slate-50 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-5 space-y-6 scrollbar-hide" style={{ backgroundColor: '#3D3B65' }}>
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-fade-in-up`}>
                   <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} max-w-[90%]`}>
                     {msg.role === 'model' && (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white flex-shrink-0 mr-3 mt-1 shadow-md border border-white">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-white flex-shrink-0 mr-3 mt-1 shadow-md border border-white" style={{ backgroundImage: 'linear-gradient(135deg, #E6B325 0%, #D4A017 100%)' }}>
                         <Sparkles size={14} />
                       </div>
                     )}
                     <div className={`rounded-2xl px-5 py-3.5 text-sm shadow-sm leading-relaxed relative ${
                       msg.role === 'user' 
-                        ? 'bg-indigo-600 text-white rounded-tr-sm shadow-indigo-200' 
-                        : 'bg-white text-slate-700 border border-slate-100 rounded-tl-sm shadow-slate-200'
-                    }`}>
+                        ? 'rounded-tr-sm' 
+                        : 'rounded-tl-sm'
+                    }`} style={msg.role === 'user' ? { backgroundImage: 'linear-gradient(135deg, #E6B325 0%, #D4A017 100%)', color: '#FFFFFF', boxShadow: '0 4px 12px rgba(230, 179, 37, 0.2)' } : { backgroundColor: 'rgba(61, 59, 101, 0.5)', color: '#F5F5F7', borderColor: '#4A4860', border: '1px solid', boxShadow: '0 2px 8px rgba(61, 59, 101, 0.3)' }}>
                       {msg.text}
                     </div>
                   </div>
@@ -137,7 +137,7 @@ export const SmartAssistant: React.FC = () => {
                               href={url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 text-[10px] font-bold bg-white border border-indigo-100 text-indigo-600 px-3 py-1.5 rounded-full hover:bg-indigo-50 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                              className="inline-flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-full transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5" style={{ backgroundColor: '#F5F5F7', borderColor: '#E6B325', color: '#2D2B55', border: '1.5px solid' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5D547'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F5F5F7'}
                             >
                               <MapPin size={10} /> {title}
                             </a>
@@ -149,14 +149,14 @@ export const SmartAssistant: React.FC = () => {
               ))}
               {isLoading && (
                 <div className="flex justify-start items-center ml-1">
-                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white flex-shrink-0 mr-3 shadow-md border border-white">
+                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-white flex-shrink-0 mr-3 shadow-md border border-white" style={{ backgroundImage: 'linear-gradient(135deg, #E6B325 0%, #D4A017 100%)' }}>
                       <Sparkles size={14} />
                     </div>
-                  <div className="bg-white px-5 py-4 rounded-2xl rounded-tl-sm border border-slate-100 shadow-sm">
+                  <div className="px-5 py-4 rounded-2xl rounded-tl-sm shadow-sm" style={{ backgroundColor: 'rgba(61, 59, 101, 0.5)', borderColor: '#4A4860', border: '1px solid' }}>
                     <div className="flex space-x-1.5">
-                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></div>
-                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
-                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#E6B325' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#E6B325', animationDelay: '0.15s' }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#E6B325', animationDelay: '0.3s' }}></div>
                     </div>
                   </div>
                 </div>
@@ -165,7 +165,7 @@ export const SmartAssistant: React.FC = () => {
             </div>
   
             {/* Input */}
-            <div className="p-4 bg-white border-t border-slate-100">
+            <div className="p-4" style={{ backgroundColor: '#2D2B55', borderTop: '1px solid #4A4860' }}>
               <div className="relative flex items-center">
                 <input
                   type="text"
@@ -173,13 +173,11 @@ export const SmartAssistant: React.FC = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask anything..."
-                  className="flex-1 bg-slate-50 border border-slate-200 rounded-full pl-6 pr-14 py-3.5 text-sm focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 placeholder:text-slate-400 font-medium shadow-inner"
-                />
+                  className="flex-1 border rounded-full pl-6 pr-14 py-3.5 text-sm focus:outline-none focus:ring-2 transition-all font-medium shadow-inner" style={{ backgroundColor: 'rgba(61, 59, 101, 0.3)', borderColor: '#4A4860', color: '#F5F5F7' }} onFocus={(e) => { e.currentTarget.style.backgroundColor = 'rgba(61, 59, 101, 0.6)'; e.currentTarget.style.borderColor = '#E6B325'; e.currentTarget.style.boxShadow = '0 0 0 4px rgba(230, 179, 37, 0.1)'; }} onBlur={(e) => { e.currentTarget.style.backgroundColor = 'rgba(61, 59, 101, 0.3)'; e.currentTarget.style.borderColor = '#4A4860'; e.currentTarget.style.boxShadow = 'inset 0 1px 2px rgba(0, 0, 0, 0.1)'; }} />
                 <button 
                   onClick={handleSend}
                   disabled={isLoading || !input.trim()}
-                  className="absolute right-1.5 p-2.5 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95"
-                >
+                  className="absolute right-1.5 p-2.5 text-white rounded-full transition-all hover:scale-105 active:scale-95" style={{ backgroundImage: 'linear-gradient(135deg, #E6B325 0%, #D4A017 100%)', boxShadow: '0 8px 16px rgba(230, 179, 37, 0.2)', opacity: isLoading || !input.trim() ? 0.5 : 1 }} onMouseEnter={(e) => e.currentTarget.style.backgroundImage = 'linear-gradient(135deg, #F5D547 0%, #E6B325 100%)'} onMouseLeave={(e) => e.currentTarget.style.backgroundImage = 'linear-gradient(135deg, #E6B325 0%, #D4A017 100%)'}>
                   <Send size={16} className={input.trim() ? "translate-x-0.5 translate-y-0.5" : ""} />
                 </button>
               </div>
@@ -192,11 +190,10 @@ export const SmartAssistant: React.FC = () => {
         {!isOpen && (
           <button 
             onClick={() => setIsOpen(true)}
-            className="group relative bg-slate-900 hover:bg-indigo-600 text-white p-4 rounded-full shadow-2xl shadow-indigo-500/30 transition-all duration-300 hover:scale-110 flex items-center justify-center ring-4 ring-white"
-          >
+            className="group relative text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 flex items-center justify-center ring-4 ring-white" style={{ backgroundColor: '#2D2B55', boxShadow: '0 16px 32px rgba(230, 179, 37, 0.2)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E6B325'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2D2B55'}>
             <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
             <MessageCircle size={28} />
-            <span className="absolute right-full mr-6 bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 whitespace-nowrap pointer-events-none">
+            <span className="absolute right-full mr-6 px-4 py-2 rounded-xl text-xs font-bold shadow-xl opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 whitespace-nowrap pointer-events-none" style={{ backgroundColor: '#3D3B65', color: '#F5F5F7' }}>
               Need Help?
             </span>
           </button>

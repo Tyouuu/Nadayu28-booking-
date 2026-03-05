@@ -1,0 +1,37 @@
+import { createClient } from '@supabase/supabase-js';
+
+// Replace with your actual Supabase project URL and anon key
+// from https://supabase.com/dashboard -> Settings -> API
+const SUPABASE_URL  = import.meta.env.VITE_SUPABASE_URL  as string;
+const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── Auth helpers ─────────────────────────────────────────────────────
+
+export async function signIn(email: string, password: string) {
+  return supabase.auth.signInWithPassword({ email, password });
+}
+
+export async function signOut() {
+  return supabase.auth.signOut();
+}
+
+export async function getSession() {
+  return supabase.auth.getSession();
+}
+
+// ── Real-time bookings subscription ──────────────────────────────────
+export function subscribeToBookings(
+  userId: string,
+  onChange: (payload: unknown) => void
+) {
+  return supabase
+    .channel(`bookings:${userId}`)
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'bookings', filter: `user_id=eq.${userId}` },
+      onChange
+    )
+    .subscribe();
+}

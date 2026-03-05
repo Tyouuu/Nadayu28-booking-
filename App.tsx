@@ -10,6 +10,7 @@ import { SecurityScanner } from './components/SecurityScanner';
 import { SmartAssistant } from './components/SmartAssistant';
 import { Profile } from './components/Profile';
 import { Login } from './components/Login';
+import { CommunityBoard } from './components/CommunityBoard';
 import { Bell } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -47,15 +48,7 @@ const App: React.FC = () => {
       case 'account':
         return <Profile />;
       case 'community':
-        return (
-          <div className="text-center py-20 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border-none animate-fade-in-up">
-            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-               <Bell size={40} className="text-slate-300" />
-            </div>
-            <h2 className="text-2xl font-bold text-slate-800">Community Board</h2>
-            <p className="text-slate-500 max-w-md mx-auto mt-2">All community announcements and notices will appear here in a chronological feed.</p>
-          </div>
-        );
+        return <CommunityBoard />;
       default:
         return <Dashboard userRole={currentUserRole} setCurrentView={setCurrentView} />;
     }

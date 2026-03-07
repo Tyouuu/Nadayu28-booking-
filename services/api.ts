@@ -1,5 +1,5 @@
 // PHP backend base URL — update for production
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost/nadayu-api';
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost/Nadayu28/Nadayu28-booking-/backend';
 
 async function request<T>(
   path: string,
@@ -38,25 +38,25 @@ export interface ApiBooking extends BookingPayload {
 
 export const bookingsApi = {
   getByUser: (userId: string) =>
-    request<ApiBooking[]>(`api/bookings?user_id=${userId}`),
+    request<ApiBooking[]>(`api/bookings.php?user_id=${userId}`),
 
   getById: (id: string) =>
-    request<ApiBooking[]>(`api/bookings?id=${id}`),
+    request<ApiBooking[]>(`api/bookings.php?id=${id}`),
 
   create: (booking: BookingPayload) =>
-    request<ApiBooking[]>('api/bookings', {
+    request<ApiBooking[]>('api/bookings.php', {
       method: 'POST',
       body: JSON.stringify(booking),
     }),
 
   updateStatus: (id: string, status: string) =>
-    request<ApiBooking[]>('api/bookings', {
+    request<ApiBooking[]>('api/bookings.php', {
       method: 'PATCH',
       body: JSON.stringify({ id, status }),
     }),
 
   validate: (id: string) =>
-    request<{ valid: boolean; booking?: ApiBooking }>('api/validate', {
+    request<{ valid: boolean; booking?: ApiBooking }>('api/validate.php', {
       method: 'POST',
       body: JSON.stringify({ id }),
     }),

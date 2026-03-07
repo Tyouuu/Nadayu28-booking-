@@ -135,33 +135,33 @@ export const Reporting: React.FC = () => {
     const selectedCat = issueCategories.find(c => c.id === selectedCategory);
     
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#111111]">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-white">
         <div className="absolute top-0 left-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
 
-        <div className="max-w-md w-full bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#111111] p-6 rounded-2xl shadow-sm border border-[#333]/50 text-center ">
+        <div className="max-w-md w-full bg-white p-6 rounded-2xl shadow-lg border border-gray-100 text-center">
           <div className="w-20 h-20 bg-gradient-to-br from-[#C8FF00] to-[#b0e000] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#C8FF00]/30 animate-bounce">
             <CheckCircle2 size={40} className="text-white" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-3">Report Submitted</h3>
-          <p className="text-gray-400 mb-2 leading-relaxed">
+          <h3 className="text-xl font-bold text-gray-900 mb-3">Report Submitted</h3>
+          <p className="text-gray-500 mb-2 leading-relaxed">
             Your issue has been received and assigned to our maintenance team.
           </p>
           
-          <div className="bg-[#1a1a1a]/30 border border-[#333]/50 rounded-2xl p-4 mb-6 mt-6 space-y-2">
+          <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-6 mt-6 space-y-2">
             <div className="font-mono text-lg font-bold text-[#C8FF00]">
               Ticket: {referenceId}
             </div>
             <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
               <Zap size={16} className="text-[#C8FF00]" />
-              Expected response: <span className="font-bold text-white">{responseTime}</span>
+              Expected response: <span className="font-bold text-gray-900">{responseTime}</span>
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 mb-5">Save your ticket number for tracking status</p>
+          <p className="text-xs text-gray-500 mb-5">Save your ticket number for tracking status</p>
           <button 
             onClick={resetForm}
-            className="w-full bg-gradient-to-r from-[#C8FF00] to-[#b0e000] hover:from-[#d4ff33] hover:to-[#C8FF00] text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg shadow-[#C8FF00]/30 flex items-center justify-center gap-2"
+            className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
           >
             <Plus size={20} /> Submit Another Report
           </button>
@@ -171,7 +171,7 @@ export const Reporting: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#111111] p-4">
+    <div className="min-h-screen bg-white p-4">
       <div className="absolute top-0 left-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
 
@@ -180,14 +180,15 @@ export const Reporting: React.FC = () => {
         {/* STEP 1: CATEGORY SELECTION - OPTIMIZED */}
         {step === 'category' && (
           <div className="">
-            <div className="mb-5">
-              <h2 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#C8FF00] to-[#b0e000] rounded-2xl flex items-center justify-center shadow-lg shadow-[#C8FF00]/30">
-                  <AlertTriangle size={24} className="text-white" />
-                </div>
-                Report an Issue
-              </h2>
-              <p className="text-gray-400 text-lg">Select the type of issue you're experiencing</p>
+            {/* Dark Header Banner */}
+            <div className="bg-[#111111] rounded-3xl p-8 mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-4xl font-bold text-white mb-2">Report an Issue</h2>
+                <p className="text-gray-400 text-base">Select the type of issue you're experiencing</p>
+              </div>
+              <div className="w-16 h-16 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
+                <AlertTriangle size={32} className="text-[#111111]" />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -195,15 +196,17 @@ export const Reporting: React.FC = () => {
                 <button
                   key={category.id}
                   onClick={() => handleCategorySelect(category.id)}
-                  className={`bg-gradient-to-br ${category.color} border ${category.borderColor} hover:shadow-lg hover:shadow-[#C8FF00]/20 rounded-2xl p-6 text-left transition-all duration-300 group cursor-pointer backdrop-blur-sm`}
+                  className="bg-white border border-gray-100 hover:border-[#111111] hover:shadow-md rounded-2xl p-6 text-left transition-all duration-300 group cursor-pointer shadow-sm"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="text-4xl">{category.icon}</div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-white group-hover:text-[#C8FF00] transition-colors mb-1">{category.label}</h3>
-                      <p className="text-sm text-gray-400 group-hover:text-gray-400/80 transition-colors">{category.description}</p>
+                    <div className="w-12 h-12 bg-[#111111] rounded-xl flex items-center justify-center flex-shrink-0 text-2xl group-hover:bg-[#C8FF00] transition-colors">
+                      {category.icon}
                     </div>
-                    <ChevronRight size={20} className="text-gray-400 group-hover:text-[#C8FF00] transition-colors mt-1 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1">{category.label}</h3>
+                      <p className="text-sm text-gray-500">{category.description}</p>
+                    </div>
+                    <ChevronRight size={20} className="text-gray-300 group-hover:text-[#111111] transition-colors mt-1 flex-shrink-0" />
                   </div>
                 </button>
               ))}
@@ -217,28 +220,35 @@ export const Reporting: React.FC = () => {
             <div className="mb-5">
               <button
                 onClick={() => setStep('category')}
-                className="text-gray-400 hover:text-white transition-colors mb-4 flex items-center gap-2 font-semibold"
+                className="text-gray-500 hover:text-gray-900 transition-colors mb-4 flex items-center gap-2 font-semibold"
               >
                 ← Back to Categories
               </button>
-              <h2 className="text-4xl font-bold text-white mb-2">Select Specific Issue</h2>
-              <p className="text-gray-400">Choose the specific subcategory that matches your issue</p>
+              <div className="bg-[#111111] rounded-3xl p-8 flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-2">Select Specific Issue</h2>
+                  <p className="text-gray-400">Choose the specific subcategory that matches your issue</p>
+                </div>
+                <div className="w-14 h-14 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <ChevronRight size={28} className="text-[#111111]" />
+                </div>
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#111111] border border-[#333]/50 rounded-2xl p-6 space-y-3 mb-5">
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-3 mb-5 shadow-sm">
               {issueCategories
                 .find(c => c.id === selectedCategory)
                 ?.subcategories.map(sub => (
                   <button
                     key={sub.id}
                     onClick={() => handleSubcategorySelect(sub.id)}
-                    className="w-full flex items-center gap-4 p-5 rounded-2xl transition-all border bg-[#1a1a1a]/20 border-[#333]/50 hover:border-[#C8FF00]/50 hover:bg-[#C8FF00]/10 text-white hover:text-[#C8FF00] group"
+                    className="w-full flex items-center gap-4 p-5 rounded-2xl transition-all border bg-white border-gray-100 hover:border-[#111111] hover:bg-[#111111] hover:text-white text-gray-800 group"
                   >
                     <div className="text-3xl flex-shrink-0">{sub.emoji}</div>
                     <div className="flex-1 text-left">
-                      <p className="font-bold group-hover:text-[#C8FF00] transition-colors">{sub.label}</p>
+                      <p className="font-bold group-hover:text-white transition-colors">{sub.label}</p>
                     </div>
-                    <ChevronRight size={20} className="text-gray-400 group-hover:text-[#C8FF00] transition-colors flex-shrink-0" />
+                    <ChevronRight size={20} className="text-gray-300 group-hover:text-[#C8FF00] transition-colors flex-shrink-0" />
                   </button>
                 ))}
             </div>
@@ -251,21 +261,28 @@ export const Reporting: React.FC = () => {
             <div className="mb-5">
               <button
                 onClick={() => setStep('details')}
-                className="text-gray-400 hover:text-white transition-colors mb-4 flex items-center gap-2 font-semibold"
+                className="text-gray-500 hover:text-gray-900 transition-colors mb-4 flex items-center gap-2 font-semibold"
               >
                 ← Back to Issue Type
               </button>
-              <h2 className="text-4xl font-bold text-white mb-2">Provide Details</h2>
-              <p className="text-gray-400">Help us understand the issue better. Photos required for faster resolution.</p>
+              <div className="bg-[#111111] rounded-3xl p-8 flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-2">Provide Details</h2>
+                  <p className="text-gray-400">Help us understand the issue better. Photos required for faster resolution.</p>
+                </div>
+                <div className="w-14 h-14 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <Camera size={28} className="text-[#111111]" />
+                </div>
+              </div>
             </div>
 
-            <div className="bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#111111] border border-[#333]/50 rounded-2xl p-6 space-y-5">
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5 shadow-sm">
               
               {/* Character Count Description */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Description</label>
-                  <span className={`text-xs font-bold ${description.length > 200 ? 'text-[#C8FF00]' : 'text-gray-400'}`}>
+                  <span className={`text-xs font-bold ${description.length > 200 ? 'text-red-500' : 'text-gray-400'}`}>
                     {description.length}/200 characters
                   </span>
                 </div>
@@ -274,7 +291,7 @@ export const Reporting: React.FC = () => {
                   onChange={(e) => setDescription(e.target.value.slice(0, 200))}
                   rows={4}
                   placeholder="Describe the issue in detail. Include any observations that might help our team..."
-                  className="w-full px-6 py-4 bg-[#1a1a1a]/30 border border-[#333]/50 rounded-2xl text-white placeholder-gray-400/60 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors resize-none"
+                  className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors resize-none"
                 />
               </div>
 
@@ -282,11 +299,11 @@ export const Reporting: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Add Photos</label>
-                  <div className="px-2 py-1 bg-[#C8FF00]/20 border border-[#C8FF00]/50 rounded text-xs font-bold text-[#C8FF00] flex items-center gap-1">
+                  <div className="px-2 py-1 bg-gray-100 border border-gray-200 rounded text-xs font-bold text-gray-600 flex items-center gap-1">
                     <AlertCircle size={12} /> Required
                   </div>
                 </div>
-                <div className="relative border-2 border-dashed border-[#C8FF00]/40 hover:border-[#C8FF00]/70 rounded-2xl p-6 text-center transition-all cursor-pointer bg-[#C8FF00]/5 hover:bg-[#C8FF00]/10 group">
+                <div className="relative border-2 border-dashed border-gray-200 hover:border-[#111111] rounded-2xl p-6 text-center transition-all cursor-pointer bg-gray-50 hover:bg-gray-100 group">
                   <input
                     type="file"
                     multiple
@@ -295,15 +312,15 @@ export const Reporting: React.FC = () => {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer rounded-2xl"
                   />
                   <div className="relative pointer-events-none">
-                    <div className="w-16 h-16 bg-gradient-to-br from-[#C8FF00]/30 to-[#b0e000]/20 group-hover:from-[#C8FF00]/40 group-hover:to-[#b0e000]/30 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors">
-                      <Camera size={32} className="text-[#C8FF00] group-hover:text-[#C8FF00]" />
+                    <div className="w-16 h-16 bg-[#111111] group-hover:bg-[#C8FF00] rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors">
+                      <Camera size={32} className="text-white group-hover:text-[#111111]" />
                     </div>
-                    <p className="text-white font-bold mb-1">Tap to upload photos or videos</p>
-                    <p className="text-xs text-gray-400">JPG, PNG, MP4 up to 10MB each • Min 1 photo required</p>
+                    <p className="text-gray-900 font-bold mb-1">Tap to upload photos or videos</p>
+                    <p className="text-xs text-gray-500">JPG, PNG, MP4 up to 10MB each • Min 1 photo required</p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 flex items-center gap-2">
-                  <AlertTriangle size={14} className="text-[#C8FF00]" />
+                <p className="text-xs text-gray-500 flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-gray-400" />
                   Clear photos help us respond faster and more accurately
                 </p>
               </div>
@@ -318,11 +335,11 @@ export const Reporting: React.FC = () => {
                         <img
                           src={image}
                           alt={`Upload ${idx + 1}`}
-                          className="w-full h-28 object-cover rounded-2xl border border-[#C8FF00]/30 hover:border-[#C8FF00]/70 transition-all shadow-lg shadow-[#C8FF00]/10"
+                          className="w-full h-28 object-cover rounded-2xl border border-gray-200 hover:border-[#111111] transition-all shadow-sm"
                         />
                         <button
                           onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
-                          className="absolute top-2 right-2 w-7 h-7 bg-[#C8FF00]/90 hover:bg-[#b0e000] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          className="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                         >
                           <X size={16} className="text-white" />
                         </button>
@@ -338,8 +355,8 @@ export const Reporting: React.FC = () => {
                 disabled={uploadedImages.length === 0 || !description.trim()}
                 className={`w-full font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-2 ${
                   uploadedImages.length > 0 && description.trim()
-                    ? 'bg-gradient-to-r from-[#C8FF00] to-[#b0e000] hover:from-[#d4ff33] hover:to-[#C8FF00] text-white shadow-lg shadow-[#C8FF00]/30 cursor-pointer'
-                    : 'bg-[#1a1a1a]/50 text-gray-400 cursor-not-allowed'
+                    ? 'bg-[#111111] hover:bg-[#222222] text-white shadow-sm cursor-pointer'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
               >
                 <CheckCircle2 size={20} /> 

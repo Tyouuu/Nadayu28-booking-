@@ -3,7 +3,7 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^api/(.*)$ api/$1 [L]
+  RewriteRule ^api/([a-zA-Z0-9_-]+)(\?.*)?$ api/$1.php [QSA,L]
 </IfModule>
 
 # CORS headers for all responses

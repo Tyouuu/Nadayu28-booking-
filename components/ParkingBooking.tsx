@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Calendar, Car, ChevronLeft, Download, Share2, Moon, Sun, CheckCircle2 } from 'lucide-react';
 import { Booking, FacilityType } from '../types';
 import { bookingsApi } from '../services/api';
+import { CustomDatePicker, CustomTimePicker } from './CustomPickers';
 
 const generateParkingSpots = (startNum: number, count: number) => {
   return Array.from({ length: count }, (_, i) => ({
@@ -84,25 +85,30 @@ export const ParkingBooking: React.FC = () => {
 
   return (
     <div className="pb-12 space-y-5">
-      <div className="flex items-end justify-between px-4 md:px-0">
-        <div>
-          <h2 className="text-4xl font-bold tracking-tight text-gray-900">Parkzone</h2>
-          <p className="mt-2 text-sm text-gray-400">Double-line parking: P01-P36 (Visitor) and P37-P72 (Overnight)</p>
+      <div className="bg-[#111111] rounded-2xl p-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
+            <Car size={28} className="text-[#111111]" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-white">Parkzone</h2>
+            <p className="mt-1 text-sm text-gray-400">Double-line parking: P01-P36 (Visitor) and P37-P72 (Overnight)</p>
+          </div>
         </div>
-        <div className="hidden md:flex items-center gap-5 bg-white border border-gray-100 px-6 py-3 rounded-2xl shadow-sm">
+        <div className="hidden md:flex items-center gap-5 bg-white/10 px-6 py-3 rounded-2xl">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-gray-100 border-2 border-gray-300"></div>
-            <span className="text-sm font-semibold text-gray-600">Available</span>
+            <div className="w-3 h-3 rounded-full bg-white/20 border-2 border-white/30"></div>
+            <span className="text-sm font-semibold text-gray-400">Available</span>
           </div>
-          <div className="w-px h-5 bg-gray-100"></div>
+          <div className="w-px h-5 bg-white/10"></div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-gray-200"></div>
-            <span className="text-sm font-semibold text-gray-600">Occupied</span>
+            <div className="w-3 h-3 rounded-full bg-white/10"></div>
+            <span className="text-sm font-semibold text-gray-400">Occupied</span>
           </div>
-          <div className="w-px h-5 bg-gray-100"></div>
+          <div className="w-px h-5 bg-white/10"></div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-[#C8FF00]"></div>
-            <span className="text-sm font-semibold text-gray-600">Selected</span>
+            <span className="text-sm font-semibold text-[#C8FF00]">Selected</span>
           </div>
         </div>
       </div>
@@ -150,7 +156,7 @@ export const ParkingBooking: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-6 gap-2 mb-5">
+                <div className="grid grid-cols-6 gap-2 mb-5" style={{ gridAutoRows: '1fr' }}>
                   {SLOTS_DATA[zone].map((slot) => {
                     const isOccupied = slot.status === 'occupied';
                     const isSelected = selectedSlot === slot.id;
@@ -158,7 +164,8 @@ export const ParkingBooking: React.FC = () => {
                       <button key={slot.id}
                         disabled={isOccupied || activeZone !== zone}
                         onClick={(e) => { e.stopPropagation(); if (activeZone === zone) setSelectedSlot(slot.id); }}
-                        className={"aspect-square rounded-lg transition-all duration-200 font-bold text-xs " + (isOccupied ? "cursor-not-allowed" : "cursor-pointer") + " " + (activeZone !== zone ? "opacity-40" : "opacity-100")}>
+                        className={"rounded-lg transition-all duration-200 font-bold text-xs " + (isOccupied ? "cursor-not-allowed" : "cursor-pointer") + " " + (activeZone !== zone ? "opacity-40" : "opacity-100")}
+                        style={{ aspectRatio: '1 / 1' }}>
                         <div className={"w-full h-full rounded-lg border-2 flex items-center justify-center transition-all duration-200 " + (isSelected ? "bg-[#C8FF00] border-[#C8FF00] text-[#111111] font-bold" : isOccupied ? (isDark ? "bg-white/5 border-white/10 text-gray-600" : "bg-gray-100 border-gray-100 text-gray-300") : (isDark ? "bg-white/10 border-white/20 text-gray-300 hover:border-[#C8FF00] hover:bg-[#C8FF00]/15" : "bg-white border-gray-200 text-gray-700 hover:border-[#C8FF00] hover:bg-[#C8FF00]/10"))}>
                           {slot.number}
                         </div>
@@ -182,30 +189,31 @@ export const ParkingBooking: React.FC = () => {
           </div>
 
           <div className="w-full lg:w-96 flex flex-col gap-5">
-            <div className={"rounded-2xl p-6 relative overflow-hidden transition-all duration-500 " + (isOvernight ? "bg-[#111111]" : "bg-[#C8FF00]")}>
-              <div className="relative z-10">
+            <div className={"rounded-2xl overflow-hidden relative transition-all duration-500 " + (isOvernight ? "bg-[#111111]" : "bg-white border border-gray-100 shadow-sm")}>
+              {!isOvernight && <div className="h-1.5 bg-[#C8FF00] w-full"></div>}
+              <div className="p-6 relative z-10">
                 <div className="flex items-start justify-between mb-5">
                   <div>
-                    <p className={"font-semibold text-xs uppercase tracking-widest mb-1 " + (isOvernight ? "text-gray-500" : "text-black/50")}>Parking Type</p>
-                    <h3 className={"text-xl font-bold " + (isOvernight ? "text-white" : "text-[#111111]")}>{activeZone}</h3>
+                    <p className={"font-semibold text-xs uppercase tracking-widest mb-1 " + (isOvernight ? "text-gray-500" : "text-gray-400")}>Parking Type</p>
+                    <h3 className={"text-xl font-bold " + (isOvernight ? "text-white" : "text-gray-900")}>{activeZone}</h3>
                   </div>
-                  <div className={"p-3 rounded-xl " + (isOvernight ? "bg-white/10" : "bg-black/10")}>
-                    {isOvernight ? <Moon size={24} className="text-[#C8FF00]" /> : <Sun size={24} className="text-[#111111]" />}
+                  <div className={"p-3 rounded-xl " + (isOvernight ? "bg-white/10" : "bg-gray-100")}>
+                    {isOvernight ? <Moon size={24} className="text-[#C8FF00]" /> : <Sun size={24} className="text-gray-700" />}
                   </div>
                 </div>
-                <div className={"space-y-3 pt-5 border-t " + (isOvernight ? "border-white/10" : "border-black/10")}>
+                <div className={"space-y-3 pt-5 border-t " + (isOvernight ? "border-white/10" : "border-gray-100")}>
                   <div className="flex justify-between items-center">
-                    <span className={"font-medium text-sm " + (isOvernight ? "text-gray-400" : "text-black/60")}>Duration</span>
-                    <span className={"font-semibold " + (isOvernight ? "text-white" : "text-[#111111]")}>{isOvernight ? '48h' : 'Up to 6h'}</span>
+                    <span className={"font-medium text-sm " + (isOvernight ? "text-gray-400" : "text-gray-500")}>Duration</span>
+                    <span className={"font-semibold " + (isOvernight ? "text-white" : "text-gray-900")}>{isOvernight ? '48h' : 'Up to 6h'}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className={"font-medium text-sm " + (isOvernight ? "text-gray-400" : "text-black/60")}>Spot</span>
-                    <span className={"text-xl font-bold " + (isOvernight ? "text-white" : "text-[#111111]")}>{selectedSlot ? selectedSlot.replace('P', 'P-') : '-'}</span>
+                    <span className={"text-xl font-bold " + (isOvernight ? "text-white" : "text-gray-900")}>{selectedSlot ? selectedSlot.replace('P', 'P-') : '-'}</span>
                   </div>
                   {selectedSlot && (
-                    <div className={"flex items-center gap-2 mt-4 pt-4 border-t " + (isOvernight ? "border-white/10" : "border-black/10")}>
-                      <div className={"w-2 h-2 rounded-full " + (isOvernight ? "bg-[#C8FF00]" : "bg-[#111111]")}></div>
-                      <span className={"text-sm font-semibold " + (isOvernight ? "text-white" : "text-[#111111]")}>Ready to book</span>
+                    <div className={"flex items-center gap-2 mt-4 pt-4 border-t " + (isOvernight ? "border-white/10" : "border-gray-100")}>
+                      <div className={"w-2 h-2 rounded-full " + (isOvernight ? "bg-[#C8FF00]" : "bg-[#C8FF00]")}></div>
+                      <span className={"text-sm font-semibold " + (isOvernight ? "text-white" : "text-gray-900")}>Ready to book</span>
                     </div>
                   )}
                 </div>
@@ -222,16 +230,12 @@ export const ParkingBooking: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</label>
-                  <input type="date" required
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none font-medium text-gray-900 transition-all"
-                    value={date} onChange={(e) => setDate(e.target.value)} />
+                  <CustomDatePicker required value={date} onChange={setDate} />
                 </div>
                 <div className="flex gap-3">
                   <div className="space-y-2 flex-1">
                     <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Arrival Time</label>
-                    <input type="time" required
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none font-medium text-gray-900 transition-all"
-                      value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                    <CustomTimePicker required value={startTime} onChange={setStartTime} />
                   </div>
                   {!isOvernight && (
                     <div className="space-y-2 flex-1">
@@ -262,7 +266,7 @@ export const ParkingBooking: React.FC = () => {
                 )}
                 <button type="submit"
                   disabled={!selectedSlot || isLoading || !date || !startTime || !plateNumber}
-                  className="w-full py-4 rounded-xl font-bold text-[#111111] transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm bg-[#C8FF00] hover:brightness-95">
+                  className="w-full py-4 rounded-xl font-bold text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm bg-[#111111] hover:bg-[#222222]">
                   <Calendar size={16} />
                   {isLoading ? 'Processing...' : 'Confirm Booking'}
                 </button>
@@ -280,10 +284,10 @@ export const ParkingBooking: React.FC = () => {
             <ChevronLeft size={16} /> Back to Selection
           </button>
           <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
-            <div className={"p-6 text-center " + (isOvernight ? "bg-[#111111]" : "bg-[#C8FF00]")}>
-              <h3 className={"font-bold text-2xl tracking-widest mb-1 " + (isOvernight ? "text-white" : "text-[#111111]")}>PARKING PASS</h3>
-              <p className={"text-xs uppercase tracking-widest " + (isOvernight ? "text-gray-500" : "text-black/50")}>Nadayu28 Residences</p>
-              <div className={"inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase " + (isOvernight ? "bg-white/10 text-white" : "bg-[#111111] text-[#C8FF00]")}>
+            <div className={"p-6 text-center bg-[#111111]"}>
+              <h3 className={"font-bold text-2xl tracking-widest mb-1 text-white"}>PARKING PASS</h3>
+              <p className={"text-xs uppercase tracking-widest text-gray-500"}>Nadayu28 Residences</p>
+              <div className={"inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase bg-[#C8FF00] text-[#111111]"}>
                 {isOvernight ? <Moon size={12} /> : <Sun size={12} />}
                 {isOvernight ? 'Overnight (48h)' : 'Visitor (6h)'}
               </div>

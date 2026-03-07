@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { CheckCircle, XCircle, Camera, CameraOff } from 'lucide-react';
+import { CheckCircle, XCircle, Camera, CameraOff, Shield, ScanLine } from 'lucide-react';
 import { bookingsApi } from '../services/api';
 
 interface ScannedBooking {
@@ -96,114 +96,136 @@ export const SecurityScanner: React.FC = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto text-center py-8 ">
-      <div className="mb-5">
-        <h2 className="text-xl font-bold" style={{color: '#F5F5F7'}}>Access Control</h2>
-        <p className="mt-2" style={{color: '#B0B0B8'}}>Scan visitor QR codes for entry verification.</p>
+    <div className="pb-12">
+      <div className="flex items-end justify-between mb-8">
+        <div>
+          <p className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Security</p>
+          <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Access Control</h1>
+          <p className="text-gray-400 text-sm mt-1">Scan visitor QR codes for entry verification.</p>
+        </div>
+        <div className="hidden md:flex items-center gap-2 bg-[#111111] text-white px-4 py-2 rounded-full text-xs font-medium">
+          <Shield size={12} className="text-[#C8FF00]" />
+          Scanner Active
+        </div>
       </div>
 
-      <div className="rounded-[3rem] p-6 shadow-sm flex flex-col items-center justify-center relative overflow-hidden border-8 ring-1 min-h-[520px]"
-        style={{backgroundColor: '#1A1A2E', borderColor: '#2D2B55', boxShadow: '0 25px 50px rgba(26, 26, 46, 0.4)'}}>
+      <div className="max-w-md mx-auto">
+        {/* Scanner Card */}
+        <div className="bg-[#111111] rounded-2xl p-8 flex flex-col items-center justify-center relative overflow-hidden min-h-[420px]">
+          {/* Corner markers */}
+          <div className="absolute top-5 left-5 w-10 h-10 border-l-[3px] border-t-[3px] border-[#C8FF00]/30 rounded-tl-xl"></div>
+          <div className="absolute top-5 right-5 w-10 h-10 border-r-[3px] border-t-[3px] border-[#C8FF00]/30 rounded-tr-xl"></div>
+          <div className="absolute bottom-5 left-5 w-10 h-10 border-l-[3px] border-b-[3px] border-[#C8FF00]/30 rounded-bl-xl"></div>
+          <div className="absolute bottom-5 right-5 w-10 h-10 border-r-[3px] border-b-[3px] border-[#C8FF00]/30 rounded-br-xl"></div>
 
-        <div className="absolute top-6 left-8 w-12 h-12 border-l-4 border-t-4 rounded-tl-2xl" style={{borderColor: '#4A4860'}}></div>
-        <div className="absolute top-6 right-8 w-12 h-12 border-r-4 border-t-4 rounded-tr-2xl" style={{borderColor: '#4A4860'}}></div>
-        <div className="absolute bottom-8 left-8 w-12 h-12 border-l-4 border-b-4 rounded-bl-2xl" style={{borderColor: '#4A4860'}}></div>
-        <div className="absolute bottom-8 right-8 w-12 h-12 border-r-4 border-b-4 rounded-br-2xl" style={{borderColor: '#4A4860'}}></div>
+          {/* Camera viewfinder */}
+          <div id={SCANNER_ID}
+            className={`w-full rounded-xl overflow-hidden ${scanning ? 'block' : 'hidden'}`}
+            style={{ maxWidth: '280px' }} />
 
-        {/* Camera viewfinder - always mounted so html5-qrcode can attach */}
-        <div id={SCANNER_ID}
-          className={`w-full rounded-2xl overflow-hidden ${scanning ? 'block' : 'hidden'}`}
-          style={{maxWidth: '300px'}} />
-
-        {!scanning && !result && !cameraStarting && (
-          <div className="z-20 flex flex-col items-center relative">
-            <div className="w-32 h-32 rounded-2xl flex items-center justify-center mb-5"
-              style={{backgroundColor: 'rgba(230, 179, 37, 0.1)', border: '1px solid rgba(230, 179, 37, 0.3)', boxShadow: '0 0 50px rgba(230,179,37,0.2)'}}>
-              <Camera className="w-16 h-16 animate-pulse" style={{color: '#E6B325'}} />
+          {/* Ready state */}
+          {!scanning && !result && !cameraStarting && (
+            <div className="z-20 flex flex-col items-center">
+              <div className="w-24 h-24 bg-white/[0.06] rounded-2xl flex items-center justify-center mb-6">
+                <Camera className="w-12 h-12 text-gray-500" />
+              </div>
+              <p className="font-semibold text-white text-lg mb-1">Ready to Scan</p>
+              <p className="text-sm text-gray-500 mb-6">Point camera at a booking QR code</p>
+              {errorMsg && (
+                <p className="text-sm mb-4 px-4 py-2 rounded-xl bg-red-500/10 text-red-400">{errorMsg}</p>
+              )}
+              <button onClick={startScanner}
+                className="bg-[#C8FF00] text-[#111111] px-8 py-4 rounded-xl font-bold text-sm transition-all hover:brightness-95 active:scale-95 flex items-center gap-2">
+                <Camera size={18} /> Open Camera
+              </button>
             </div>
-            <p className="font-medium tracking-wide text-lg mb-2" style={{color: '#B0B0B8'}}>Ready to Scan</p>
-            <p className="text-sm mb-5" style={{color: '#4A4860'}}>Point camera at a booking QR code</p>
-            {errorMsg && (
-              <p className="text-sm mb-4 px-4 py-2 rounded-xl" style={{color: '#F5D547', backgroundColor: 'rgba(245,213,71,0.1)'}}>{errorMsg}</p>
-            )}
-            <button onClick={startScanner}
-              className="text-white px-8 py-4 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 shadow-lg flex items-center gap-2"
-              style={{backgroundImage: 'linear-gradient(to right, #E6B325, #D4A017)', boxShadow: '0 0 30px rgba(230,179,37,0.3)'}}>
-              <Camera size={18} /> Open Camera
-            </button>
-          </div>
-        )}
+          )}
 
-        {cameraStarting && (
-          <div className="z-20 flex flex-col items-center">
-            <div className="w-16 h-16 border-4 border-[#C8FF00] border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="font-mono text-sm tracking-[0.2em] animate-pulse font-bold" style={{color: '#E6B325'}}>STARTING CAMERA...</p>
-          </div>
-        )}
-
-        {scanning && (
-          <div className="z-20 flex flex-col items-center w-full mt-4">
-            <p className="font-mono text-sm tracking-[0.2em] animate-pulse font-bold mb-4" style={{color: '#E6B325'}}>SCANNING...</p>
-            <button onClick={handleReset}
-              className="flex items-center gap-2 font-medium text-sm px-4 py-2 rounded-xl"
-              style={{color: '#B0B0B8', backgroundColor: 'rgba(74,72,96,0.3)'}}>
-              <CameraOff size={16} /> Cancel
-            </button>
-          </div>
-        )}
-
-        {result === 'success' && scannedData && (
-          <div className="z-20 text-center w-full flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
-              style={{backgroundColor: '#E6B325', boxShadow: '0 0 60px rgba(230,179,37,0.4)'}}>
-              <CheckCircle className="w-12 h-12" strokeWidth={3} style={{color: '#2D2B55'}} />
+          {/* Loading state */}
+          {cameraStarting && (
+            <div className="z-20 flex flex-col items-center">
+              <div className="w-14 h-14 border-[3px] border-[#C8FF00] border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-sm text-gray-400 font-medium animate-pulse">Starting camera...</p>
             </div>
-            <h3 className="text-2xl font-bold tracking-wide mb-6" style={{color: '#F5F5F7'}}>ACCESS GRANTED</h3>
-            <div className="p-5 rounded-xl w-72 text-left space-y-3"
-              style={{backgroundColor: 'rgba(45,43,85,0.8)', border: '1px solid rgba(74,72,96,0.5)'}}>
-              <div className="flex justify-between">
-                <span className="text-xs font-bold uppercase" style={{color: '#E6B325'}}>Vehicle</span>
-                <span className="font-mono font-bold" style={{color: '#F5F5F7'}}>{scannedData.plate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs font-bold uppercase" style={{color: '#E6B325'}}>Spot</span>
-                <span className="font-bold" style={{color: '#F5F5F7'}}>{scannedData.slot}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs font-bold uppercase" style={{color: '#E6B325'}}>Unit</span>
-                <span className="font-bold" style={{color: '#F5F5F7'}}>{scannedData.unit}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs font-bold uppercase" style={{color: '#E6B325'}}>Date & Time</span>
-                <span className="font-bold" style={{color: '#F5F5F7'}}>{scannedData.date} {scannedData.time}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-xs font-bold uppercase" style={{color: '#E6B325'}}>Duration</span>
-                <span className="font-bold" style={{color: '#F5F5F7'}}>{scannedData.duration}h</span>
-              </div>
-            </div>
-            <button onClick={handleReset}
-              className="mt-6 font-medium text-sm rounded-xl px-4 py-2" style={{color: '#B0B0B8'}}>
-              Scan Next
-            </button>
-          </div>
-        )}
+          )}
 
-        {result === 'fail' && (
-          <div className="z-20 text-center w-full flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
-              style={{backgroundColor: 'rgba(230,179,37,0.15)', border: '2px solid #E6B325'}}>
-              <XCircle className="w-12 h-12" strokeWidth={3} style={{color: '#E6B325'}} />
+          {/* Scanning state */}
+          {scanning && (
+            <div className="z-20 flex flex-col items-center w-full mt-4">
+              <p className="text-sm text-[#C8FF00] font-semibold mb-4 animate-pulse flex items-center gap-2">
+                <ScanLine size={16} /> Scanning...
+              </p>
+              <button onClick={handleReset}
+                className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors px-4 py-2 rounded-xl bg-white/5">
+                <CameraOff size={14} /> Cancel
+              </button>
             </div>
-            <h3 className="text-2xl font-bold tracking-wide" style={{color: '#F5F5F7'}}>ACCESS DENIED</h3>
-            <p className="text-lg mt-2 mb-6" style={{color: '#E6B325'}}>{errorMsg || 'Invalid or Expired Code'}</p>
-            <button onClick={handleReset}
-              className="px-6 py-3 rounded-xl font-bold text-sm border"
-              style={{backgroundColor: 'rgba(74,72,96,0.3)', borderColor: 'rgba(74,72,96,0.5)', color: '#F5F5F7'}}>
-              Try Again
-            </button>
+          )}
+
+          {/* Success state */}
+          {result === 'success' && scannedData && (
+            <div className="z-20 text-center w-full flex flex-col items-center">
+              <div className="w-20 h-20 bg-[#C8FF00] rounded-full flex items-center justify-center mb-5">
+                <CheckCircle className="w-10 h-10 text-[#111111]" strokeWidth={3} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Access Granted</h3>
+              <p className="text-sm text-gray-500 mb-5">Booking verified successfully</p>
+              <div className="bg-white/[0.06] rounded-xl p-5 w-full max-w-[280px] text-left space-y-3">
+                {[
+                  { label: 'Vehicle', value: scannedData.plate },
+                  { label: 'Spot', value: scannedData.slot },
+                  { label: 'Unit', value: scannedData.unit },
+                  { label: 'Date & Time', value: `${scannedData.date} ${scannedData.time}` },
+                  { label: 'Duration', value: `${scannedData.duration}h` },
+                ].map(item => (
+                  <div key={item.label} className="flex justify-between items-center">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">{item.label}</span>
+                    <span className="text-sm font-bold text-white">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+              <button onClick={handleReset}
+                className="mt-5 text-sm font-semibold text-[#C8FF00] hover:underline">
+                Scan Next
+              </button>
+            </div>
+          )}
+
+          {/* Fail state */}
+          {result === 'fail' && (
+            <div className="z-20 text-center w-full flex flex-col items-center">
+              <div className="w-20 h-20 bg-red-500/15 border-2 border-red-500/30 rounded-full flex items-center justify-center mb-5">
+                <XCircle className="w-10 h-10 text-red-400" strokeWidth={3} />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-1">Access Denied</h3>
+              <p className="text-sm text-red-400 mb-6">{errorMsg || 'Invalid or expired code'}</p>
+              <button onClick={handleReset}
+                className="bg-white/10 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/15 transition-colors">
+                Try Again
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Info card below scanner */}
+        <div className="mt-4 bg-white border border-gray-100 rounded-2xl p-5">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+              <Shield size={15} className="text-gray-400" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-900">How it works</h3>
           </div>
-        )}
+          <div className="space-y-2">
+            {['Visitor shows QR code from their booking confirmation',
+              'Scanner verifies the booking against the database',
+              'Green = valid entry, Red = denied access'].map((step, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="flex-shrink-0 w-5 h-5 bg-[#111111] text-[#C8FF00] rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5">{i + 1}</span>
+                <p className="text-xs text-gray-500 leading-relaxed">{step}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

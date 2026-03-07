@@ -39,8 +39,8 @@
                 '100%': { backgroundPosition: '1000px 0' },
               },
               glow: {
-                '0%, 100%': { boxShadow: '0 0 20px rgba(79, 70, 229, 0.3)' },
-                '50%': { boxShadow: '0 0 30px rgba(79, 70, 229, 0.5)' },
+                '0%, 100%': { boxShadow: '0 0 20px rgba(17, 17, 17, 0.15)' },
+                '50%': { boxShadow: '0 0 30px rgba(17, 17, 17, 0.25)' },
               },
             }
           }
@@ -54,7 +54,7 @@
       }
 
       body {
-        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        background: #ffffff;
         font-family: 'Inter', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -72,29 +72,28 @@
       }
       
       ::-webkit-scrollbar-track {
-        background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
+        background: #f3f4f6;
         border-radius: 10px;
       }
       
       ::-webkit-scrollbar-thumb {
-        background: linear-gradient(to bottom, #818cf8, #6366f1);
+        background: #999;
         border-radius: 10px;
         transition: all 0.3s ease;
       }
-      
+
       ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(to bottom, #6366f1, #4f46e5);
-        box-shadow: 0 0 10px rgba(79, 70, 229, 0.3);
+        background: #666;
       }
 
       /* Custom focus styles for better accessibility */
       *:focus-visible {
-        outline: 2px solid #4f46e5;
+        outline: 2px solid #111111;
         outline-offset: 2px;
       }
 
       button:focus-visible {
-        outline: 2px solid #4f46e5;
+        outline: 2px solid #111111;
         outline-offset: 0;
       }
 
@@ -111,13 +110,22 @@
 
       /* Custom selection color */
       ::selection {
-        background-color: #4f46e5;
+        background-color: #111111;
         color: white;
       }
 
       ::-moz-selection {
-        background-color: #4f46e5;
+        background-color: #111111;
         color: white;
+      }
+
+      /* Date picker styling */
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0);
+        cursor: pointer;
+      }
+      input[type="date"] {
+        color-scheme: light;
       }
 
       /* Backdrop blur support */

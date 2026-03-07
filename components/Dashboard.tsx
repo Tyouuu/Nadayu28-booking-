@@ -1,6 +1,7 @@
-import React from "react";
-import { UserRole } from "../types";
-import { MOCK_ANNOUNCEMENTS, MOCK_BOOKINGS } from "../constants";
+import React, { useEffect, useState } from "react";
+import { UserRole, Booking, Announcement } from "../types";
+import { MOCK_ANNOUNCEMENTS as FALLBACK_ANNOUNCEMENTS, MOCK_BOOKINGS as FALLBACK_BOOKINGS } from "../constants";
+import { fetchBookings, fetchAnnouncements } from "../services/dataService";
 import { Bell, Clock, ChevronRight, Activity, ArrowUpRight, Car, Dumbbell, MessageSquare, AlertTriangle, Zap } from "lucide-react";
 
 interface DashboardProps {
@@ -9,8 +10,13 @@ interface DashboardProps {
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }) => {
-  const activeBookings = MOCK_BOOKINGS.filter(b => b.status === "active");
-  const recentAnnouncements = MOCK_ANNOUNCEMENTS.slice(0, 3);
+  const [activeBookings, setActiveBookings] = useState<Booking[]>(FALLBACK_BOOKINGS.filter(b => b.status === "active"));
+  const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>(FALLBACK_ANNOUNCEMENTS.slice(0, 3));
+
+  useEffect(() => {
+    fetchBookings().then(data => setActiveBookings(data.filter(b => b.status === "active"))).catch(() => {});
+    fetchAnnouncements().then(data => setRecentAnnouncements(data.slice(0, 3))).catch(() => {});
+  }, []);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -62,7 +68,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
               <span className="text-gray-400 text-xs font-semibold">Announcements</span>
               <ArrowUpRight size={14} className="text-gray-600" />
             </div>
-            <p className="text-white text-[1.6rem] font-bold leading-none mb-1">{MOCK_ANNOUNCEMENTS.length}</p>
+            <p className="text-white text-[1.6rem] font-bold leading-none mb-1">{recentAnnouncements.length}</p>
             <p className="text-gray-500 text-xs mt-2">Community updates</p>
           </div>
         </div>

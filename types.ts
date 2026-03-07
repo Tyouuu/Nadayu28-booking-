@@ -1,5 +1,6 @@
 export enum UserRole {
   RESIDENT = 'RESIDENT',
+  TENANT = 'TENANT',
   SECURITY = 'SECURITY',
   MANAGEMENT = 'MANAGEMENT',
 }
@@ -59,4 +60,27 @@ export interface Report {
   category: string;
   description: string;
   status: 'Received' | 'In Progress' | 'Resolved';
+  residentUnit: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  unit: string;
+  role: UserRole;
+  moveInDate: string;
+}
+
+export interface CommunityPost {
+  id: string;
+  authorUnit: string;
+  authorName: string;
+  title: string;
+  content: string;
+  date: string;
+  category: 'general' | 'event' | 'marketplace' | 'lost-found';
+  likes: number;
+  comments: number;
 }

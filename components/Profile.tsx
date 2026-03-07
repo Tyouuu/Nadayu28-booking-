@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Car, Plus, Trash2, History, AlertTriangle, FileText, Settings, Camera, Save, Lock, Users, Shield, Eye, EyeOff, Edit2, LogOut, Home, CheckCircle2, Calendar } from 'lucide-react';
-import { MOCK_BOOKINGS, MOCK_VIOLATIONS, MOCK_REPORTS, MOCK_VEHICLES } from '../constants';
-import { Vehicle } from '../types';
+import { MOCK_BOOKINGS, MOCK_VEHICLES } from '../constants';
+import { fetchBookings, fetchVehicles } from '../services/dataService';
+import { Vehicle, Booking } from '../types';
 
 interface Tenant {
   id: string;
@@ -18,6 +19,11 @@ export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'details' | 'vehicles' | 'security' | 'history' | 'tenants'>('details');
   const [accountRole, setAccountRole] = useState<AccountRole>('owner'); // Change to test different roles
   const [vehicles, setVehicles] = useState<Vehicle[]>(MOCK_VEHICLES);
+  const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
+
+  useEffect(() => {
+    fetchBookings().then(setBookings).catch(() => {});
+  }, []);
   const [newVehicle, setNewVehicle] = useState({ plate: '', model: '' });
   const [isAddingVehicle, setIsAddingVehicle] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -83,10 +89,10 @@ export const Profile: React.FC = () => {
             
             {/* Profile Avatar */}
             <div className="relative mx-auto w-fit">
-              <div className="w-24 h-24 rounded-full bg-[#C8FF00] flex items-center justify-center shadow-lg  border-2 border-[#C8FF00]/30">
+              <div className="w-24 h-24 rounded-full bg-[#f3f4f6] flex items-center justify-center shadow-lg border-2 border-gray-200">
                 <User size={48} className="text-gray-900" />
               </div>
-              <button className="absolute bottom-0 right-0 p-2.5 bg-[#C8FF00] rounded-full text-gray-900 hover:bg-[#F5D547] transition-colors shadow-lg border-2 border-[#2D2B55]">
+              <button className="absolute bottom-0 right-0 p-2.5 bg-[#111111] rounded-full text-white hover:bg-[#333333] transition-colors shadow-lg border-2 border-white">
                 <Camera size={16} />
               </button>
             </div>
@@ -220,25 +226,26 @@ export const Profile: React.FC = () => {
         {/* RIGHT CONTENT AREA */}
         <div className="lg:col-span-3 space-y-6">
         {activeTab === 'details' && (
-          <div className="bg-white rounded-2xl p-6 border border-gray-100  space-y-5">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <User size={24} className={accountRole === 'owner' ? 'text-[#111111]' : 'text-[#111111]'} />
+          <div className="bg-white rounded-2xl border border-gray-100 space-y-5 overflow-hidden">
+            <div className="bg-[#111111] p-6 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <div className="w-9 h-9 bg-[#C8FF00] rounded-xl flex items-center justify-center">
+                  <User size={18} className="text-[#111111]" />
+                </div>
                 {accountRole === 'owner' ? 'Account Details' : 'My Profile'}
               </h3>
-              <button 
+              <button
                 onClick={() => setIsEditingProfile(!isEditingProfile)}
                 className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold transition-all duration-300 ${
-                  isEditingProfile 
-                    ? 'bg-[#111111] text-white' 
-                    : accountRole === 'owner'
-                    ? 'bg-[#111111] text-white hover:bg-[#C8FF00]/30'
-                    : 'bg-[#111111] text-white hover:bg-[#C8FF00]/30'
+                  isEditingProfile
+                    ? 'bg-[#C8FF00] text-[#111111]'
+                    : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
                 <Edit2 size={16} /> {isEditingProfile ? 'Editing...' : 'Edit'}
               </button>
             </div>
+            <div className="px-6 pb-6">
 
             <div className="border-t border-gray-100 pt-8">
               <form className="space-y-6">
@@ -306,9 +313,9 @@ export const Profile: React.FC = () => {
                 {accountRole === 'owner' && (
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Account Type</label>
-                    <div className="flex items-center gap-3 px-5 py-4 bg-[#C8FF00]/10 border border-[#C8FF00]/30 rounded-2xl">
+                    <div className="flex items-center gap-3 px-5 py-4 bg-gray-100 border border-gray-200 rounded-2xl">
                       <Shield className="text-[#111111]" size={20} />
-                      <span className="text-[#C8FF00] font-bold">Property Owner</span>
+                      <span className="text-gray-800 font-bold">Property Owner</span>
                     </div>
                   </div>
                 )}
@@ -324,7 +331,7 @@ export const Profile: React.FC = () => {
                     </button>
                     <button 
                       type="submit"
-                      className="px-6 py-3 rounded-xl font-bold text-gray-900 bg-[#C8FF00] hover:brightness-95 transition-all shadow-lg  flex items-center gap-2"
+                      className="px-6 py-3 rounded-xl font-bold text-white bg-[#111111] hover:bg-[#222222] transition-all shadow-lg flex items-center gap-2"
                     >
                       <CheckCircle2 size={18} /> Save Changes
                     </button>
@@ -332,26 +339,26 @@ export const Profile: React.FC = () => {
                 )}
               </form>
             </div>
+            </div>
           </div>
         )}
 
         {activeTab === 'vehicles' && (
           <div className="space-y-6 ">
             {/* Add Vehicle Header */}
-            <div className={`rounded-2xl p-6 shadow-sm border overflow-hidden relative ${
-              accountRole === 'owner'
-                ? 'bg-[#C8FF00] border-[#C8FF00]/30'
-                : 'bg-[#C8FF00] border-[#C8FF00]/30'
-            }`}>
+            <div className="rounded-2xl p-6 shadow-sm border overflow-hidden relative bg-[#111111] border-[#111111]">
               <div className="relative z-10">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <Car size={24} /> {accountRole === 'owner' ? 'Manage Vehicles' : 'My Vehicles'}
+                <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                  <div className="w-9 h-9 bg-[#C8FF00] rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Car size={18} className="text-[#111111]" />
+                  </div>
+                  {accountRole === 'owner' ? 'Manage Vehicles' : 'My Vehicles'}
                 </h3>
-                <p className="text-gray-900/90 text-sm">Register and manage your vehicles for auto-entry access</p>
+                <p className="text-gray-400 text-sm">Register and manage your vehicles for auto-entry access</p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsAddingVehicle(!isAddingVehicle)}
-                className="absolute top-6 right-8 bg-black/10 text-gray-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-[#111111]/30 transition-colors backdrop-blur-sm border border-[#1A1A2E]/20 flex items-center gap-2"
+                className="absolute top-6 right-8 bg-white/10 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2"
               >
                 <Plus size={18} /> Add Vehicle
               </button>
@@ -401,11 +408,7 @@ export const Profile: React.FC = () => {
                     </button>
                     <button 
                       type="submit"
-                      className={`px-6 py-3 rounded-xl font-bold text-gray-900 transition-all shadow-lg flex items-center gap-2 ${
-                        accountRole === 'owner'
-                          ? 'bg-[#C8FF00] hover:brightness-95 '
-                          : 'bg-[#C8FF00] hover:brightness-95 '
-                      }`}
+                      className="px-6 py-3 rounded-xl font-bold text-white bg-[#111111] hover:bg-[#222222] transition-all shadow-lg flex items-center gap-2"
                     >
                       <CheckCircle2 size={18} /> Register
                     </button>
@@ -456,16 +459,19 @@ export const Profile: React.FC = () => {
         {activeTab === 'tenants' && accountRole === 'owner' && (
           <div className="space-y-6 ">
             {/* Add Tenant Header */}
-            <div className="bg-[#C8FF00] rounded-2xl p-6 shadow-sm border border-[#C8FF00]/30 overflow-hidden relative">
+            <div className="bg-[#111111] rounded-2xl p-6 shadow-sm border border-[#111111] overflow-hidden relative">
               <div className="relative z-10">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                  <Users size={24} /> Manage Tenants
+                <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                  <div className="w-9 h-9 bg-[#C8FF00] rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Users size={18} className="text-[#111111]" />
+                  </div>
+                  Manage Tenants
                 </h3>
-                <p className="text-gray-900/90 text-sm">Add, edit, and manage tenant accounts for your properties</p>
+                <p className="text-gray-400 text-sm">Add, edit, and manage tenant accounts for your properties</p>
               </div>
               <button 
                 onClick={() => setIsAddingTenant(!isAddingTenant)}
-                className="absolute top-6 right-8 bg-black/10 text-gray-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-[#111111]/30 transition-colors backdrop-blur-sm border border-[#1A1A2E]/20 flex items-center gap-2"
+                className="absolute top-6 right-8 bg-white/10 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2"
               >
                 <Plus size={18} /> Add Tenant
               </button>
@@ -530,7 +536,7 @@ export const Profile: React.FC = () => {
                     </button>
                     <button 
                       type="submit"
-                      className="px-6 py-3 rounded-xl font-bold text-gray-900 bg-[#C8FF00] hover:brightness-95 transition-all shadow-lg  flex items-center gap-2"
+                      className="px-6 py-3 rounded-xl font-bold text-white bg-[#111111] hover:bg-[#222222] transition-all shadow-lg flex items-center gap-2"
                     >
                       <CheckCircle2 size={18} /> Add Tenant
                     </button>
@@ -543,10 +549,10 @@ export const Profile: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {tenants.length > 0 ? (
                 tenants.map((tenant) => (
-                  <div key={tenant.id} className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hover:border-[#C8FF00]/30 transition-all group hover:shadow-[#E6B325]/20">
+                  <div key={tenant.id} className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 hover:border-gray-200 transition-all group">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#C8FF00] flex items-center justify-center text-gray-900 font-bold text-lg">
+                        <div className="w-12 h-12 rounded-full bg-[#111111] flex items-center justify-center text-white font-bold text-lg">
                           {tenant.name.charAt(0)}
                         </div>
                         <div className="flex-1">
@@ -575,7 +581,7 @@ export const Profile: React.FC = () => {
                     <div className="flex gap-2 pt-4 border-t border-gray-100">
                       <button 
                         onClick={() => setSelectedTenant(tenant)}
-                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-[#111111] hover:text-[#C8FF00] hover:bg-[#C8FF00]/10 transition-all border border-[#C8FF00]/30 hover:border-[#C8FF00]/50 flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-gray-600 hover:text-[#111111] hover:bg-gray-50 transition-all border border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2"
                       >
                         <Edit2 size={16} /> Edit
                       </button>
@@ -600,11 +606,14 @@ export const Profile: React.FC = () => {
         )}
 
         {activeTab === 'security' && (
-          <div className="bg-white rounded-2xl p-6 border border-gray-100  space-y-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Lock className={accountRole === 'owner' ? 'text-[#111111]' : 'text-[#111111]'} size={24} />
-              <h3 className="text-lg font-semibold text-gray-900">Security & Privacy</h3>
+          <div className="bg-white rounded-2xl border border-gray-100 space-y-5 overflow-hidden">
+            <div className="bg-[#111111] p-6 flex items-center gap-3">
+              <div className="w-9 h-9 bg-[#C8FF00] rounded-xl flex items-center justify-center flex-shrink-0">
+                <Lock size={18} className="text-[#111111]" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">Security & Privacy</h3>
             </div>
+            <div className="px-6 pb-6">
 
             <div className="border-t border-gray-100 pt-8 space-y-5">
               {/* Password Section */}
@@ -647,11 +656,7 @@ export const Profile: React.FC = () => {
                       className="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none outline-none font-medium transition-colors"
                     />
                   </div>
-                  <button className={`w-full px-6 py-3 rounded-xl font-bold text-gray-900 transition-all shadow-lg flex items-center justify-center gap-2 ${
-                    accountRole === 'owner'
-                      ? 'bg-[#C8FF00] hover:brightness-95 '
-                      : 'bg-[#C8FF00] hover:brightness-95 '
-                  }`}>
+                  <button className="w-full px-6 py-3 rounded-xl font-bold text-white bg-[#111111] hover:bg-[#222222] transition-all shadow-lg flex items-center justify-center gap-2">
                     <CheckCircle2 size={18} /> Update Password
                   </button>
                 </div>
@@ -691,20 +696,24 @@ export const Profile: React.FC = () => {
                 </div>
               </div>
             </div>
+            </div>
           </div>
         )}
 
         {activeTab === 'history' && (
-          <div className="bg-white rounded-2xl p-6 border border-gray-100  space-y-6">
-            <div className="flex items-center gap-2">
-              <History className={accountRole === 'owner' ? 'text-[#111111]' : 'text-[#111111]'} size={24} />
-              <h3 className="text-lg font-semibold text-gray-900">{accountRole === 'owner' ? 'Activity Log' : 'My Bookings'}</h3>
+          <div className="bg-white rounded-2xl border border-gray-100 space-y-6 overflow-hidden">
+            <div className="bg-[#111111] p-6 flex items-center gap-3">
+              <div className="w-9 h-9 bg-[#C8FF00] rounded-xl flex items-center justify-center flex-shrink-0">
+                <History size={18} className="text-[#111111]" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">{accountRole === 'owner' ? 'Activity Log' : 'My Bookings'}</h3>
             </div>
+            <div className="px-6 pb-6">
 
             <div className="border-t border-gray-100 pt-8">
               <div className="space-y-6">
-                {MOCK_BOOKINGS.length > 0 ? (
-                  MOCK_BOOKINGS.map((booking, index) => (
+                {bookings.length > 0 ? (
+                  bookings.map((booking, index) => (
                     <div key={booking.id} className="flex gap-4">
                       <div className="relative">
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center text-gray-900 font-bold border-2 ${
@@ -714,7 +723,7 @@ export const Profile: React.FC = () => {
                         }`}>
                           {index + 1}
                         </div>
-                        {index < MOCK_BOOKINGS.length - 1 && (
+                        {index < bookings.length - 1 && (
                           <div className="absolute top-14 left-6 w-0.5 h-6 bg-gray-200"></div>
                         )}
                       </div>
@@ -740,6 +749,7 @@ export const Profile: React.FC = () => {
                   </div>
                 )}
               </div>
+            </div>
             </div>
           </div>
         )}

@@ -9,6 +9,8 @@ import { Reporting } from './components/Reporting';
 import { SecurityScanner } from './components/SecurityScanner';
 import { SmartAssistant } from './components/SmartAssistant';
 import { Profile } from './components/Profile';
+import { SecurityProfile } from './components/SecurityProfile';
+import { ManagementProfile } from './components/ManagementProfile';
 import { Login } from './components/Login';
 import { CommunityBoard } from './components/CommunityBoard';
 import { Bell } from 'lucide-react';
@@ -23,6 +25,7 @@ const App: React.FC = () => {
     setCurrentUserRole(role);
     setIsLoggedIn(true);
     setCurrentView(role === UserRole.MANAGEMENT ? 'management' : role === UserRole.SECURITY ? 'security' : 'dashboard');
+    // TENANT uses same views as RESIDENT
   };
 
   const handleLogout = () => {
@@ -47,6 +50,10 @@ const App: React.FC = () => {
         return <SecurityScanner />;
       case 'account':
         return <Profile />;
+      case 'sec-profile':
+        return <SecurityProfile setCurrentView={setCurrentView} />;
+      case 'mgmt-profile':
+        return <ManagementProfile setCurrentView={setCurrentView} />;
       case 'community':
         return <CommunityBoard />;
       default:

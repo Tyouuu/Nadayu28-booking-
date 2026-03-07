@@ -58,7 +58,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (error) throw error;
 
       // Read profile role from Supabase
-      let appRole = UserRole.RESIDENT;
+      let appRole = role === 'TENANT' ? UserRole.TENANT : UserRole.RESIDENT;
       if (data.user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -67,6 +67,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
           .single();
         if (profile?.role === 'SECURITY')        appRole = UserRole.SECURITY;
         else if (profile?.role === 'MANAGEMENT') appRole = UserRole.MANAGEMENT;
+        else if (profile?.role === 'TENANT')     appRole = UserRole.TENANT;
       }
       onLogin(appRole);
     } catch (err: unknown) {
@@ -278,9 +279,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         key={r}
                         onClick={() => setRole(r)}
                         className={`px-4 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap ${
-                          role === r 
-                            ? 'bg-[#C8FF00] text-[#111111]' 
-                            : 'bg-gray-100 text-gray-400 hover:text-white border border-gray-200/50'
+                          role === r
+                            ? 'bg-[#111111] text-white'
+                            : 'bg-gray-100 text-gray-500 hover:text-gray-900 border border-gray-200'
                         }`}
                       >
                         {r.charAt(0) + r.slice(1).toLowerCase()}

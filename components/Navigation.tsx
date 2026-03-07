@@ -20,14 +20,16 @@ export const Navigation: React.FC<NavigationProps> = ({
   isMobileOpen, setIsMobileOpen, onLogout
 }) => {
   const navItems = [
-    { id: 'dashboard',  label: 'Dashboard',      icon: Home,          roles: [UserRole.RESIDENT, UserRole.SECURITY, UserRole.MANAGEMENT] },
-    { id: 'parking',    label: 'Visitor Parking', icon: Car,           roles: [UserRole.RESIDENT] },
-    { id: 'amenities',  label: 'Amenities',       icon: Dumbbell,      roles: [UserRole.RESIDENT] },
-    { id: 'community',  label: 'Community Board', icon: MessageSquare, roles: [UserRole.RESIDENT] },
-    { id: 'report',     label: 'Report Issue',    icon: AlertTriangle, roles: [UserRole.RESIDENT, UserRole.SECURITY] },
+    { id: 'dashboard',  label: 'Dashboard',      icon: Home,          roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY, UserRole.MANAGEMENT] },
+    { id: 'parking',    label: 'Visitor Parking', icon: Car,           roles: [UserRole.RESIDENT, UserRole.TENANT] },
+    { id: 'amenities',  label: 'Amenities',       icon: Dumbbell,      roles: [UserRole.RESIDENT, UserRole.TENANT] },
+    { id: 'community',  label: 'Community Board', icon: MessageSquare, roles: [UserRole.RESIDENT, UserRole.TENANT] },
+    { id: 'report',     label: 'Report Issue',    icon: AlertTriangle, roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY] },
     { id: 'security',   label: 'Security Scan',   icon: Shield,        roles: [UserRole.SECURITY] },
     { id: 'management', label: 'Admin Panel',     icon: BarChart2,     roles: [UserRole.MANAGEMENT] },
-    { id: 'account',    label: 'My Account',      icon: User,          roles: [UserRole.RESIDENT] },
+    { id: 'account',    label: 'My Account',      icon: User,          roles: [UserRole.RESIDENT, UserRole.TENANT] },
+    { id: 'sec-profile', label: 'Profile',        icon: User,          roles: [UserRole.SECURITY] },
+    { id: 'mgmt-profile', label: 'Profile',       icon: User,          roles: [UserRole.MANAGEMENT] },
   ];
 
   const filtered = navItems.filter(i => i.roles.includes(currentUserRole));
@@ -79,6 +81,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             onChange={e => { setCurrentUserRole(e.target.value as UserRole); setCurrentView('dashboard'); }}
           >
             <option value={UserRole.RESIDENT}>Resident</option>
+            <option value={UserRole.TENANT}>Tenant</option>
             <option value={UserRole.SECURITY}>Security</option>
             <option value={UserRole.MANAGEMENT}>Management</option>
           </select>

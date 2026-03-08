@@ -13,6 +13,28 @@ export async function signIn(email: string, password: string) {
   return supabase.auth.signInWithPassword({ email, password });
 }
 
+export async function signUp(
+  email: string,
+  password: string,
+  metadata: { full_name: string; role: string; unit?: string; phone?: string }
+) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: metadata },
+  });
+  if (error) return { data, error };
+
+  // Update profile with unit + phone (trigger only sets full_name + role)
+  if (data.user && (metadata.unit || metadata.phone)) {
+    await supabase
+      .from('profiles')
+      .update({ unit: metadata.unit, phone: metadata.phone })
+      .eq('id', data.user.id);
+  }
+  return { data, error };
+}
+
 export async function signOut() {
   return supabase.auth.signOut();
 }

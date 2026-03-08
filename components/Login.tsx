@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserRole } from '../types';
 import { Eye, EyeOff, Upload, ArrowRight, ShieldCheck, User, Key, Building, Mail, ChevronLeft, CheckCircle2, Badge, Phone, Smartphone, Fingerprint, Zap, Users, Clock } from 'lucide-react';
-import { signIn, supabase } from '../services/supabase';
+import { signIn, signUp, supabase } from '../services/supabase';
 
 interface LoginProps {
   onLogin: (role: UserRole) => void;
@@ -42,6 +42,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [loginPassword, setLoginPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
 
+  // Register form state
+  const [regFirstName, setRegFirstName] = useState('');
+  const [regLastName, setRegLastName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regPhone, setRegPhone] = useState('');
+  const [regUnit, setRegUnit] = useState('');
+  const [regSuccess, setRegSuccess] = useState(false);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
@@ -72,6 +81,33 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       onLogin(appRole);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setAuthError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    if (!regEmail || !regPassword || !regFirstName) {
+      setAuthError('Please fill in all required fields.');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const fullName = `${regFirstName} ${regLastName}`.trim();
+      const mappedRole = role === 'OWNER' ? 'RESIDENT' : role;
+      const { error } = await signUp(regEmail, regPassword, {
+        full_name: fullName,
+        role: mappedRole,
+        unit: regUnit || undefined,
+        phone: regPhone || undefined,
+      });
+      if (error) throw error;
+      setRegSuccess(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Registration failed. Please try again.';
       setAuthError(msg);
     } finally {
       setIsLoading(false);
@@ -522,55 +558,96 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 )}
 
                 {/* REGISTER FORM */}
-                {mode === 'signup' && (
-                  <form onSubmit={handleLogin} className="space-y-5 animate-fade-in max-h-[600px] overflow-y-auto pr-4">
+                {mode === 'signup' && !regSuccess && (
+                  <form onSubmit={handleRegister} className="space-y-5 animate-fade-in max-h-[600px] overflow-y-auto pr-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">First Name</label>
-                        <input 
-                          type="text" 
-                          placeholder="e.g. John" 
+                        <label className="text-xs font-bold text-gray-400 uppercase">First Name *</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Ahmad"
+                          value={regFirstName}
+                          onChange={e => setRegFirstName(e.target.value)}
+                          required
                           className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-gray-400 uppercase">Last Name</label>
-                        <input 
-                          type="text" 
-                          placeholder="e.g. Smith" 
+                        <input
+                          type="text"
+                          placeholder="e.g. Razali"
+                          value={regLastName}
+                          onChange={e => setRegLastName(e.target.value)}
                           className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Email Address</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase">Email Address *</label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-4 text-gray-400" size={18} />
-                        <input 
-                          type="email" 
-                          placeholder="you@example.com" 
+                        <input
+                          type="email"
+                          placeholder="you@example.com"
+                          value={regEmail}
+                          onChange={e => setRegEmail(e.target.value)}
+                          required
                           className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Password</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase">Password *</label>
                       <div className="relative">
                         <Key className="absolute left-4 top-4 text-gray-400" size={18} />
-                        <input 
+                        <input
                           type={showPassword ? "text" : "password"}
-                          placeholder="Enter your password"
+                          placeholder="Min 6 characters"
+                          value={regPassword}
+                          onChange={e => setRegPassword(e.target.value)}
+                          required
+                          minLength={6}
                           className="w-full pl-12 pr-12 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
-                        <button 
+                        <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-4 top-4 text-gray-400 hover:text-[#4a6600] transition-colors"
                         >
                           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-400 uppercase">Unit Number</label>
+                        <div className="relative">
+                          <Building className="absolute left-4 top-4 text-gray-400" size={18} />
+                          <input
+                            type="text"
+                            placeholder="e.g. A-08-03"
+                            value={regUnit}
+                            onChange={e => setRegUnit(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-400 uppercase">Phone</label>
+                        <div className="relative">
+                          <Phone className="absolute left-4 top-4 text-gray-400" size={18} />
+                          <input
+                            type="tel"
+                            placeholder="012-3456789"
+                            value={regPhone}
+                            onChange={e => setRegPhone(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -729,6 +806,23 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                       </button>
                     </div>
                   </form>
+                )}
+
+                {/* REGISTRATION SUCCESS */}
+                {mode === 'signup' && regSuccess && (
+                  <div className="text-center animate-fade-in py-8">
+                    <div className="w-16 h-16 bg-[#C8FF00]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle2 className="text-[#4a6600]" size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">Account Created!</h3>
+                    <p className="text-gray-400 text-sm mb-6">Please check your email to confirm your account, then log in.</p>
+                    <button
+                      onClick={() => { setMode('signin'); setRegSuccess(false); setLoginEmail(regEmail); }}
+                      className="bg-[#C8FF00] hover:brightness-95 text-[#111111] px-6 py-3 rounded-xl font-bold transition-all"
+                    >
+                      Go to Login
+                    </button>
+                  </div>
                 )}
               </>
             )}

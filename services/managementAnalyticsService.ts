@@ -280,14 +280,14 @@ class ManagementAnalyticsService {
     if (!permSet) return false;
 
     // Flatten permissions for checking
-    const allPermissions = Object.entries(permSet.permissions)
+    const allPermissions: string[] = Object.entries(permSet.permissions)
       .flatMap(([section, perms]) =>
         Object.entries(perms as Record<string, boolean>)
-          .map(([perm, allowed]) => `${section}.${perm}` as const)
-          .filter(p => (perms as Record<string, boolean>)[p.split('.')[1]])
+          .filter(([, allowed]) => allowed)
+          .map(([perm]) => `${section}.${perm}`)
       );
 
-    return allPermissions.includes(permission as any);
+    return allPermissions.includes(permission);
   }
 
   // Helper methods

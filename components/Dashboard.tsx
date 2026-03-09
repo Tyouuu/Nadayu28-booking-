@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { UserRole, Booking, Announcement } from "../types";
-import { MOCK_ANNOUNCEMENTS as FALLBACK_ANNOUNCEMENTS, MOCK_BOOKINGS as FALLBACK_BOOKINGS } from "../constants";
+import { Booking, Announcement } from "../types";
+import { MOCK_ANNOUNCEMENTS, MOCK_BOOKINGS, USE_MOCK_DATA } from "../constants";
 import { fetchBookings, fetchAnnouncements } from "../services/dataService";
 import { Bell, Clock, ChevronRight, Activity, ArrowUpRight, Car, Dumbbell, MessageSquare, AlertTriangle, Zap } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigation } from "../contexts/NavigationContext";
+import { useI18n } from "../contexts/I18nContext";
 
-interface DashboardProps {
-  userRole: UserRole;
-  setCurrentView: (view: string) => void;
-}
-
-export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }) => {
-  const [activeBookings, setActiveBookings] = useState<Booking[]>(FALLBACK_BOOKINGS.filter(b => b.status === "active"));
-  const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>(FALLBACK_ANNOUNCEMENTS.slice(0, 3));
+export const Dashboard: React.FC = () => {
+  const { userProfile } = useAuth();
+  const { setCurrentView } = useNavigation();
+  const { t } = useI18n();
+  const [activeBookings, setActiveBookings] = useState<Booking[]>(USE_MOCK_DATA ? MOCK_BOOKINGS.filter(b => b.status === "active") : []);
+  const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>(USE_MOCK_DATA ? MOCK_ANNOUNCEMENTS.slice(0, 3) : []);
 
   useEffect(() => {
     fetchBookings().then(data => setActiveBookings(data.filter(b => b.status === "active"))).catch(() => {});
     fetchAnnouncements().then(data => setRecentAnnouncements(data.slice(0, 3))).catch(() => {});
   }, []);
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+  const greeting = hour < 12 ? t.dashboard.goodMorning : hour < 18 ? t.dashboard.goodAfternoon : t.dashboard.goodEvening;
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const quickActions = [
-    { id: "parking",   label: "Visitor Parking", icon: Car,           desc: "Book a slot" },
-    { id: "amenities", label: "Amenities",        icon: Dumbbell,      desc: "Reserve facilities" },
-    { id: "community", label: "Community",        icon: MessageSquare, desc: "View board" },
-    { id: "report",    label: "Report Issue",     icon: AlertTriangle, desc: "Submit report" },
+    { id: "parking",   label: t.nav.visitorParking, icon: Car,           desc: t.dashboard.bookSlot },
+    { id: "amenities", label: t.nav.amenities,       icon: Dumbbell,      desc: t.dashboard.reserveFacilities },
+    { id: "community", label: t.dashboard.community, icon: MessageSquare, desc: t.dashboard.viewBoard },
+    { id: "report",    label: t.nav.reportIssue,     icon: AlertTriangle, desc: t.dashboard.submitReport },
   ];
 
   return (
@@ -32,44 +33,44 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
       <div className="flex items-end justify-between mb-8">
         <div>
           <p className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-1">{today}</p>
-          <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">{greeting}, Alex</h1>
-          <p className="text-gray-400 text-sm mt-1">Unit A-12-05 · Nadayu28 Residences</p>
+          <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">{greeting}, {userProfile?.full_name?.split(' ')[0] || t.dashboard.resident}</h1>
+          <p className="text-gray-400 text-sm mt-1">{userProfile?.unit ? `Unit ${userProfile.unit} · ` : ''}Nadayu28 Residences</p>
         </div>
         <div className="hidden md:flex items-center gap-2 bg-[#111111] text-white px-4 py-2 rounded-full text-xs font-medium">
           <span className="w-1.5 h-1.5 bg-[#C8FF00] rounded-full animate-pulse"></span>
-          All systems online
+          {t.common.allSystemsOnline}
         </div>
       </div>
 
       <div className="bg-[#111111] rounded-2xl p-6 mb-5">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-white font-semibold text-sm">Overview</h2>
-          <span className="text-gray-600 text-xs">This month</span>
+          <h2 className="text-white font-semibold text-sm">{t.dashboard.overview}</h2>
+          <span className="text-gray-600 text-xs">{t.common.thisMonth}</span>
         </div>
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-[#C8FF00] rounded-xl p-5 cursor-pointer hover:brightness-95 transition-all" onClick={() => setCurrentView("parking")}>
             <div className="flex items-center justify-between mb-5">
-              <span className="text-black/70 text-xs font-semibold">Visitor Parking</span>
+              <span className="text-black/70 text-xs font-semibold">{t.dashboard.visitorParking}</span>
               <ArrowUpRight size={14} className="text-black/50" />
             </div>
             <p className="text-black text-[1.6rem] font-bold leading-none mb-1">Unlimited</p>
-            <p className="text-black/50 text-xs mt-2">Access active</p>
+            <p className="text-black/50 text-xs mt-2">{t.dashboard.accessActive}</p>
           </div>
           <div className="bg-white/[0.06] rounded-xl p-5 cursor-pointer hover:bg-white/[0.1] transition-all" onClick={() => setCurrentView("amenities")}>
             <div className="flex items-center justify-between mb-5">
-              <span className="text-gray-400 text-xs font-semibold">Active Bookings</span>
+              <span className="text-gray-400 text-xs font-semibold">{t.dashboard.activeBookings}</span>
               <ArrowUpRight size={14} className="text-gray-600" />
             </div>
             <p className="text-white text-[1.6rem] font-bold leading-none mb-1">{activeBookings.length}</p>
-            <p className="text-gray-500 text-xs mt-2">Facilities reserved</p>
+            <p className="text-gray-500 text-xs mt-2">{t.dashboard.facilitiesReserved}</p>
           </div>
           <div className="bg-white/[0.06] rounded-xl p-5 cursor-pointer hover:bg-white/[0.1] transition-all" onClick={() => setCurrentView("community")}>
             <div className="flex items-center justify-between mb-5">
-              <span className="text-gray-400 text-xs font-semibold">Announcements</span>
+              <span className="text-gray-400 text-xs font-semibold">{t.dashboard.announcements}</span>
               <ArrowUpRight size={14} className="text-gray-600" />
             </div>
             <p className="text-white text-[1.6rem] font-bold leading-none mb-1">{recentAnnouncements.length}</p>
-            <p className="text-gray-500 text-xs mt-2">Community updates</p>
+            <p className="text-gray-500 text-xs mt-2">{t.dashboard.communityUpdates}</p>
           </div>
         </div>
       </div>
@@ -92,8 +93,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
             <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-50">
-              <h2 className="text-gray-900 font-semibold text-sm">Your Schedule</h2>
-              <button onClick={() => setCurrentView("amenities")} className="text-[11px] text-[#C8FF00] font-bold bg-[#111111] px-3 py-1.5 rounded-full hover:bg-[#222] transition-colors">+ New Booking</button>
+              <h2 className="text-gray-900 font-semibold text-sm">{t.dashboard.yourSchedule}</h2>
+              <button onClick={() => setCurrentView("amenities")} className="text-[11px] text-[#C8FF00] font-bold bg-[#111111] px-3 py-1.5 rounded-full hover:bg-[#222] transition-colors">{t.dashboard.newBooking}</button>
             </div>
             {activeBookings.length > 0 ? (
               <div>
@@ -111,7 +112,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-semibold bg-[#C8FF00]/15 text-[#4a6600] px-2.5 py-1 rounded-full">Confirmed</span>
+                      <span className="text-[11px] font-semibold bg-[#C8FF00]/15 text-[#4a6600] px-2.5 py-1 rounded-full">{t.dashboard.confirmed}</span>
                       <ChevronRight size={13} className="text-gray-300" />
                     </div>
                   </div>
@@ -122,10 +123,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
                 <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center mx-auto mb-3">
                   <Activity size={18} className="text-gray-300" />
                 </div>
-                <p className="text-gray-900 text-sm font-semibold mb-1">No Active Bookings</p>
-                <p className="text-gray-400 text-xs mb-4">Book a facility to get started</p>
+                <p className="text-gray-900 text-sm font-semibold mb-1">{t.dashboard.noActiveBookings}</p>
+                <p className="text-gray-400 text-xs mb-4">{t.dashboard.bookFacilityDesc}</p>
                 <button onClick={() => setCurrentView("amenities")} className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#111111] text-white rounded-full text-xs font-semibold hover:bg-[#222] transition-colors">
-                  <Zap size={11} /> Book a Facility
+                  <Zap size={11} /> {t.dashboard.bookFacility}
                 </button>
               </div>
             )}
@@ -135,9 +136,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Bell size={13} className="text-gray-900" />
-                <h3 className="text-gray-900 font-semibold text-sm">Notifications</h3>
+                <h3 className="text-gray-900 font-semibold text-sm">{t.dashboard.notifications}</h3>
               </div>
-              <span className="text-[10px] font-bold text-white bg-[#111111] px-2 py-0.5 rounded-full">2 new</span>
+              <span className="text-[10px] font-bold text-white bg-[#111111] px-2 py-0.5 rounded-full">2 {t.dashboard.newNotif}</span>
             </div>
             <div>
               {[
@@ -156,7 +157,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
 
         <div className="lg:col-span-1">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-gray-900 font-semibold text-sm">Community Board</h2>
+            <h2 className="text-gray-900 font-semibold text-sm">{t.nav.communityBoard}</h2>
             <button onClick={() => setCurrentView("community")} className="text-gray-400 hover:text-gray-700 transition-colors"><ArrowUpRight size={15} /></button>
           </div>
           <div className="space-y-3">
@@ -176,10 +177,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, setCurrentView }
             })}
             <button onClick={() => setCurrentView("report")} className="w-full bg-[#111111] rounded-xl p-4 text-left hover:bg-[#181818] transition-colors group">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[#C8FF00] text-xs font-semibold">Report an Issue</span>
+                <span className="text-[#C8FF00] text-xs font-semibold">{t.dashboard.reportAnIssue}</span>
                 <ArrowUpRight size={12} className="text-gray-600 group-hover:text-[#C8FF00] transition-colors" />
               </div>
-              <p className="text-gray-500 text-[11px] leading-relaxed">Report maintenance or safety concerns to help improve the community.</p>
+              <p className="text-gray-500 text-[11px] leading-relaxed">{t.dashboard.reportIssueDesc}</p>
             </button>
           </div>
         </div>

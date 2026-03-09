@@ -3,6 +3,8 @@ import { FACILITIES } from '../constants';
 import { Clock, Check, X, Calendar, AlertCircle, ArrowRight, ArrowUpRight, Star } from 'lucide-react';
 import { FacilityType } from '../types';
 import { CustomDatePicker } from './CustomPickers';
+import { amenityBookingSchema, validate } from '../services/validation';
+import { useI18n } from '../contexts/I18nContext';
 
 export const Amenities: React.FC = () => {
   const [selectedFacility, setSelectedFacility] = useState<any | null>(null);
@@ -11,7 +13,9 @@ export const Amenities: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'available' | 'popular'>('all');
-  
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const { t } = useI18n();
+
   const getFacilityImage = (type: FacilityType) => {
     switch (type) {
       case FacilityType.GYM:
@@ -39,10 +43,10 @@ export const Amenities: React.FC = () => {
     const statusMap: { [key: string]: { status: string; available: boolean } } = {
       [FacilityType.GYM]: { status: 'Available', available: true },
       [FacilityType.SWIMMING_POOL]: { status: 'Available', available: true },
-      [FacilityType.TENNIS]: { status: 'Fully Booked', available: false },
+      [FacilityType.TENNIS]: { status: t.amenities.fullyBooked, available: false },
       [FacilityType.BBQ]: { status: 'Available', available: true },
       [FacilityType.PARTY_ROOM]: { status: 'Available', available: true },
-      [FacilityType.SQUASH_COURT]: { status: 'Fully Booked', available: false },
+      [FacilityType.SQUASH_COURT]: { status: t.amenities.fullyBooked, available: false },
       [FacilityType.BASKETBALL_COURT]: { status: 'Available', available: true },
       [FacilityType.MULTI_PURPOSE_COURT]: { status: 'Available', available: true },
     };
@@ -63,10 +67,10 @@ export const Amenities: React.FC = () => {
     return descMap[id] || '2-hour session';
   };
 
-  const categoryFilters = [
-    { id: 'all', label: 'All Facilities' },
-    { id: 'available', label: 'Available Now' },
-    { id: 'popular', label: 'Popular Facilities' },
+  const categoryFilters: { id: typeof selectedCategory; label: string }[] = [
+    { id: 'all', label: t.amenities.allFacilities },
+    { id: 'available', label: t.amenities.availableNow },
+    { id: 'popular', label: t.amenities.popularFacilities },
   ];
 
   const closeModal = () => {
@@ -76,7 +80,9 @@ export const Amenities: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!bookingDate || !bookingTime) return;
+    setFieldErrors({});
+    const result = validate(amenityBookingSchema, { bookingDate, bookingTime });
+    if (!result.success) { setFieldErrors(result.errors); return; }
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
@@ -104,12 +110,10 @@ export const Amenities: React.FC = () => {
          
          <div className="absolute bottom-0 left-0 p-12 md:p-16 max-w-3xl text-white z-10">
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
-               Community <br/>
-               <span style={{color: '#C8FF00'}}>Amenities</span>
+               {t.amenities.title}
             </h1>
             <p className="text-lg mb-5 max-w-xl leading-relaxed" style={{color: '#B0B0B8'}}>
-               Book our world-class facilities and make the most of your community. 
-               Find your perfect time slot today.
+               {t.amenities.subtitle}
             </p>
          </div>
       </div>
@@ -133,7 +137,7 @@ export const Amenities: React.FC = () => {
             {categoryFilters.map(filter => (
                <button
                   key={filter.id}
-                  onClick={() => setSelectedCategory(filter.id as any)}
+                  onClick={() => setSelectedCategory(filter.id)}
                   className="px-6 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-shrink-0"
                   style={selectedCategory === filter.id ? {
                      backgroundColor: '#111111',
@@ -192,7 +196,7 @@ export const Amenities: React.FC = () => {
                         {getFacilityDescription(facility.id)}
                      </p>
                      <div className="flex items-center gap-2 font-bold text-sm group-hover:translate-x-1 transition-transform" style={{color: '#C8FF00'}}>
-                        Book Now <ArrowRight size={16} />
+                        {t.amenities.bookNow} <ArrowRight size={16} />
                      </div>
                   </div>
                </div>
@@ -217,7 +221,7 @@ export const Amenities: React.FC = () => {
                 <div className="w-24 h-24 text-[#111111] rounded-full flex items-center justify-center mb-5 shadow-xl animate-bounce" style={{backgroundColor: '#C8FF00'}}>
                   <Check size={48} />
                 </div>
-                <h3 className="text-4xl font-bold mb-4 text-gray-900">Booking Confirmed!</h3>
+                <h3 className="text-4xl font-bold mb-4 text-gray-900">{t.amenities.bookingConfirmed}</h3>
                 <p className="text-lg mb-5 max-w-md leading-relaxed text-gray-500">
                   You're all set for <span className="font-bold text-[#111111]">{selectedFacility.name}</span>
                   <br/>
@@ -247,23 +251,24 @@ export const Amenities: React.FC = () => {
                    <form onSubmit={handleSubmit} className="space-y-5">
                       {/* Date Input */}
                       <div className="space-y-4">
-                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">Select Date</label>
+                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">{t.amenities.selectDate}</label>
                         <CustomDatePicker
                           required
                           value={bookingDate}
-                          onChange={setBookingDate}
+                          onChange={(v) => { setBookingDate(v); setFieldErrors(prev => ({ ...prev, bookingDate: '' })); }}
                         />
+                        {fieldErrors.bookingDate && <p className="text-red-500 text-xs mt-1">{fieldErrors.bookingDate}</p>}
                       </div>
 
                       {/* Time Slots */}
                       <div className="space-y-4">
-                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">Select Time Slot</label>
+                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">{t.amenities.selectTimeSlot}</label>
                         <div className="grid grid-cols-3 gap-3">
                           {['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'].map(time => (
                             <button
                               key={time}
                               type="button"
-                              onClick={() => setBookingTime(time)}
+                              onClick={() => { setBookingTime(time); setFieldErrors(prev => ({ ...prev, bookingTime: '' })); }}
                               className={`py-4 rounded-xl text-sm font-bold transition-all duration-300`}
                               style={bookingTime === time ? {
                                 backgroundColor: '#111111',
@@ -281,12 +286,13 @@ export const Amenities: React.FC = () => {
                             </button>
                           ))}
                         </div>
+                        {fieldErrors.bookingTime && <p className="text-red-500 text-xs mt-1">{fieldErrors.bookingTime}</p>}
                       </div>
 
                       {/* Info Alert */}
                       <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#f9fafb', borderColor: '#111111', color: '#374151'}}>
                         <p className="text-sm font-medium">
-                          ⏱️ Bookings are confirmed instantly. You'll receive a QR code for check-in.
+                          {t.amenities.instantQr}
                         </p>
                       </div>
 

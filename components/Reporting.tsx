@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Camera, AlertTriangle, CheckCircle2, ChevronRight, X, Zap, Wrench, AlertCircle, Plus } from 'lucide-react';
 import { taskManagementService } from '../services/taskManagementService';
+import { reportingSchema, validate } from '../services/validation';
+import { useI18n } from '../contexts/I18nContext';
 
 export const Reporting: React.FC = () => {
   const [step, setStep] = useState<'category' | 'details' | 'form' | 'success'>('category');
@@ -10,11 +12,13 @@ export const Reporting: React.FC = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [referenceId, setReferenceId] = useState('');
   const [responseTime, setResponseTime] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const { t } = useI18n();
 
   const issueCategories = [
     { 
       id: 'facility-malfunction', 
-      label: 'Facility Malfunctions', 
+      label: t.reporting.facilityMalfunctions,
       icon: '⚙️',
       description: 'Issues with gym equipment, pool facilities, etc.',
       color: 'from-[#C8FF00]/20 to-[#b0e000]/10',
@@ -28,7 +32,7 @@ export const Reporting: React.FC = () => {
     },
     { 
       id: 'common-area', 
-      label: 'Common Area Issues', 
+      label: t.reporting.commonAreaIssues,
       icon: '🏢',
       description: 'Corridor lights, trash, cleanliness, etc.',
       color: 'from-[#d4ff33]/20 to-[#C8FF00]/10',
@@ -42,7 +46,7 @@ export const Reporting: React.FC = () => {
     },
     { 
       id: 'service-problem', 
-      label: 'Service Problems', 
+      label: t.reporting.serviceProblems,
       icon: '📞',
       description: 'Unresponded requests, service delays, etc.',
       color: 'from-[#b0e000]/20 to-[#C8FF00]/10',
@@ -56,7 +60,7 @@ export const Reporting: React.FC = () => {
     },
     { 
       id: 'other', 
-      label: 'Other Issues', 
+      label: t.reporting.otherIssues,
       icon: '💬',
       description: 'Custom issue with detailed description',
       color: 'from-[#B0B0B8]/20 to-[#333]/10',
@@ -105,9 +109,15 @@ export const Reporting: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    setFieldErrors({});
+    const result = validate(reportingSchema, {
+      category: selectedCategory, subcategory: selectedSubcategory, description,
+    });
+    if (!result.success) { setFieldErrors(result.errors); return; }
+
     const selectedCategoryObj = issueCategories.find(c => c.id === selectedCategory);
     const selectedSubObj = selectedCategoryObj?.subcategories.find(s => s.id === selectedSubcategory);
-    
+
     // Create task via service
     const task = taskManagementService.reportTask({
       type: 'maintenance',
@@ -143,18 +153,18 @@ export const Reporting: React.FC = () => {
           <div className="w-20 h-20 bg-gradient-to-br from-[#C8FF00] to-[#b0e000] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#C8FF00]/30 animate-bounce">
             <CheckCircle2 size={40} className="text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-3">Report Submitted</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-3">{t.reporting.reportSubmitted}</h3>
           <p className="text-gray-500 mb-2 leading-relaxed">
             Your issue has been received and assigned to our maintenance team.
           </p>
           
           <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-6 mt-6 space-y-2">
             <div className="font-mono text-lg font-bold text-[#C8FF00]">
-              Ticket: {referenceId}
+              {t.reporting.referenceId}: {referenceId}
             </div>
             <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
               <Zap size={16} className="text-[#C8FF00]" />
-              Expected response: <span className="font-bold text-gray-900">{responseTime}</span>
+              {t.reporting.expectedResponse}: <span className="font-bold text-gray-900">{responseTime}</span>
             </div>
           </div>
 
@@ -163,7 +173,7 @@ export const Reporting: React.FC = () => {
             onClick={resetForm}
             className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
           >
-            <Plus size={20} /> Submit Another Report
+            <Plus size={20} /> {t.reporting.submitAnother}
           </button>
         </div>
       </div>
@@ -183,8 +193,8 @@ export const Reporting: React.FC = () => {
             {/* Dark Header Banner */}
             <div className="bg-[#111111] rounded-3xl p-8 mb-6 flex items-center justify-between">
               <div>
-                <h2 className="text-4xl font-bold text-white mb-2">Report an Issue</h2>
-                <p className="text-gray-400 text-base">Select the type of issue you're experiencing</p>
+                <h2 className="text-4xl font-bold text-white mb-2">{t.reporting.title}</h2>
+                <p className="text-gray-400 text-base">{t.reporting.subtitle}</p>
               </div>
               <div className="w-16 h-16 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
                 <AlertTriangle size={32} className="text-[#111111]" />
@@ -226,8 +236,8 @@ export const Reporting: React.FC = () => {
               </button>
               <div className="bg-[#111111] rounded-3xl p-8 flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-bold text-white mb-2">Select Specific Issue</h2>
-                  <p className="text-gray-400">Choose the specific subcategory that matches your issue</p>
+                  <h2 className="text-3xl font-bold text-white mb-2">{t.reporting.selectCategory}</h2>
+                  <p className="text-gray-400">{t.reporting.subtitle}</p>
                 </div>
                 <div className="w-14 h-14 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
                   <ChevronRight size={28} className="text-[#111111]" />
@@ -281,24 +291,25 @@ export const Reporting: React.FC = () => {
               {/* Character Count Description */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Description</label>
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">{t.reporting.description}</label>
                   <span className={`text-xs font-bold ${description.length > 200 ? 'text-red-500' : 'text-gray-400'}`}>
                     {description.length}/200 characters
                   </span>
                 </div>
                 <textarea
                   value={description}
-                  onChange={(e) => setDescription(e.target.value.slice(0, 200))}
+                  onChange={(e) => { setDescription(e.target.value.slice(0, 200)); setFieldErrors(prev => ({ ...prev, description: '' })); }}
                   rows={4}
                   placeholder="Describe the issue in detail. Include any observations that might help our team..."
-                  className="w-full px-6 py-4 bg-gray-50 border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors resize-none"
+                  className={`w-full px-6 py-4 bg-gray-50 border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors resize-none ${fieldErrors.description ? 'border-red-400' : 'border-gray-200'}`}
                 />
+                {fieldErrors.description && <p className="text-red-500 text-xs mt-1">{fieldErrors.description}</p>}
               </div>
 
               {/* Image Upload - REQUIRED */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Add Photos</label>
+                  <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">{t.reporting.addPhotos}</label>
                   <div className="px-2 py-1 bg-gray-100 border border-gray-200 rounded text-xs font-bold text-gray-600 flex items-center gap-1">
                     <AlertCircle size={12} /> Required
                   </div>
@@ -360,7 +371,7 @@ export const Reporting: React.FC = () => {
                 }`}
               >
                 <CheckCircle2 size={20} /> 
-                {uploadedImages.length === 0 ? 'Add photos to submit' : 'Submit Report'}
+                {uploadedImages.length === 0 ? t.reporting.addPhotos : t.reporting.submitReport}
               </button>
             </div>
           </div>

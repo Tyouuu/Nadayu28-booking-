@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Phone, MapPin, BarChart2, Clock, CheckCircle2, AlertTriangle, FileText, Bell, Briefcase, Calendar, Megaphone, Scale, ClipboardList, Edit2, Save } from 'lucide-react';
+import { useNavigation } from '../contexts/NavigationContext';
 
 interface Approval {
   id: number;
@@ -11,7 +12,8 @@ interface Approval {
   status: 'pending' | 'approved' | 'rejected';
 }
 
-export const ManagementProfile: React.FC<{ setCurrentView: (view: string) => void }> = ({ setCurrentView }) => {
+export const ManagementProfile: React.FC = () => {
+  const { setCurrentView } = useNavigation();
   const [activeTab, setActiveTab] = useState<'overview' | 'approvals' | 'settings'>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({

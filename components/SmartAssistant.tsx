@@ -72,7 +72,6 @@ Keep answers concise, polite, and helpful.`;
       setMessages(prev => [...prev, { role: 'assistant', text }]);
 
     } catch (error) {
-      console.error(error);
       setMessages(prev => [...prev, { role: 'assistant', text: "I'm having trouble connecting. Please try again later." }]);
     } finally {
       setIsLoading(false);

@@ -95,7 +95,7 @@ export const CommunityBoard: React.FC = () => {
     },
   ]);
 
-  const categoryTabs = [
+  const categoryTabs: { id: typeof selectedCategory; label: string; icon: string }[] = [
     { id: 'all', label: 'All Updates', icon: '📢' },
     { id: 'property-notice', label: 'Property Notices', icon: '🏢' },
     { id: 'event', label: 'Events', icon: '🎉' },
@@ -103,7 +103,7 @@ export const CommunityBoard: React.FC = () => {
     { id: 'announcement', label: 'Announcements', icon: '📣' },
   ];
 
-  const timeFilters = [
+  const timeFilters: { id: typeof selectedTimeFilter; label: string }[] = [
     { id: '7days', label: 'Last 7 Days' },
     { id: '30days', label: 'Last 30 Days' },
     { id: 'all', label: 'All Time' },
@@ -230,7 +230,7 @@ export const CommunityBoard: React.FC = () => {
           {categoryTabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setSelectedCategory(tab.id as any)}
+              onClick={() => setSelectedCategory(tab.id)}
               className={`px-6 py-3 rounded-full font-bold transition-all flex items-center gap-2 whitespace-nowrap flex-shrink-0 ${
                 selectedCategory === tab.id
                   ? 'bg-[#111111] text-white shadow-md'
@@ -250,7 +250,7 @@ export const CommunityBoard: React.FC = () => {
             {timeFilters.map(filter => (
               <button
                 key={filter.id}
-                onClick={() => setSelectedTimeFilter(filter.id as any)}
+                onClick={() => setSelectedTimeFilter(filter.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                   selectedTimeFilter === filter.id
                     ? 'bg-[#111111] text-white border border-[#111111]'

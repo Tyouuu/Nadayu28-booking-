@@ -3,6 +3,8 @@ import { User, Mail, Phone, MapPin, Car, Plus, Trash2, History, AlertTriangle, F
 import { MOCK_BOOKINGS, MOCK_VEHICLES } from '../constants';
 import { fetchBookings, fetchVehicles } from '../services/dataService';
 import { Vehicle, Booking } from '../types';
+import { addVehicleSchema, addTenantSchema, validate } from '../services/validation';
+import { useI18n } from '../contexts/I18nContext';
 
 interface Tenant {
   id: string;
@@ -35,10 +37,14 @@ export const Profile: React.FC = () => {
   const [newTenant, setNewTenant] = useState({ name: '', email: '', unit: '' });
   const [isAddingTenant, setIsAddingTenant] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const { t } = useI18n();
 
   const handleAddVehicle = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newVehicle.plate) return;
+    setFieldErrors({});
+    const result = validate(addVehicleSchema, newVehicle);
+    if (!result.success) { setFieldErrors(result.errors); return; }
     const vehicle: Vehicle = {
       id: Date.now().toString(),
       plateNumber: newVehicle.plate.toUpperCase(),
@@ -56,7 +62,9 @@ export const Profile: React.FC = () => {
 
   const handleAddTenant = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTenant.name || !newTenant.email) return;
+    setFieldErrors({});
+    const result = validate(addTenantSchema, newTenant);
+    if (!result.success) { setFieldErrors(result.errors); return; }
     const tenant: Tenant = {
       id: Date.now().toString(),
       name: newTenant.name,
@@ -125,7 +133,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <User size={18} /> Profile Details
+                    <User size={18} /> {t.profile.details}
                   </button>
                   <button
                     onClick={() => setActiveTab('vehicles')}
@@ -135,7 +143,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Car size={18} /> Vehicles
+                    <Car size={18} /> {t.profile.vehicles}
                   </button>
                   <button
                     onClick={() => setActiveTab('tenants')}
@@ -145,7 +153,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Users size={18} /> Manage Tenants ({tenants.length})
+                    <Users size={18} /> {t.profile.tenants} ({tenants.length})
                   </button>
                   <button
                     onClick={() => setActiveTab('security')}
@@ -155,7 +163,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Lock size={18} /> Security
+                    <Lock size={18} /> {t.profile.securityTab}
                   </button>
                   <button
                     onClick={() => setActiveTab('history')}
@@ -165,7 +173,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <History size={18} /> Activity Log
+                    <History size={18} /> {t.profile.history}
                   </button>
                 </>
               ) : (
@@ -178,7 +186,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <User size={18} /> My Profile
+                    <User size={18} /> {t.profile.title}
                   </button>
                   <button
                     onClick={() => setActiveTab('vehicles')}
@@ -188,7 +196,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Car size={18} /> My Vehicles
+                    <Car size={18} /> {t.profile.vehicles}
                   </button>
                   <button
                     onClick={() => setActiveTab('security')}
@@ -198,7 +206,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Lock size={18} /> Security
+                    <Lock size={18} /> {t.profile.securityTab}
                   </button>
                   <button
                     onClick={() => setActiveTab('history')}
@@ -208,7 +216,7 @@ export const Profile: React.FC = () => {
                         : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <History size={18} /> My Bookings
+                    <History size={18} /> {t.profile.history}
                   </button>
                 </>
               )}
@@ -271,7 +279,7 @@ export const Profile: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t.profile.emailAddress}</label>
                   <div className="relative">
                     <Mail className="absolute left-5 top-4 text-gray-400" size={20} />
                     <input 
@@ -360,7 +368,7 @@ export const Profile: React.FC = () => {
                 onClick={() => setIsAddingVehicle(!isAddingVehicle)}
                 className="absolute top-6 right-8 bg-white/10 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2"
               >
-                <Plus size={18} /> Add Vehicle
+                <Plus size={18} /> {t.profile.addVehicle}
               </button>
               <div className="absolute right-0 bottom-0 opacity-5">
                 <Car size={240} />
@@ -377,18 +385,19 @@ export const Profile: React.FC = () => {
                 <form onSubmit={handleAddVehicle} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Plate Number</label>
-                      <input 
-                        type="text" 
+                      <label className="text-xs font-bold text-gray-400 uppercase">{t.profile.plateNumber}</label>
+                      <input
+                        type="text"
                         value={newVehicle.plate}
-                        onChange={(e) => setNewVehicle({...newVehicle, plate: e.target.value})}
+                        onChange={(e) => { setNewVehicle({...newVehicle, plate: e.target.value}); setFieldErrors(prev => ({ ...prev, plate: '' })); }}
                         placeholder="e.g. ABC 1234"
-                        className="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none outline-none uppercase font-bold transition-colors"
+                        className={`w-full px-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none uppercase font-bold transition-colors ${fieldErrors.plate ? 'border-red-400' : 'border-gray-200'}`}
                         autoFocus
                       />
+                      {fieldErrors.plate && <p className="text-red-500 text-xs mt-1">{fieldErrors.plate}</p>}
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Model</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase">{t.profile.model}</label>
                       <input 
                         type="text" 
                         value={newVehicle.model}
@@ -473,7 +482,7 @@ export const Profile: React.FC = () => {
                 onClick={() => setIsAddingTenant(!isAddingTenant)}
                 className="absolute top-6 right-8 bg-white/10 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/20 transition-colors backdrop-blur-sm border border-white/20 flex items-center gap-2"
               >
-                <Plus size={18} /> Add Tenant
+                <Plus size={18} /> {t.profile.addTenant}
               </button>
               <div className="absolute right-0 bottom-0 opacity-5">
                 <Users size={240} />
@@ -490,41 +499,40 @@ export const Profile: React.FC = () => {
                 <form onSubmit={handleAddTenant} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Full Name</label>
-                      <input 
-                        type="text" 
+                      <label className="text-xs font-bold text-gray-400 uppercase">{t.profile.fullName}</label>
+                      <input
+                        type="text"
                         value={newTenant.name}
-                        onChange={(e) => setNewTenant({...newTenant, name: e.target.value})}
+                        onChange={(e) => { setNewTenant({...newTenant, name: e.target.value}); setFieldErrors(prev => ({ ...prev, name: '' })); }}
                         placeholder="e.g. John Smith"
-                        className="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none outline-none font-medium transition-colors"
-                        required
+                        className={`w-full px-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors ${fieldErrors.name ? 'border-red-400' : 'border-gray-200'}`}
                       />
+                      {fieldErrors.name && <p className="text-red-500 text-xs mt-1">{fieldErrors.name}</p>}
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase">Unit Number</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newTenant.unit}
                         onChange={(e) => setNewTenant({...newTenant, unit: e.target.value})}
                         placeholder="e.g. A-12-06"
-                        className="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none outline-none font-medium transition-colors"
-                        required
+                        className="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Email Address</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase">{t.profile.emailAddress}</label>
                     <div className="relative">
                       <Mail className="absolute left-5 top-4 text-gray-400" size={20} />
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         value={newTenant.email}
-                        onChange={(e) => setNewTenant({...newTenant, email: e.target.value})}
+                        onChange={(e) => { setNewTenant({...newTenant, email: e.target.value}); setFieldErrors(prev => ({ ...prev, email: '' })); }}
                         placeholder="e.g. john@example.com"
-                        className="w-full pl-12 pr-5 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none outline-none font-medium transition-colors"
-                        required
+                        className={`w-full pl-12 pr-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors ${fieldErrors.email ? 'border-red-400' : 'border-gray-200'}`}
                       />
                     </div>
+                    {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
                   </div>
                   <div className="flex gap-3 justify-end pt-4 border-t border-gray-100">
                     <button 
@@ -538,7 +546,7 @@ export const Profile: React.FC = () => {
                       type="submit"
                       className="px-6 py-3 rounded-xl font-bold text-white bg-[#111111] hover:bg-[#222222] transition-all shadow-lg flex items-center gap-2"
                     >
-                      <CheckCircle2 size={18} /> Add Tenant
+                      <CheckCircle2 size={18} /> {t.profile.addTenant}
                     </button>
                   </div>
                 </form>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { UserRole } from '../types';
-import { Eye, EyeOff, Upload, ArrowRight, ShieldCheck, User, Key, Building, Mail, ChevronLeft, CheckCircle2, Badge, Phone, Smartphone, Fingerprint, Zap, Users, Clock } from 'lucide-react';
+import { Eye, EyeOff, Upload, ArrowRight, User, Key, Building, Mail, ChevronLeft, CheckCircle2, Badge, Phone, Smartphone, Users, Clock } from 'lucide-react';
 import { signIn, signUp, supabase } from '../services/supabase';
+import { loginSchema, registerSchema, phoneOtpSchema, otpVerifySchema, resetPasswordSchema, validate } from '../services/validation';
+import { useI18n } from '../contexts/I18nContext';
 
 interface LoginProps {
   onLogin: (role: UserRole) => void;
@@ -12,26 +14,25 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [role, setRole] = useState<'OWNER' | 'TENANT' | 'SECURITY' | 'MANAGEMENT'>('OWNER');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Login Methods
-  const [loginMethod, setLoginMethod] = useState<'password' | 'mobile' | 'biometric'>('password');
-  const [mobileVerificationSent, setMobileVerificationSent] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  
+
+  // Login Methods (password or mobile OTP)
+  const [loginMethod, setLoginMethod] = useState<'password' | 'mobile'>('password');
+
+  // Phone OTP state
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpError, setOtpError] = useState<string | null>(null);
+
   // Forgot Password States
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetStatus, setResetStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
-  
-  // Owner Registration States
-  const [ownerIDVerified, setOwnerIDVerified] = useState(false);
-  const [idUploadFile, setIdUploadFile] = useState<File | null>(null);
-  const [twoFactorRequired, setTwoFactorRequired] = useState(false);
-  
+
   // Tenant Registration States
   const [tenantRegMethod, setTenantRegMethod] = useState<'invite' | 'apply'>('invite');
   const [invitationCode, setInvitationCode] = useState('');
-  
+
   // Visitor Registration States
   const [visitorEmail, setVisitorEmail] = useState('');
   const [visitorPhone, setVisitorPhone] = useState('');
@@ -50,17 +51,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [regPhone, setRegPhone] = useState('');
   const [regUnit, setRegUnit] = useState('');
   const [regSuccess, setRegSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const { t } = useI18n();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-
-    // For owner, require two-factor confirmation step
-    if (role === 'OWNER' && !twoFactorRequired) {
-      setTwoFactorRequired(true);
-      return;
-    }
-
+    setFieldErrors({});
+    const result = validate(loginSchema, { email: loginEmail, password: loginPassword });
+    if (!result.success) { setFieldErrors(result.errors); return; }
     setIsLoading(true);
     try {
       const { data, error } = await signIn(loginEmail, loginPassword);
@@ -90,10 +90,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-    if (!regEmail || !regPassword || !regFirstName) {
-      setAuthError('Please fill in all required fields.');
-      return;
-    }
+    setFieldErrors({});
+    const result = validate(registerSchema, {
+      firstName: regFirstName, lastName: regLastName, email: regEmail,
+      password: regPassword, phone: regPhone, unit: regUnit,
+    });
+    if (!result.success) { setFieldErrors(result.errors); return; }
     setIsLoading(true);
     try {
       const fullName = `${regFirstName} ${regLastName}`.trim();
@@ -114,14 +116,64 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
-  const handleMobileVerificationSend = () => {
-    setMobileVerificationSent(true);
-    // Simulate SMS sending
+  // ── Phone OTP: Send code via Supabase ──
+  const handleSendOTP = async () => {
+    setOtpError(null);
+    const result = validate(phoneOtpSchema, { phone: phoneNumber });
+    if (!result.success) { setOtpError(result.errors.phone); return; }
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ phone: phoneNumber });
+      if (error) throw error;
+      setOtpSent(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to send OTP. Please try again.';
+      setOtpError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ── Phone OTP: Verify code via Supabase ──
+  const handleVerifyOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setOtpError(null);
+    const result = validate(otpVerifySchema, { code: otpCode });
+    if (!result.success) { setOtpError(result.errors.code); return; }
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: phoneNumber,
+        token: otpCode,
+        type: 'sms',
+      });
+      if (error) throw error;
+
+      // Read profile role from Supabase
+      let appRole = UserRole.RESIDENT;
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+        if (profile?.role === 'SECURITY')        appRole = UserRole.SECURITY;
+        else if (profile?.role === 'MANAGEMENT') appRole = UserRole.MANAGEMENT;
+        else if (profile?.role === 'TENANT')     appRole = UserRole.TENANT;
+      }
+      onLogin(appRole);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Invalid OTP. Please try again.';
+      setOtpError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!resetEmail) return;
+    const result = validate(resetPasswordSchema, { email: resetEmail });
+    if (!result.success) { setFieldErrors(result.errors); return; }
     setResetStatus('sending');
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
@@ -131,17 +183,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       setResetStatus('sent');
     } catch {
       setResetStatus('idle');
-    }
-  };
-
-  const handleIDUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setIdUploadFile(file);
-      // Simulate ID verification
-      setTimeout(() => {
-        setOwnerIDVerified(true);
-      }, 1500);
     }
   };
 
@@ -164,7 +205,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
 
       <div className="max-w-6xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[700px] animate-fade-in border border-gray-100">
-        
+
         {/* LEFT SIDE - VISUAL SHOWCASE */}
         <div className="hidden md:flex w-1/2 bg-[#111111] relative overflow-hidden flex-col justify-between p-12">
           {/* Gradient Overlay */}
@@ -190,9 +231,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           {/* Background Image/Pattern */}
           <div className="absolute inset-0 opacity-20">
-            <img 
-              src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000" 
-              alt="Community" 
+            <img
+              src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000"
+              alt="Community"
               className="w-full h-full object-cover"
             />
           </div>
@@ -201,42 +242,42 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         {/* RIGHT SIDE - FORM */}
         <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
           <div className="max-w-sm mx-auto w-full">
-            
+
             {showForgotPassword ? (
               // FORGOT PASSWORD VIEW
               <div className="animate-fade-in">
-                <button 
+                <button
                   onClick={() => { setShowForgotPassword(false); setResetStatus('idle'); }}
-                  className="flex items-center text-gray-400 hover:text-white transition-colors mb-8 font-bold text-sm"
+                  className="flex items-center text-gray-400 hover:text-gray-900 transition-colors mb-8 font-bold text-sm"
                 >
-                  <ChevronLeft size={16} className="mr-2" /> Back to Login
+                  <ChevronLeft size={16} className="mr-2" /> {t.login.signIn}
                 </button>
-                
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
+
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{t.login.resetPassword}</h2>
                 <p className="text-gray-400 mb-8 leading-relaxed">Enter your registered email address and we'll send you instructions to reset your password.</p>
-                
+
                 {resetStatus === 'sent' ? (
                   <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 rounded-2xl p-8 text-center animate-scale-in">
                     <div className="w-16 h-16 bg-[#C8FF00] text-[#111111] rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 size={32} />
                     </div>
-                    <h3 className="font-bold text-gray-900 text-lg mb-2">Check your email</h3>
+                    <h3 className="font-bold text-gray-900 text-lg mb-2">{t.login.checkEmail}</h3>
                     <p className="text-gray-400 text-sm mb-6">We've sent password reset instructions to <span className="font-bold text-gray-900">{resetEmail}</span></p>
-                    <button 
+                    <button
                       onClick={() => { setShowForgotPassword(false); setResetStatus('idle'); }}
                       className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all"
                     >
-                      Return to Login
+                      {t.login.signIn}
                     </button>
                   </div>
                 ) : (
                   <form onSubmit={handleResetPassword} className="space-y-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Email Address</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase">{t.login.email}</label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-4 text-gray-400" size={18} />
-                        <input 
-                          type="email" 
+                        <input
+                          type="email"
                           required
                           value={resetEmail}
                           onChange={(e) => setResetEmail(e.target.value)}
@@ -245,7 +286,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         />
                       </div>
                     </div>
-                    <button 
+                    <button
                       type="submit"
                       disabled={resetStatus === 'sending'}
                       className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
@@ -253,7 +294,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                       {resetStatus === 'sending' ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        'Send Reset Link'
+                        t.login.sendResetLink
                       )}
                     </button>
                   </form>
@@ -265,44 +306,44 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 {/* Header */}
                 <div className="mb-8">
                   <h2 className="text-4xl font-bold text-gray-900 mb-1">
-                    {mode === 'signin' ? 'Welcome Back' : 'Create an account'}
+                    {mode === 'signin' ? t.login.welcome : t.login.createAccount}
                   </h2>
                   {mode === 'signin' && (
-                    <p className="text-gray-400">Sign in to your account to continue</p>
+                    <p className="text-gray-400">{t.login.signIn}</p>
                   )}
                 </div>
 
                 {/* Already have account / New here */}
                 <div className="mb-8">
                   {mode === 'signin' ? (
-                    <span className="text-gray-400 text-sm">Already have an account? <button onClick={() => setMode('signup')} className="text-[#111111] font-semibold hover:text-gray-700 transition-colors underline">Log in</button></span>
+                    <span className="text-gray-400 text-sm">{t.login.noAccount} <button onClick={() => setMode('signup')} className="text-[#111111] font-semibold hover:text-gray-700 transition-colors underline">{t.login.createAccount}</button></span>
                   ) : (
-                    <span className="text-gray-400 text-sm">Already have an account? <button onClick={() => setMode('signin')} className="text-[#111111] font-semibold hover:text-gray-700 transition-colors underline">Sign in</button></span>
+                    <span className="text-gray-400 text-sm">{t.login.hasAccount} <button onClick={() => setMode('signin')} className="text-[#111111] font-semibold hover:text-gray-700 transition-colors underline">{t.login.signIn}</button></span>
                   )}
                 </div>
 
-                {/* Mode Selector - Sign In vs Visitor */}
+                {/* Mode Selector - Sign In vs Register */}
                 {mode !== 'visitor' && (
                   <div className="flex gap-2 mb-6">
                     <button
-                      onClick={() => { setMode('signin'); setTwoFactorRequired(false); }}
+                      onClick={() => setMode('signin')}
                       className={`flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all ${
-                        mode === 'signin' 
-                          ? 'bg-[#111111] border border-[#111111] text-white' 
-                          : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-white'
+                        mode === 'signin'
+                          ? 'bg-[#111111] border border-[#111111] text-white'
+                          : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
                       }`}
                     >
-                      Sign In
+                      {t.login.signIn}
                     </button>
                     <button
-                      onClick={() => { setMode('signup'); setTwoFactorRequired(false); }}
+                      onClick={() => setMode('signup')}
                       className={`flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all ${
-                        mode === 'signup' 
-                          ? 'bg-[#111111] border border-[#111111] text-white' 
-                          : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-white'
+                        mode === 'signup'
+                          ? 'bg-[#111111] border border-[#111111] text-white'
+                          : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
                       }`}
                     >
-                      Register
+                      {t.login.signUp}
                     </button>
                   </div>
                 )}
@@ -320,7 +361,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             : 'bg-gray-100 text-gray-500 hover:text-gray-900 border border-gray-200'
                         }`}
                       >
-                        {r.charAt(0) + r.slice(1).toLowerCase()}
+                        {r === 'OWNER' ? t.login.owner : r === 'TENANT' ? t.login.tenant : r === 'SECURITY' ? t.login.security : t.login.management}
                       </button>
                     ))}
                   </div>
@@ -328,57 +369,35 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                 {/* SIGN IN FORM */}
                 {mode === 'signin' && (
-                  <form onSubmit={handleLogin} className="space-y-5 animate-fade-in">
-                    {/* Two-Factor Authentication for Owner */}
-                    {role === 'OWNER' && twoFactorRequired && (
-                      <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-4 rounded-xl mb-6 flex gap-3">
-                        <ShieldCheck className="text-[#4a6600] flex-shrink-0 mt-0.5" size={18} />
-                        <p className="text-xs text-[#4a6600] leading-relaxed">
-                          <strong>Two-Factor Authentication Required:</strong> Complete biometric verification or mobile OTP for sensitive operations.
-                        </p>
-                      </div>
-                    )}
+                  <form onSubmit={loginMethod === 'mobile' ? handleVerifyOTP : handleLogin} className="space-y-5 animate-fade-in">
 
                     {/* Login Method Selection - For Owner & Tenant */}
-                    {(role === 'OWNER' || role === 'TENANT') && !twoFactorRequired && (
+                    {(role === 'OWNER' || role === 'TENANT') && (
                       <div className="space-y-3 mb-6">
-                        <label className="text-xs font-bold text-gray-400 uppercase">Select Login Method</label>
-                        <div className="grid grid-cols-3 gap-2">
+                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.loginMethod}</label>
+                        <div className="grid grid-cols-2 gap-2">
                           <button
                             type="button"
-                            onClick={() => { setLoginMethod('password'); setMobileVerificationSent(false); }}
+                            onClick={() => { setLoginMethod('password'); setOtpSent(false); setOtpCode(''); setOtpError(null); }}
                             className={`py-3 px-2 rounded-xl transition-all font-bold text-xs flex flex-col items-center gap-2 ${
                               loginMethod === 'password'
                                 ? 'bg-[#111111] border border-[#111111] text-white'
-                                : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-white'
+                                : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
                             }`}
                           >
-                            <Key size={16} /> Password
+                            <Key size={16} /> {t.login.passwordLogin}
                           </button>
                           <button
                             type="button"
-                            onClick={() => { setLoginMethod('mobile'); }}
+                            onClick={() => { setLoginMethod('mobile'); setAuthError(null); }}
                             className={`py-3 px-2 rounded-xl transition-all font-bold text-xs flex flex-col items-center gap-2 ${
                               loginMethod === 'mobile'
                                 ? 'bg-[#111111] border border-[#111111] text-white'
-                                : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-white'
+                                : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
                             }`}
                           >
-                            <Smartphone size={16} /> Mobile OTP
+                            <Smartphone size={16} /> {t.login.mobileOtp}
                           </button>
-                          {role === 'OWNER' && (
-                            <button
-                              type="button"
-                              onClick={() => { setLoginMethod('biometric'); }}
-                              className={`py-3 px-2 rounded-xl transition-all font-bold text-xs flex flex-col items-center gap-2 ${
-                                loginMethod === 'biometric'
-                                  ? 'bg-[#111111] border border-[#111111] text-white'
-                                  : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-white'
-                              }`}
-                            >
-                              <Fingerprint size={16} /> Biometric
-                            </button>
-                          )}
                         </div>
                       </div>
                     )}
@@ -392,42 +411,42 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             <User className="absolute left-4 top-4 text-gray-400" size={18} />
                             <input
                               type="email"
-                              required
                               value={loginEmail}
-                              onChange={(e) => setLoginEmail(e.target.value)}
+                              onChange={(e) => { setLoginEmail(e.target.value); setFieldErrors(prev => ({ ...prev, email: '' })); }}
                               placeholder={getLoginPlaceholder()}
-                              className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                              className={`w-full pl-12 pr-4 py-3 bg-gray-100 border rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.email ? 'border-red-400' : 'border-gray-200/50'}`}
                             />
                           </div>
+                          {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-400 uppercase">Password</label>
+                          <label className="text-xs font-bold text-gray-400 uppercase">{t.login.password}</label>
                           <div className="relative">
                             <Key className="absolute left-4 top-4 text-gray-400" size={18} />
                             <input
                               type={showPassword ? "text" : "password"}
-                              required
                               value={loginPassword}
-                              onChange={(e) => setLoginPassword(e.target.value)}
+                              onChange={(e) => { setLoginPassword(e.target.value); setFieldErrors(prev => ({ ...prev, password: '' })); }}
                               placeholder="••••••••"
-                              className="w-full pl-12 pr-12 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                              className={`w-full pl-12 pr-12 py-3 bg-gray-100 border rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.password ? 'border-red-400' : 'border-gray-200/50'}`}
                             />
-                            <button 
+                            <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-4 top-4 text-gray-400 hover:text-white transition-colors"
+                              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 transition-colors"
                             >
                               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                           </div>
+                          {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
                           <div className="flex justify-end">
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               onClick={() => setShowForgotPassword(true)}
                               className="text-xs font-bold text-[#4a6600] hover:text-gray-700 transition-colors"
                             >
-                              Forgot password?
+                              {t.login.forgotPassword}
                             </button>
                           </div>
                         </div>
@@ -438,101 +457,80 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     {loginMethod === 'mobile' && (
                       <div className="space-y-4 animate-fade-in">
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-400 uppercase">Mobile Number</label>
+                          <label className="text-xs font-bold text-gray-400 uppercase">{t.login.phone}</label>
                           <div className="relative">
                             <Phone className="absolute left-4 top-4 text-gray-400" size={18} />
-                            <input 
-                              type="tel" 
-                              placeholder="you@gmail.com or username"
-                              className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                            <input
+                              type="tel"
+                              value={phoneNumber}
+                              onChange={(e) => setPhoneNumber(e.target.value)}
+                              placeholder="+60123456789"
+                              disabled={otpSent}
+                              className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 disabled:opacity-50"
                             />
                           </div>
+                          <p className="text-[10px] text-gray-400">Include country code (e.g. +60 for Malaysia)</p>
                         </div>
 
-                        {!mobileVerificationSent ? (
+                        {!otpSent ? (
                           <button
                             type="button"
-                            onClick={handleMobileVerificationSend}
-                            className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all"
+                            onClick={handleSendOTP}
+                            disabled={isLoading}
+                            className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                           >
-                            Send Verification Code
+                            {isLoading ? (
+                              <div className="w-5 h-5 border-2 border-[#111111]/30 border-t-[#111111] rounded-full animate-spin" />
+                            ) : (
+                              t.login.sendOtp
+                            )}
                           </button>
                         ) : (
-                          <div className="space-y-2 animate-fade-in">
-                            <label className="text-xs font-bold text-gray-400 uppercase">Verification Code</label>
-                            <input 
-                              type="text" 
+                          <div className="space-y-3 animate-fade-in">
+                            <label className="text-xs font-bold text-gray-400 uppercase">{t.login.enterOtp}</label>
+                            <input
+                              type="text"
                               placeholder="000000"
-                              value={verificationCode}
-                              onChange={(e) => setVerificationCode(e.target.value)}
+                              value={otpCode}
+                              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                               maxLength={6}
                               className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 text-center tracking-widest"
                             />
                             <p className="text-xs text-gray-400 text-center">Code expires in 5 minutes</p>
+                            <button
+                              type="button"
+                              onClick={() => { setOtpSent(false); setOtpCode(''); setOtpError(null); }}
+                              className="text-xs font-bold text-[#4a6600] hover:text-gray-700 transition-colors"
+                            >
+                              Change phone number
+                            </button>
                           </div>
                         )}
-                      </div>
-                    )}
 
-                    {/* Biometric Login (Owner Only) */}
-                    {loginMethod === 'biometric' && role === 'OWNER' && (
-                      <div className="space-y-4 animate-fade-in">
-                        <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-8 rounded-2xl text-center">
-                          <div className="w-16 h-16 bg-[#C8FF00] text-[#111111] rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Fingerprint size={32} />
-                          </div>
-                          <h3 className="font-bold text-gray-900 text-lg mb-2">Biometric Authentication</h3>
-                          <p className="text-gray-400 text-sm mb-6">Place your finger on the scanner to authenticate</p>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsLoading(true);
-                              setTimeout(() => {
-                                setIsLoading(false);
-                                handleLogin({ preventDefault: () => {} } as React.FormEvent);
-                              }, 2000);
-                            }}
-                            className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all"
-                          >
-                            Scan Fingerprint
-                          </button>
-                        </div>
+                        {/* OTP Error */}
+                        {otpError && (
+                          <p className="text-sm text-center px-4 py-2 rounded-xl text-red-600 bg-red-50">{otpError}</p>
+                        )}
                       </div>
                     )}
 
                     {/* Auth error */}
                     {authError && (
-                      <p className="text-sm text-center px-4 py-2 rounded-xl" className="text-[#4a6600] bg-[#C8FF00]/10">{authError}</p>
+                      <p className="text-sm text-center px-4 py-2 rounded-xl text-red-600 bg-red-50">{authError}</p>
                     )}
 
                     {/* Submit Button */}
-                    {!twoFactorRequired && (
-                      <button 
-                        type="submit"
-                        disabled={isLoading || (loginMethod === 'mobile' && !verificationCode)}
-                        className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
-                      >
-                        {isLoading ? (
-                          <div className="w-5 h-5 border-2 border-[#111111]/30 border-t-[#111111] rounded-full animate-spin" />
-                        ) : (
-                          <>Sign in <ArrowRight size={18} /></>
-                        )}
-                      </button>
-                    )}
-
-                    {twoFactorRequired && (
-                      <button 
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
-                      >
-                        {isLoading ? (
-                          <div className="w-5 h-5 border-2 border-[#111111]/30 border-t-[#111111] rounded-full animate-spin" />
-                        ) : (
-                          <>Complete 2FA <ShieldCheck size={18} /></>
-                        )}
-                      </button>
-                    )}
+                    <button
+                      type="submit"
+                      disabled={isLoading || (loginMethod === 'mobile' && (!otpSent || otpCode.length !== 6))}
+                      className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
+                    >
+                      {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-[#111111]/30 border-t-[#111111] rounded-full animate-spin" />
+                      ) : (
+                        <>{t.login.signIn} <ArrowRight size={18} /></>
+                      )}
+                    </button>
 
                     {/* OAuth Options */}
                     <div className="relative my-8">
@@ -562,7 +560,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <form onSubmit={handleRegister} className="space-y-5 animate-fade-in max-h-[600px] overflow-y-auto pr-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">First Name *</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.firstName} *</label>
                         <input
                           type="text"
                           placeholder="e.g. Ahmad"
@@ -573,7 +571,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">Last Name</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.lastName}</label>
                         <input
                           type="text"
                           placeholder="e.g. Razali"
@@ -585,7 +583,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Email Address *</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase">{t.login.email} *</label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-4 text-gray-400" size={18} />
                         <input
@@ -600,7 +598,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">Password *</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase">{t.login.password} *</label>
                       <div className="relative">
                         <Key className="absolute left-4 top-4 text-gray-400" size={18} />
                         <input
@@ -624,7 +622,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">Unit Number</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.unitNumber}</label>
                         <div className="relative">
                           <Building className="absolute left-4 top-4 text-gray-400" size={18} />
                           <input
@@ -637,7 +635,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">Phone</label>
+                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.phone}</label>
                         <div className="relative">
                           <Phone className="absolute left-4 top-4 text-gray-400" size={18} />
                           <input
@@ -659,82 +657,29 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                       </label>
                     </div>
 
-                    {/* OWNER REGISTRATION - ID VERIFICATION */}
-                    {role === 'OWNER' && (
-                      <div className="space-y-4 pt-4 border-t border-gray-200/50 animate-fade-in">
-                        <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-4 rounded-xl flex gap-3">
-                          <ShieldCheck className="text-[#4a6600] flex-shrink-0 mt-0.5" size={18} />
-                          <div className="text-xs text-[#4a6600] leading-relaxed">
-                            <strong>Identity Verification Required:</strong> Upload your National ID, Passport, or Driver's License for verification.
-                          </div>
-                        </div>
-
-                        {!ownerIDVerified ? (
-                          <div className="space-y-3">
-                            <label className="text-xs font-bold text-gray-400 uppercase">Upload ID Document</label>
-                            <div className="border-2 border-dashed border-[#C8FF00]/50 hover:border-[#C8FF00] rounded-xl p-6 text-center hover:bg-[#C8FF00]/5 transition-all cursor-pointer">
-                              <input 
-                                type="file" 
-                                accept="image/*,.pdf"
-                                onChange={handleIDUpload}
-                                className="hidden"
-                                id="idUpload"
-                              />
-                              <label htmlFor="idUpload" className="cursor-pointer">
-                                <Upload className="mx-auto text-[#4a6600] mb-2" size={24} />
-                                <p className="text-xs font-bold text-[#4a6600] hover:text-gray-700 transition-colors">{idUploadFile ? 'File uploaded: ' + idUploadFile.name : 'Click or drag to upload'}</p>
-                              </label>
-                            </div>
-                            {idUploadFile && !ownerIDVerified && (
-                              <p className="text-xs text-gray-400">Verifying your identity...</p>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-4 rounded-xl flex gap-3 animate-scale-in">
-                            <CheckCircle2 className="text-[#4a6600] flex-shrink-0 mt-0.5" size={18} />
-                            <div className="text-xs text-[#4a6600]">
-                              <strong>ID Verified!</strong> Your identity has been confirmed.
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-400 uppercase">Mobile Number (for 2FA)</label>
-                          <div className="relative">
-                            <Phone className="absolute left-4 top-4 text-gray-400" size={18} />
-                            <input 
-                              type="tel" 
-                              placeholder="you@gmail.com or username" 
-                              className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
                     {/* TENANT REGISTRATION - INVITATION OR APPLICATION */}
                     {role === 'TENANT' && (
                       <div className="space-y-4 pt-4 border-t border-gray-200/50 animate-fade-in">
                         <div className="flex gap-4 mb-4">
                           <label className="flex items-center gap-2 cursor-pointer flex-1">
-                            <input 
-                              type="radio" 
-                              name="tenantRegMethod" 
-                              checked={tenantRegMethod === 'invite'} 
-                              onChange={() => setTenantRegMethod('invite')} 
-                              className="accent-[#C8FF00]" 
+                            <input
+                              type="radio"
+                              name="tenantRegMethod"
+                              checked={tenantRegMethod === 'invite'}
+                              onChange={() => setTenantRegMethod('invite')}
+                              className="accent-[#C8FF00]"
                             />
-                            <span className="text-sm font-medium text-white">Invitation Code</span>
+                            <span className="text-sm font-medium text-gray-900">Invitation Code</span>
                           </label>
                           <label className="flex items-center gap-2 cursor-pointer flex-1">
-                            <input 
-                              type="radio" 
-                              name="tenantRegMethod" 
-                              checked={tenantRegMethod === 'apply'} 
-                              onChange={() => setTenantRegMethod('apply')} 
-                              className="accent-[#C8FF00]" 
+                            <input
+                              type="radio"
+                              name="tenantRegMethod"
+                              checked={tenantRegMethod === 'apply'}
+                              onChange={() => setTenantRegMethod('apply')}
+                              className="accent-[#C8FF00]"
                             />
-                            <span className="text-sm font-medium text-white">Self-Apply</span>
+                            <span className="text-sm font-medium text-gray-900">Self-Apply</span>
                           </label>
                         </div>
 
@@ -744,9 +689,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                               <p className="text-xs text-[#4a6600]">Enter the invitation code sent by the property owner</p>
                             </div>
                             <label className="text-xs font-bold text-gray-400 uppercase">Invitation Code</label>
-                            <input 
-                              type="text" 
-                              placeholder="e.g. ND28-XYZ-999" 
+                            <input
+                              type="text"
+                              placeholder="e.g. ND28-XYZ-999"
                               value={invitationCode}
                               onChange={(e) => setInvitationCode(e.target.value)}
                               className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
@@ -760,8 +705,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             </div>
                             <label className="text-xs font-bold text-gray-400 uppercase">Tenancy Agreement</label>
                             <div className="border-2 border-dashed border-[#C8FF00]/50 hover:border-[#C8FF00] rounded-xl p-4 text-center hover:bg-[#C8FF00]/5 transition-all cursor-pointer">
-                              <input 
-                                type="file" 
+                              <input
+                                type="file"
                                 accept=".pdf,.doc,.docx,image/*"
                                 className="hidden"
                                 id="tenancyUpload"
@@ -777,12 +722,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                       </div>
                     )}
 
-                    <button 
+                    {/* Auth error */}
+                    {authError && (
+                      <p className="text-sm text-center px-4 py-2 rounded-xl text-red-600 bg-red-50">{authError}</p>
+                    )}
+
+                    <button
                       type="submit"
-                      disabled={isLoading || (role === 'OWNER' && !ownerIDVerified) || (role === 'TENANT' && tenantRegMethod === 'invite' && !invitationCode)}
+                      disabled={isLoading || (role === 'TENANT' && tenantRegMethod === 'invite' && !invitationCode)}
                       className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all mt-8 disabled:opacity-50"
                     >
-                      {isLoading ? 'Processing...' : 'Create account'}
+                      {isLoading ? 'Processing...' : t.login.createAccount}
                     </button>
 
                     {/* OAuth Options */}
@@ -814,13 +764,13 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <div className="w-16 h-16 bg-[#C8FF00]/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 className="text-[#4a6600]" size={32} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">Account Created!</h3>
-                    <p className="text-gray-400 text-sm mb-6">Please check your email to confirm your account, then log in.</p>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{t.login.registerSuccess}</h3>
+                    <p className="text-gray-400 text-sm mb-6">{t.login.checkEmail}</p>
                     <button
                       onClick={() => { setMode('signin'); setRegSuccess(false); setLoginEmail(regEmail); }}
                       className="bg-[#C8FF00] hover:brightness-95 text-[#111111] px-6 py-3 rounded-xl font-bold transition-all"
                     >
-                      Go to Login
+                      {t.login.signIn}
                     </button>
                   </div>
                 )}
@@ -830,16 +780,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             {/* VISITOR LOGIN */}
             {mode === 'visitor' && (
               <div className="animate-fade-in">
-                <button 
+                <button
                   onClick={() => setMode('signin')}
-                  className="flex items-center text-gray-400 hover:text-white transition-colors mb-8 font-bold text-sm"
+                  className="flex items-center text-gray-400 hover:text-gray-900 transition-colors mb-8 font-bold text-sm"
                 >
                   <ChevronLeft size={16} className="mr-2" /> Back
                 </button>
-                
+
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Visitor Access</h2>
                 <p className="text-gray-400 mb-8 leading-relaxed">Enter your temporary visitor credentials to access the facility</p>
-                
+
                 <form onSubmit={handleLogin} className="space-y-5">
                   <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-4 rounded-xl flex gap-3 mb-6">
                     <Users className="text-[#4a6600] flex-shrink-0 mt-0.5" size={18} />
@@ -852,8 +802,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <label className="text-xs font-bold text-gray-400 uppercase">Visitor Code</label>
                     <div className="relative">
                       <Badge className="absolute left-4 top-4 text-gray-400" size={18} />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         placeholder="e.g. VISIT-ABC123"
                         className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
                       />
@@ -862,8 +812,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-400 uppercase">Verification Code</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="000000"
                       maxLength={6}
                       className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 text-center tracking-widest"
@@ -880,7 +830,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     type="submit"
                     disabled={isLoading}
                     className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8"

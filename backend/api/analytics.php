@@ -1,41 +1,14 @@
 <?php
 // ── Analytics API (MANAGEMENT only) ──────────────────────────────────
-// GET /api/analytics?type=overview          → booking + parking summary
-// GET /api/analytics?type=facility-usage    → bookings grouped by facility
-// GET /api/analytics?type=parking-usage     → parking slot stats
-// GET /api/analytics?type=bookings-by-date  → bookings per day (last 30 days)
-// GET /api/analytics?type=all-bookings      → all bookings (staff view)
-// GET /api/analytics?type=all-users         → all user profiles
-// ─────────────────────────────────────────────────────────────────────
-require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../supabase_helper.php';
 
-header('Access-Control-Allow-Origin: ' . ALLOWED_ORIGIN);
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Content-Type: application/json');
+set_api_headers();
+handle_preflight();
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
   http_response_code(405);
   echo json_encode(['error' => 'Method not allowed']);
   exit;
-}
-
-function sb(string $path): array {
-  $url = SUPABASE_URL . '/rest/v1/' . $path;
-  $ch  = curl_init($url);
-  curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_HTTPHEADER     => [
-      'apikey: '        . SUPABASE_SERVICE_KEY,
-      'Authorization: Bearer ' . SUPABASE_SERVICE_KEY,
-      'Content-Type: application/json',
-    ],
-  ]);
-  $response = curl_exec($ch);
-  $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-  curl_close($ch);
-  return ['status' => $httpCode, 'data' => json_decode($response, true)];
 }
 
 $type = $_GET['type'] ?? 'overview';
@@ -44,24 +17,24 @@ switch ($type) {
 
   // ── Overview: counts for dashboard ───────────────────────────────
   case 'overview':
-    $bookings = sb('bookings?select=id,status,facility_type,created_at');
-    $parking  = sb('parking_slots?select=id,status,zone');
-    $users    = sb('profiles?select=id,role');
+    $bookings = supabase_request('bookings?select=id,status,facility_type,created_at');
+    $parking  = supabase_request('parking_slots?select=id,status,zone');
+    $users    = supabase_request('profiles?select=id,role');
 
     $bData = $bookings['data'] ?? [];
     $pData = $parking['data']  ?? [];
     $uData = $users['data']    ?? [];
 
-    $activeBookings    = count(array_filter($bData, fn($b) => $b['status'] === 'active'));
-    $completedBookings = count(array_filter($bData, fn($b) => $b['status'] === 'completed'));
-    $cancelledBookings = count(array_filter($bData, fn($b) => $b['status'] === 'cancelled'));
+    $activeBookings    = count(array_filter($bData, fn($b) => ($b['status'] ?? '') === 'active'));
+    $completedBookings = count(array_filter($bData, fn($b) => ($b['status'] ?? '') === 'completed'));
+    $cancelledBookings = count(array_filter($bData, fn($b) => ($b['status'] ?? '') === 'cancelled'));
 
-    $availableSlots = count(array_filter($pData, fn($p) => $p['status'] === 'available'));
-    $occupiedSlots  = count(array_filter($pData, fn($p) => $p['status'] === 'occupied'));
+    $availableSlots = count(array_filter($pData, fn($p) => ($p['status'] ?? '') === 'available'));
+    $occupiedSlots  = count(array_filter($pData, fn($p) => ($p['status'] ?? '') === 'occupied'));
 
-    $residents   = count(array_filter($uData, fn($u) => $u['role'] === 'RESIDENT'));
-    $security    = count(array_filter($uData, fn($u) => $u['role'] === 'SECURITY'));
-    $management  = count(array_filter($uData, fn($u) => $u['role'] === 'MANAGEMENT'));
+    $residents   = count(array_filter($uData, fn($u) => ($u['role'] ?? '') === 'RESIDENT'));
+    $security    = count(array_filter($uData, fn($u) => ($u['role'] ?? '') === 'SECURITY'));
+    $management  = count(array_filter($uData, fn($u) => ($u['role'] ?? '') === 'MANAGEMENT'));
 
     echo json_encode([
       'bookings' => [
@@ -86,12 +59,12 @@ switch ($type) {
 
   // ── Facility usage: booking count per facility_type ──────────────
   case 'facility-usage':
-    $result = sb('bookings?select=facility_type,status');
+    $result = supabase_request('bookings?select=facility_type,status');
     $data   = $result['data'] ?? [];
 
     $usage = [];
     foreach ($data as $booking) {
-      $ft = $booking['facility_type'];
+      $ft = $booking['facility_type'] ?? 'unknown';
       if (!isset($usage[$ft])) {
         $usage[$ft] = ['facility_type' => $ft, 'total' => 0, 'active' => 0, 'completed' => 0, 'cancelled' => 0];
       }
@@ -105,12 +78,12 @@ switch ($type) {
 
   // ── Parking usage: breakdown by zone and status ──────────────────
   case 'parking-usage':
-    $result = sb('parking_slots?select=id,zone,status,slot_number&order=slot_number.asc');
+    $result = supabase_request('parking_slots?select=id,zone,status,slot_number&order=slot_number.asc');
     $data   = $result['data'] ?? [];
 
     $zones = [];
     foreach ($data as $slot) {
-      $zone = $slot['zone'];
+      $zone = $slot['zone'] ?? 'unknown';
       if (!isset($zones[$zone])) {
         $zones[$zone] = ['zone' => $zone, 'total' => 0, 'available' => 0, 'occupied' => 0, 'reserved' => 0, 'maintenance' => 0];
       }
@@ -129,12 +102,13 @@ switch ($type) {
   // ── Bookings per day (last 30 days) ──────────────────────────────
   case 'bookings-by-date':
     $since  = date('Y-m-d', strtotime('-30 days'));
-    $result = sb("bookings?select=date,status&date=gte.{$since}&order=date.asc");
+    $result = supabase_request("bookings?select=date,status&date=gte.{$since}&order=date.asc");
     $data   = $result['data'] ?? [];
 
     $byDate = [];
     foreach ($data as $b) {
-      $d = $b['date'];
+      $d = $b['date'] ?? '';
+      if (!$d) continue;
       if (!isset($byDate[$d])) {
         $byDate[$d] = ['date' => $d, 'total' => 0, 'active' => 0, 'completed' => 0, 'cancelled' => 0];
       }
@@ -148,8 +122,8 @@ switch ($type) {
 
   // ── All bookings (staff/management view) ─────────────────────────
   case 'all-bookings':
-    $limit  = isset($_GET['limit'])  ? (int)$_GET['limit']  : 100;
-    $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+    $limit  = isset($_GET['limit'])  ? max(1, min((int)$_GET['limit'], 500))  : 100;
+    $offset = isset($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
     $status = $_GET['status'] ?? '';
 
     $query = "bookings?select=*&order=created_at.desc&limit={$limit}&offset={$offset}";
@@ -157,7 +131,7 @@ switch ($type) {
       $query = "bookings?status=eq." . urlencode($status) . "&select=*&order=created_at.desc&limit={$limit}&offset={$offset}";
     }
 
-    $result = sb($query);
+    $result = supabase_request($query);
     http_response_code($result['status']);
     echo json_encode($result['data']);
     break;
@@ -170,7 +144,7 @@ switch ($type) {
       $query = 'profiles?role=eq.' . urlencode($role) . '&select=id,full_name,unit,role,phone,created_at&order=created_at.asc';
     }
 
-    $result = sb($query);
+    $result = supabase_request($query);
     http_response_code($result['status']);
     echo json_encode($result['data']);
     break;

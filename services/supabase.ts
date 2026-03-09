@@ -42,18 +42,3 @@ export async function signOut() {
 export async function getSession() {
   return supabase.auth.getSession();
 }
-
-// ── Real-time bookings subscription ──────────────────────────────────
-export function subscribeToBookings(
-  userId: string,
-  onChange: (payload: unknown) => void
-) {
-  return supabase
-    .channel(`bookings:${userId}`)
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'bookings', filter: `user_id=eq.${userId}` },
-      onChange
-    )
-    .subscribe();
-}

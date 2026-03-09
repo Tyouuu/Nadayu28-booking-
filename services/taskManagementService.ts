@@ -324,9 +324,8 @@ class TaskManagementService {
   }
 
   // Helper: Send feedback request
-  private sendFeedbackRequest(taskId: string): void {
-    // In real implementation, send notification to resident
-    console.log(`Feedback request sent for task ${taskId}`);
+  private sendFeedbackRequest(_taskId: string): void {
+    // TODO: In real implementation, send notification to resident
   }
 }
 

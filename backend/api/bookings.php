@@ -1,45 +1,11 @@
 <?php
-require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../supabase_helper.php';
 
-// CORS
-header('Access-Control-Allow-Origin: ' . ALLOWED_ORIGIN);
-header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
-header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-  http_response_code(200);
-  exit;
-}
+set_api_headers();
+handle_preflight();
 
 $method = $_SERVER['REQUEST_METHOD'];
 $input  = json_decode(file_get_contents('php://input'), true) ?? [];
-
-/**
- * Make a cURL request to Supabase REST API.
- */
-function supabase(string $path, string $method = 'GET', array $body = []): array {
-  $url = SUPABASE_URL . '/rest/v1/' . $path;
-  $ch  = curl_init($url);
-  curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_CUSTOMREQUEST  => $method,
-    CURLOPT_HTTPHEADER     => [
-      'apikey: '        . SUPABASE_SERVICE_KEY,
-      'Authorization: Bearer ' . SUPABASE_SERVICE_KEY,
-      'Content-Type: application/json',
-      'Prefer: return=representation',
-    ],
-  ]);
-  if (!empty($body)) {
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-  }
-  $response = curl_exec($ch);
-  $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-  curl_close($ch);
-  $data = json_decode($response, true);
-  return ['status' => $httpCode, 'data' => $data];
-}
 
 // ── GET /api/bookings?user_id=xxx  or  ?id=xxx ──────────────────────
 if ($method === 'GET') {
@@ -51,7 +17,7 @@ if ($method === 'GET') {
     $id    = urlencode($_GET['id']);
     $query = "bookings?id=eq.{$id}&select=*";
   }
-  $result = supabase($query);
+  $result = supabase_request($query);
   http_response_code($result['status']);
   echo json_encode($result['data']);
   exit;
@@ -80,7 +46,7 @@ if ($method === 'POST') {
     'is_overnight'   => $input['is_overnight']   ?? false,
     'user_id'        => $input['user_id']        ?? null,
   ];
-  $result = supabase('bookings', 'POST', $booking);
+  $result = supabase_request('bookings', 'POST', $booking);
   http_response_code($result['status']);
   echo json_encode($result['data']);
   exit;
@@ -97,7 +63,7 @@ if ($method === 'PATCH') {
   $update = [];
   if (isset($input['status']))   $update['status']   = $input['status'];
   if (isset($input['details']))  $update['details']  = $input['details'];
-  $result = supabase("bookings?id=eq.{$id}", 'PATCH', $update);
+  $result = supabase_request("bookings?id=eq.{$id}", 'PATCH', $update);
   http_response_code($result['status']);
   echo json_encode($result['data']);
   exit;
@@ -111,7 +77,7 @@ if ($method === 'DELETE') {
     exit;
   }
   $id     = urlencode($_GET['id']);
-  $result = supabase("bookings?id=eq.{$id}", 'DELETE');
+  $result = supabase_request("bookings?id=eq.{$id}", 'DELETE');
   http_response_code($result['status']);
   echo json_encode(['deleted' => true]);
   exit;

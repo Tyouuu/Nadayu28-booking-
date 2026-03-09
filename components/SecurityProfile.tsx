@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Shield, User, Clock, CheckCircle2, AlertTriangle, Camera, Bell, MapPin, Calendar, ScanLine, FileText, Phone, Edit2, Save } from 'lucide-react';
+import { useNavigation } from '../contexts/NavigationContext';
 
-export const SecurityProfile: React.FC<{ setCurrentView: (view: string) => void }> = ({ setCurrentView }) => {
+export const SecurityProfile: React.FC = () => {
+  const { setCurrentView } = useNavigation();
   const [activeTab, setActiveTab] = useState<'overview' | 'log' | 'settings'>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({

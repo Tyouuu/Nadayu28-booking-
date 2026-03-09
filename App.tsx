@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { UserRole } from './types';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
@@ -13,31 +13,19 @@ import { SecurityProfile } from './components/SecurityProfile';
 import { ManagementProfile } from './components/ManagementProfile';
 import { Login } from './components/Login';
 import { CommunityBoard } from './components/CommunityBoard';
-import { Bell } from 'lucide-react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
+import { I18nProvider } from './contexts/I18nContext';
 
-const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole>(UserRole.RESIDENT);
-  const [currentView, setCurrentView] = useState('dashboard');
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-  const handleLogin = (role: UserRole) => {
-    setCurrentUserRole(role);
-    setIsLoggedIn(true);
-    setCurrentView(role === UserRole.MANAGEMENT ? 'management' : role === UserRole.SECURITY ? 'security' : 'dashboard');
-    // TENANT uses same views as RESIDENT
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setCurrentView('dashboard');
-  };
+const AppContent: React.FC = () => {
+  const { isLoggedIn, isLoading, currentUserRole, login } = useAuth();
+  const { currentView, setCurrentView } = useNavigation();
 
   // Render logic based on view
   const renderContent = () => {
     switch(currentView) {
       case 'dashboard':
-        return <Dashboard userRole={currentUserRole} setCurrentView={setCurrentView} />;
+        return <Dashboard />;
       case 'parking':
         return <ParkingBooking />;
       case 'amenities':
@@ -51,31 +39,38 @@ const App: React.FC = () => {
       case 'account':
         return <Profile />;
       case 'sec-profile':
-        return <SecurityProfile setCurrentView={setCurrentView} />;
+        return <SecurityProfile />;
       case 'mgmt-profile':
-        return <ManagementProfile setCurrentView={setCurrentView} />;
+        return <ManagementProfile />;
       case 'community':
         return <CommunityBoard />;
       default:
-        return <Dashboard userRole={currentUserRole} setCurrentView={setCurrentView} />;
+        return <Dashboard />;
     }
   };
 
+  // Show loading spinner while checking session
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-[#C8FF00] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400 text-sm">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!isLoggedIn) {
-    return <Login onLogin={handleLogin} />;
+    return <Login onLogin={async (role: UserRole) => {
+      await login(role);
+      setCurrentView(role === UserRole.MANAGEMENT ? 'management' : role === UserRole.SECURITY ? 'security' : 'dashboard');
+    }} />;
   }
 
   return (
     <div className="flex min-h-screen bg-white text-gray-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      <Navigation 
-        currentView={currentView}
-        setCurrentView={setCurrentView}
-        currentUserRole={currentUserRole}
-        setCurrentUserRole={setCurrentUserRole}
-        isMobileOpen={isMobileOpen}
-        setIsMobileOpen={setIsMobileOpen}
-        onLogout={handleLogout}
-      />
+      <Navigation />
 
       <main className="flex-1 transition-all duration-300 ease-in-out relative">
         {/* Top spacing for mobile only */}
@@ -92,6 +87,18 @@ const App: React.FC = () => {
       {/* Floating Action Button for AI Help */}
       <SmartAssistant />
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <I18nProvider>
+      <AuthProvider>
+        <NavigationProvider initialView="dashboard">
+          <AppContent />
+        </NavigationProvider>
+      </AuthProvider>
+    </I18nProvider>
   );
 };
 

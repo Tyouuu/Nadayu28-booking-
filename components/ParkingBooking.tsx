@@ -4,6 +4,8 @@ import { Calendar, Car, ChevronLeft, Download, Share2, Moon, Sun, CheckCircle2 }
 import { Booking, FacilityType } from '../types';
 import { bookingsApi } from '../services/api';
 import { CustomDatePicker, CustomTimePicker } from './CustomPickers';
+import { parkingBookingSchema, validate } from '../services/validation';
+import { useI18n } from '../contexts/I18nContext';
 
 const generateParkingSpots = (startNum: number, count: number) => {
   return Array.from({ length: count }, (_, i) => ({
@@ -31,10 +33,17 @@ export const ParkingBooking: React.FC = () => {
   const isOvernight = activeZone === 'Overnight Parking';
   const [generatedBooking, setGeneratedBooking] = useState<Booking | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const { t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiError(null);
+    setFieldErrors({});
+    const result = validate(parkingBookingSchema, {
+      date, startTime, duration, plateNumber, selectedSlot: selectedSlot || '',
+    });
+    if (!result.success) { setFieldErrors(result.errors); return; }
     setIsLoading(true);
     try {
       const bookingId = Math.random().toString(36).substr(2, 9).toUpperCase();
@@ -91,24 +100,24 @@ export const ParkingBooking: React.FC = () => {
             <Car size={28} className="text-[#111111]" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-white">Parkzone</h2>
-            <p className="mt-1 text-sm text-gray-400">Double-line parking: P01-P36 (Visitor) and P37-P72 (Overnight)</p>
+            <h2 className="text-3xl font-bold tracking-tight text-white">{t.parking.title}</h2>
+            <p className="mt-1 text-sm text-gray-400">{t.parking.subtitle}</p>
           </div>
         </div>
         <div className="hidden md:flex items-center gap-5 bg-white/10 px-6 py-3 rounded-2xl">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-white/20 border-2 border-white/30"></div>
-            <span className="text-sm font-semibold text-gray-400">Available</span>
+            <span className="text-sm font-semibold text-gray-400">{t.parking.available}</span>
           </div>
           <div className="w-px h-5 bg-white/10"></div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-white/10"></div>
-            <span className="text-sm font-semibold text-gray-400">Occupied</span>
+            <span className="text-sm font-semibold text-gray-400">{t.parking.occupied}</span>
           </div>
           <div className="w-px h-5 bg-white/10"></div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-[#C8FF00]"></div>
-            <span className="text-sm font-semibold text-[#C8FF00]">Selected</span>
+            <span className="text-sm font-semibold text-[#C8FF00]">{t.parking.selected}</span>
           </div>
         </div>
       </div>
@@ -129,11 +138,11 @@ export const ParkingBooking: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-3">
                       <div className={"flex items-center gap-2 px-3 py-1.5 rounded-full " + (isDark ? "bg-[#C8FF00]/20 text-[#C8FF00]" : "bg-[#C8FF00]/15 text-[#4a6600]")}>
                         <CheckCircle2 size={14} />
-                        <span className="text-xs font-bold">{availableSlots} Available</span>
+                        <span className="text-xs font-bold">{availableSlots} {t.parking.available}</span>
                       </div>
                       <div className={"flex items-center gap-2 px-3 py-1.5 rounded-full " + (isDark ? "bg-white/10 text-gray-400" : "bg-gray-100 text-gray-500")}>
                         <Car size={14} />
-                        <span className="text-xs font-bold">{occupiedSlots} Occupied</span>
+                        <span className="text-xs font-bold">{occupiedSlots} {t.parking.occupied}</span>
                       </div>
                     </div>
                   </div>
@@ -225,21 +234,22 @@ export const ParkingBooking: React.FC = () => {
                 <div className="p-2 rounded-xl bg-gray-100">
                   <Calendar size={18} className="text-[#111111]" />
                 </div>
-                Complete Your Booking
+                {t.parking.completeBooking}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</label>
-                  <CustomDatePicker required value={date} onChange={setDate} />
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t.parking.date}</label>
+                  <CustomDatePicker required value={date} onChange={(v) => { setDate(v); setFieldErrors(prev => ({ ...prev, date: '' })); }} />
+                  {fieldErrors.date && <p className="text-red-500 text-xs mt-1">{fieldErrors.date}</p>}
                 </div>
                 <div className="flex gap-3">
                   <div className="space-y-2 flex-1">
-                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Arrival Time</label>
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t.parking.arrivalTime}</label>
                     <CustomTimePicker required value={startTime} onChange={setStartTime} />
                   </div>
                   {!isOvernight && (
                     <div className="space-y-2 flex-1">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Duration</label>
+                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t.parking.duration}</label>
                       <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none font-medium text-gray-900 transition-all cursor-pointer"
                         value={duration} onChange={(e) => setDuration(e.target.value)}>
                         {[1,2,3,4,5,6].map(h => <option key={h} value={h}>{h}h</option>)}
@@ -251,16 +261,18 @@ export const ParkingBooking: React.FC = () => {
                   <div className="p-4 bg-[#111111] rounded-xl">
                     <p className="text-sm text-[#C8FF00] font-medium flex items-center gap-2">
                       <Moon size={15} />
-                      48-Hour Overnight Parking (P37-P72)
+                      {t.parking.overnightParking}
                     </p>
                   </div>
                 )}
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Vehicle Plate</label>
-                  <input type="text" required placeholder="WNB 1234"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none font-bold uppercase text-gray-900 placeholder:font-normal placeholder:normal-case placeholder:text-gray-400 transition-all"
-                    value={plateNumber} onChange={(e) => setPlateNumber(e.target.value)} />
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{t.parking.vehiclePlate}</label>
+                  <input type="text" placeholder="WNB 1234"
+                    className={`w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none font-bold uppercase text-gray-900 placeholder:font-normal placeholder:normal-case placeholder:text-gray-400 transition-all ${fieldErrors.plateNumber ? 'border-red-400' : 'border-gray-200'}`}
+                    value={plateNumber} onChange={(e) => { setPlateNumber(e.target.value); setFieldErrors(prev => ({ ...prev, plateNumber: '' })); }} />
+                  {fieldErrors.plateNumber && <p className="text-red-500 text-xs mt-1">{fieldErrors.plateNumber}</p>}
                 </div>
+                {fieldErrors.selectedSlot && <p className="text-red-500 text-xs mt-1">{fieldErrors.selectedSlot}</p>}
                 {apiError && (
                   <p className="text-sm text-red-500 text-center px-4 py-2 rounded-xl bg-red-50">{apiError}</p>
                 )}
@@ -268,11 +280,11 @@ export const ParkingBooking: React.FC = () => {
                   disabled={!selectedSlot || isLoading || !date || !startTime || !plateNumber}
                   className="w-full py-4 rounded-xl font-bold text-white transition-all disabled:opacity-50 flex items-center justify-center gap-2 text-sm bg-[#111111] hover:bg-[#222222]">
                   <Calendar size={16} />
-                  {isLoading ? 'Processing...' : 'Confirm Booking'}
+                  {isLoading ? t.parking.processing : t.parking.confirmBooking}
                 </button>
               </form>
               <p className="text-xs text-gray-400 text-center mt-4 leading-relaxed">
-                Instant QR code confirmation. Free cancellation up to 2 hours before.
+                {t.parking.instantConfirm}
               </p>
             </div>
           </div>
@@ -281,11 +293,11 @@ export const ParkingBooking: React.FC = () => {
         <div className="max-w-md mx-auto pt-8">
           <button onClick={() => { setStep(1); setGeneratedBooking(null); }}
             className="mb-6 flex items-center text-gray-400 hover:text-[#111111] transition-colors font-semibold text-sm gap-1">
-            <ChevronLeft size={16} /> Back to Selection
+            <ChevronLeft size={16} /> {t.parking.backToSelection}
           </button>
           <div className="bg-white rounded-2xl overflow-hidden border border-gray-100">
             <div className={"p-6 text-center bg-[#111111]"}>
-              <h3 className={"font-bold text-2xl tracking-widest mb-1 text-white"}>PARKING PASS</h3>
+              <h3 className={"font-bold text-2xl tracking-widest mb-1 text-white"}>{t.parking.parkingPass}</h3>
               <p className={"text-xs uppercase tracking-widest text-gray-500"}>Nadayu28 Residences</p>
               <div className={"inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase bg-[#C8FF00] text-[#111111]"}>
                 {isOvernight ? <Moon size={12} /> : <Sun size={12} />}

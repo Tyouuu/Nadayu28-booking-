@@ -41,11 +41,13 @@ function toViolation(row: Record<string, unknown>): Violation {
 }
 
 function toVehicle(row: Record<string, unknown>): Vehicle {
+  const make = (row.make as string) || '';
+  const model = (row.model as string) || '';
   return {
     id: row.id as string,
-    plateNumber: row.plate as string,
-    model: [row.make, row.model].filter(Boolean).join(' ') || (row.model as string),
-    isPrimary: row.is_default as boolean,
+    plateNumber: (row.plate as string) || '',
+    model: [make, model].filter(Boolean).join(' ') || model,
+    isPrimary: (row.is_default as boolean) ?? false,
   };
 }
 
@@ -64,8 +66,8 @@ function toUser(row: Record<string, unknown>): User {
   return {
     id: row.id as string,
     name: row.full_name as string,
-    email: row.email as string ?? '',
-    phone: row.phone as string ?? '',
+    email: (row.email as string) || '',
+    phone: (row.phone as string) || '',
     unit: row.unit as string,
     role: row.role as UserRole,
     moveInDate: row.created_at as string,

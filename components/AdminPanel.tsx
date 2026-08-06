@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { MOCK_VIOLATIONS } from '../constants';
-import { fetchViolations, fetchReports, fetchUsers, updateUserRole, fetchAuditLog, AuditLogEntry } from '../services/dataService';
+import { fetchViolations, fetchReports, fetchUsers, updateUserRole, fetchAuditLog, AuditLogEntry, updateViolationStatus } from '../services/dataService';
 import { Violation, Report, User, UserRole } from '../types';
 import { Download, Filter, MoreHorizontal, X, AlertTriangle, Calendar, MapPin, DollarSign, Clock } from 'lucide-react';
 
@@ -55,6 +55,12 @@ export const AdminPanel: React.FC = () => {
     } finally {
       setSavingUserId(null);
     }
+  };
+
+  const handleMarkPaid = async (violationId: string) => {
+    await updateViolationStatus(violationId, 'paid');
+    fetchViolations().then(setViolations).catch(() => {});
+    setSelectedViolation(null);
   };
 
   const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
@@ -252,7 +258,7 @@ export const AdminPanel: React.FC = () => {
             </div>
             <div className="px-6 pb-6 flex gap-3">
               {selectedViolation.status === 'pending' && (
-                <button onClick={() => setSelectedViolation(null)} className="flex-1 bg-[#111111] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#222] transition-colors">
+                <button onClick={() => handleMarkPaid(selectedViolation.id)} className="flex-1 bg-[#111111] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#222] transition-colors">
                   Mark as Paid
                 </button>
               )}

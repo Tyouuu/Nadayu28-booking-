@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Booking, Announcement } from "../types";
 import { MOCK_ANNOUNCEMENTS, MOCK_BOOKINGS, USE_MOCK_DATA } from "../constants";
 import { fetchBookings, fetchAnnouncements } from "../services/dataService";
-import { Bell, Clock, ChevronRight, Activity, ArrowUpRight, Car, Dumbbell, MessageSquare, AlertTriangle, Zap } from "lucide-react";
+import { Bell, Clock, ChevronRight, Activity, ArrowUpRight, Car, Dumbbell, MessageSquare, AlertTriangle, Zap, UserPlus } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigation } from "../contexts/NavigationContext";
 import { useI18n } from "../contexts/I18nContext";
@@ -22,10 +22,11 @@ export const Dashboard: React.FC = () => {
   const greeting = hour < 12 ? t.dashboard.goodMorning : hour < 18 ? t.dashboard.goodAfternoon : t.dashboard.goodEvening;
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const quickActions = [
-    { id: "parking",   label: t.nav.visitorParking, icon: Car,           desc: t.dashboard.bookSlot },
-    { id: "amenities", label: t.nav.amenities,       icon: Dumbbell,      desc: t.dashboard.reserveFacilities },
-    { id: "community", label: t.dashboard.community, icon: MessageSquare, desc: t.dashboard.viewBoard },
-    { id: "report",    label: t.nav.reportIssue,     icon: AlertTriangle, desc: t.dashboard.submitReport },
+    { id: "parking",         label: t.nav.visitorParking, icon: Car,           desc: t.dashboard.bookSlot },
+    { id: "invite-visitor",  label: "Invite Visitor",     icon: UserPlus,      desc: "Register a guest" },
+    { id: "amenities",       label: t.nav.amenities,       icon: Dumbbell,      desc: t.dashboard.reserveFacilities },
+    { id: "community",       label: t.dashboard.community, icon: MessageSquare, desc: t.dashboard.viewBoard },
+    { id: "report",          label: t.nav.reportIssue,     icon: AlertTriangle, desc: t.dashboard.submitReport },
   ];
 
   return (
@@ -75,7 +76,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-5 gap-3 mb-6">
         {quickActions.map(action => (
           <button key={action.id} onClick={() => setCurrentView(action.id)} className="group flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-4 py-3 text-left hover:border-[#C8FF00] hover:shadow-sm transition-all duration-200">
             <div className="w-8 h-8 bg-gray-50 group-hover:bg-[#C8FF00] rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-200">

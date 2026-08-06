@@ -3,6 +3,7 @@ import { UserRole } from './types';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ParkingBooking } from './components/ParkingBooking';
+import { InviteVisitor } from './components/InviteVisitor';
 import { Amenities } from './components/Amenities';
 import { AdminPanel } from './components/AdminPanel';
 import { Reporting } from './components/Reporting';
@@ -28,6 +29,8 @@ const AppContent: React.FC = () => {
         return <Dashboard />;
       case 'parking':
         return <ParkingBooking />;
+      case 'invite-visitor':
+        return <InviteVisitor />;
       case 'amenities':
         return <Amenities />;
       case 'report':

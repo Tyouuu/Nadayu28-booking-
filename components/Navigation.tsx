@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Home, Car, Dumbbell, MessageSquare, AlertTriangle,
-  Shield, BarChart2, LogOut, Menu, X, User, Settings, ChevronRight, Globe
+  Shield, BarChart2, LogOut, Menu, X, User, Settings, ChevronRight, Globe, UserPlus, Wrench
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,9 +17,11 @@ export const Navigation: React.FC = () => {
   const navItems = [
     { id: 'dashboard',    label: t.nav.dashboard,      icon: Home,          roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY, UserRole.MANAGEMENT] },
     { id: 'parking',      label: t.nav.visitorParking,  icon: Car,           roles: [UserRole.RESIDENT, UserRole.TENANT] },
+    { id: 'invite-visitor', label: 'Invite Visitor',    icon: UserPlus,      roles: [UserRole.RESIDENT, UserRole.TENANT] },
     { id: 'amenities',    label: t.nav.amenities,       icon: Dumbbell,      roles: [UserRole.RESIDENT, UserRole.TENANT] },
     { id: 'community',    label: t.nav.communityBoard,  icon: MessageSquare, roles: [UserRole.RESIDENT, UserRole.TENANT] },
     { id: 'report',       label: t.nav.reportIssue,     icon: AlertTriangle, roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY] },
+    { id: 'maintenance',  label: 'Maintenance',         icon: Wrench,        roles: [UserRole.SECURITY, UserRole.MANAGEMENT] },
     { id: 'security',     label: t.nav.securityScan,    icon: Shield,        roles: [UserRole.SECURITY] },
     { id: 'management',   label: t.nav.adminPanel,      icon: BarChart2,     roles: [UserRole.MANAGEMENT] },
     { id: 'account',      label: t.nav.myAccount,       icon: User,          roles: [UserRole.RESIDENT, UserRole.TENANT] },

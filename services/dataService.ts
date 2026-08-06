@@ -178,8 +178,21 @@ export async function createCommunityPost(post: { authorUnit: string; authorName
 }
 
 export async function updateViolationStatus(id: string, status: 'pending' | 'paid') {
+  const { data: current } = await supabase.from('violations').select('status').eq('id', id).single();
+
   const { error } = await supabase.from('violations').update({ status }).eq('id', id);
   if (error) throw error;
+
+  if (current && current.status !== status) {
+    await logAudit({
+      action: 'violation_status_change',
+      entityType: 'violation',
+      entityId: id,
+      field: 'status',
+      before: current.status,
+      after: status,
+    });
+  }
 }
 
 export async function likeCommunityPost(id: string) {
@@ -497,6 +510,12 @@ export async function updateReport(id: string, fields: {
   assignedToName?: string;
   resolutionNotes?: string;
 }): Promise<void> {
+  const { data: current } = await supabase
+    .from('reports')
+    .select('status, assigned_to_name, resolution_notes')
+    .eq('id', id)
+    .single();
+
   const update: Record<string, unknown> = {};
   if (fields.status !== undefined) update.status = fields.status;
   if (fields.assignedToName !== undefined) update.assigned_to_name = fields.assignedToName;
@@ -504,4 +523,106 @@ export async function updateReport(id: string, fields: {
 
   const { error } = await supabase.from('reports').update(update).eq('id', id);
   if (error) throw error;
+
+  if (!current) return;
+
+  if (fields.status !== undefined && fields.status !== current.status) {
+    await logAudit({
+      action: 'report_update', entityType: 'report', entityId: id,
+      field: 'status', before: current.status, after: fields.status,
+    });
+  }
+  if (fields.assignedToName !== undefined && fields.assignedToName !== current.assigned_to_name) {
+    await logAudit({
+      action: 'report_update', entityType: 'report', entityId: id,
+      field: 'assigned_to_name', before: current.assigned_to_name ?? null, after: fields.assignedToName,
+    });
+  }
+  if (fields.resolutionNotes !== undefined && fields.resolutionNotes !== current.resolution_notes) {
+    await logAudit({
+      action: 'report_update', entityType: 'report', entityId: id,
+      field: 'resolution_notes', before: current.resolution_notes ?? null, after: fields.resolutionNotes,
+    });
+  }
+}
+
+// ── Audit log ─────────────────────────────────────────────────
+
+async function logAudit(entry: {
+  action: string;
+  entityType: string;
+  entityId: string;
+  field: string;
+  before: string | null;
+  after: string | null;
+}): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+
+  const { error } = await supabase.from('audit_log').insert({
+    id: 'al' + Date.now(),
+    actor_id: user?.id,
+    actor_name: profile?.full_name ?? 'Unknown',
+    action: entry.action,
+    entity_type: entry.entityType,
+    entity_id: entry.entityId,
+    field: entry.field,
+    before_value: entry.before,
+    after_value: entry.after,
+  });
+  if (error) throw error;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  actorId: string | null;
+  actorName: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  field: string;
+  beforeValue: string | null;
+  afterValue: string | null;
+  createdAt: string;
+}
+
+function toAuditLogEntry(row: Record<string, unknown>): AuditLogEntry {
+  return {
+    id: row.id as string,
+    actorId: (row.actor_id as string) ?? null,
+    actorName: row.actor_name as string,
+    action: row.action as string,
+    entityType: row.entity_type as string,
+    entityId: row.entity_id as string,
+    field: row.field as string,
+    beforeValue: (row.before_value as string) ?? null,
+    afterValue: (row.after_value as string) ?? null,
+    createdAt: row.created_at as string,
+  };
+}
+
+export async function fetchAuditLog(action?: string): Promise<AuditLogEntry[]> {
+  let query = supabase.from('audit_log').select('*').order('created_at', { ascending: false });
+  if (action) query = query.eq('action', action);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []).map(toAuditLogEntry);
+}
+
+export async function updateUserRole(userId: string, newRole: UserRole): Promise<void> {
+  const { data: current } = await supabase.from('profiles').select('role').eq('id', userId).single();
+
+  const { error } = await supabase.from('profiles').update({ role: newRole }).eq('id', userId);
+  if (error) throw error;
+
+  if (current && current.role !== newRole) {
+    await logAudit({
+      action: 'role_change',
+      entityType: 'profile',
+      entityId: userId,
+      field: 'role',
+      before: current.role,
+      after: newRole,
+    });
+  }
 }

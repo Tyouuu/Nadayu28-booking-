@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Car, Plus, Trash2, History, AlertTriangle, FileText, Settings, Camera, Save, Lock, Users, Shield, Eye, EyeOff, Edit2, LogOut, Home, CheckCircle2, Calendar } from 'lucide-react';
 import { MOCK_BOOKINGS, MOCK_VEHICLES } from '../constants';
-import { fetchBookings, fetchVehicles } from '../services/dataService';
-import { Vehicle, Booking } from '../types';
+import { fetchBookings, fetchVehicles, fetchReports } from '../services/dataService';
+import { Vehicle, Booking, Report } from '../types';
 import { addVehicleSchema, addTenantSchema, validate } from '../services/validation';
 import { useI18n } from '../contexts/I18nContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Tenant {
   id: string;
@@ -26,6 +27,11 @@ export const Profile: React.FC = () => {
   useEffect(() => {
     fetchBookings().then(setBookings).catch(() => {});
   }, []);
+  const [reports, setReports] = useState<Report[]>([]);
+  const { userProfile } = useAuth();
+  useEffect(() => {
+    fetchReports(userProfile?.unit).then(setReports).catch(() => {});
+  }, [userProfile?.unit]);
   const [newVehicle, setNewVehicle] = useState({ plate: '', model: '' });
   const [isAddingVehicle, setIsAddingVehicle] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -755,6 +761,34 @@ export const Profile: React.FC = () => {
                     <History size={48} className="text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-400 font-medium">No activity yet</p>
                   </div>
+                )}
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                <h4 className="font-bold text-gray-900 text-base mb-4">My Reports</h4>
+                {reports.length > 0 ? (
+                  <div className="space-y-4">
+                    {reports.map((r) => (
+                      <div key={r.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-bold text-gray-900 text-sm">{r.category}</p>
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                            r.status === 'Resolved' ? 'bg-[#C8FF00]/15 text-[#4a6600]' :
+                            r.status === 'In Progress' ? 'bg-blue-50 text-blue-500' : 'bg-orange-50 text-orange-500'
+                          }`}>{r.status}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-1">{r.description}</p>
+                        {r.resolutionNotes && (
+                          <p className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-200">
+                            <span className="font-semibold text-gray-500">Resolution: </span>{r.resolutionNotes}
+                          </p>
+                        )}
+                        <p className="text-[11px] text-gray-400 mt-2">{r.date}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">No reports submitted yet.</p>
                 )}
               </div>
             </div>

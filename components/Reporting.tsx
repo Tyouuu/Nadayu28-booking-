@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Camera, AlertTriangle, CheckCircle2, ChevronRight, X, Zap, Wrench, AlertCircle, Plus } from 'lucide-react';
-import { taskManagementService } from '../services/taskManagementService';
+import { createReport } from '../services/dataService';
 import { reportingSchema, validate } from '../services/validation';
 import { useI18n } from '../contexts/I18nContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Reporting: React.FC = () => {
   const [step, setStep] = useState<'category' | 'details' | 'form' | 'success'>('category');
@@ -13,7 +14,10 @@ export const Reporting: React.FC = () => {
   const [referenceId, setReferenceId] = useState('');
   const [responseTime, setResponseTime] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { t } = useI18n();
+  const { userProfile } = useAuth();
 
   const issueCategories = [
     { 
@@ -98,7 +102,7 @@ export const Reporting: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file: File) => {
         const reader = new FileReader();
         reader.onload = () => {
           setUploadedImages(prev => [...prev, reader.result as string]);
@@ -108,8 +112,9 @@ export const Reporting: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setFieldErrors({});
+    setSubmitError(null);
     const result = validate(reportingSchema, {
       category: selectedCategory, subcategory: selectedSubcategory, description,
     });
@@ -118,18 +123,21 @@ export const Reporting: React.FC = () => {
     const selectedCategoryObj = issueCategories.find(c => c.id === selectedCategory);
     const selectedSubObj = selectedCategoryObj?.subcategories.find(s => s.id === selectedSubcategory);
 
-    // Create task via service
-    const task = taskManagementService.reportTask({
-      type: 'maintenance',
-      title: `${selectedCategoryObj?.label}: ${selectedSubObj?.label || 'Custom'}`,
-      description: description,
-      location: 'Common Area',
-      priority: selectedCategory === 'facility-malfunction' ? 'high' : 'medium',
-      reportedBy: 'Current User',
-    });
-
-    setReferenceId(task.id);
-    setStep('success');
+    setIsSubmitting(true);
+    try {
+      const id = await createReport({
+        category: `${selectedCategoryObj?.label}: ${selectedSubObj?.label || 'Custom'}`,
+        description,
+        residentUnit: userProfile?.unit ?? '',
+        images: uploadedImages,
+      });
+      setReferenceId(id);
+      setStep('success');
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to submit report. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -360,18 +368,24 @@ export const Reporting: React.FC = () => {
                 </div>
               )}
 
+              {submitError && (
+                <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#fef2f2', borderColor: '#ef4444', color: '#991b1b'}}>
+                  <p className="text-sm font-medium">{submitError}</p>
+                </div>
+              )}
+
               {/* Submit Button - Disabled if no images */}
               <button
                 onClick={handleSubmit}
-                disabled={uploadedImages.length === 0 || !description.trim()}
+                disabled={uploadedImages.length === 0 || !description.trim() || isSubmitting}
                 className={`w-full font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-2 ${
-                  uploadedImages.length > 0 && description.trim()
+                  uploadedImages.length > 0 && description.trim() && !isSubmitting
                     ? 'bg-[#111111] hover:bg-[#222222] text-white shadow-sm cursor-pointer'
                     : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                 }`}
               >
-                <CheckCircle2 size={20} /> 
-                {uploadedImages.length === 0 ? t.reporting.addPhotos : t.reporting.submitReport}
+                <CheckCircle2 size={20} />
+                {isSubmitting ? 'Submitting...' : uploadedImages.length === 0 ? t.reporting.addPhotos : t.reporting.submitReport}
               </button>
             </div>
           </div>

@@ -107,6 +107,12 @@ export async function fetchBookings(unit?: string): Promise<Booking[]> {
   return (data ?? []).map(toBooking);
 }
 
+export async function validateBookingById(id: string): Promise<{ valid: boolean; booking?: Booking }> {
+  const { data, error } = await supabase.from('bookings').select('*').eq('id', id).eq('status', 'active').limit(1);
+  if (error || !data || data.length === 0) return { valid: false };
+  return { valid: true, booking: toBooking(data[0]) };
+}
+
 export async function fetchViolations(unit?: string): Promise<Violation[]> {
   let query = supabase.from('violations').select('*').order('date', { ascending: false });
   if (unit) query = query.eq('unit', unit);
@@ -152,21 +158,6 @@ export async function fetchCommunityPosts(category?: string): Promise<CommunityP
 
 // ── Write operations ────────────────────────────────────────
 
-export async function createReport(report: { category: string; description: string; residentUnit: string; userId?: string }) {
-  const id = 'r' + Date.now();
-  const { error } = await supabase.from('reports').insert({
-    id,
-    date: new Date().toISOString().split('T')[0],
-    category: report.category,
-    description: report.description,
-    status: 'Received',
-    resident_unit: report.residentUnit,
-    user_id: report.userId,
-  });
-  if (error) throw error;
-  return id;
-}
-
 export async function createCommunityPost(post: { authorUnit: string; authorName: string; title: string; content: string; category: string; userId?: string }) {
   const id = 'p' + Date.now();
   const { error } = await supabase.from('community_posts').insert({
@@ -193,4 +184,189 @@ export async function likeCommunityPost(id: string) {
   if (!current) return;
   const { error } = await supabase.from('community_posts').update({ likes: current.likes + 1 }).eq('id', id);
   if (error) throw error;
+}
+
+export async function createReport(report: { category: string; description: string; residentUnit: string; images?: string[] }) {
+  const { data: { user } } = await supabase.auth.getUser();
+  const id = 'r' + Date.now();
+  const { error } = await supabase.from('reports').insert({
+    id,
+    date: new Date().toISOString().split('T')[0],
+    category: report.category,
+    description: report.description,
+    status: 'Received',
+    resident_unit: report.residentUnit,
+    user_id: user?.id,
+    images: report.images ?? [],
+  });
+  if (error) throw error;
+  return id;
+}
+
+// ── Parking slots ────────────────────────────────────────────
+
+export interface ParkingSlot {
+  id: string;
+  slotNumber: number;
+  zone: 'Visitor Parking' | 'Overnight Parking';
+  status: 'available' | 'occupied' | 'reserved' | 'maintenance';
+}
+
+function toParkingSlot(row: Record<string, unknown>): ParkingSlot {
+  return {
+    id: row.id as string,
+    slotNumber: row.slot_number as number,
+    zone: row.zone as ParkingSlot['zone'],
+    status: row.status as ParkingSlot['status'],
+  };
+}
+
+export async function fetchParkingSlots(): Promise<ParkingSlot[]> {
+  const { data, error } = await supabase.from('parking_slots').select('*').order('slot_number');
+  if (error) throw error;
+  return (data ?? []).map(toParkingSlot);
+}
+
+export async function createParkingBooking(params: {
+  slotId: string;
+  zone: string;
+  date: string;
+  startTime: string;
+  durationHours: number;
+  plateNumber: string;
+  unit: string;
+  isOvernight: boolean;
+}): Promise<{ id: string; qrCode: string }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const bookingId = Math.random().toString(36).substr(2, 9).toUpperCase();
+  const qrPayload = JSON.stringify({
+    id: bookingId,
+    plate: params.plateNumber.toUpperCase(),
+    slot: params.slotId,
+    date: params.date,
+    time: params.startTime,
+    duration: params.durationHours,
+    unit: params.unit,
+    zone: params.zone,
+  });
+
+  const { error: bookingError } = await supabase.from('bookings').insert({
+    id: bookingId,
+    facility_type: `PARKING:${params.zone}`,
+    date: params.date,
+    start_time: params.startTime,
+    duration_hours: params.durationHours,
+    status: 'active',
+    resident_unit: params.unit,
+    details: `${params.plateNumber.toUpperCase()} • ${params.slotId}`,
+    qr_code: qrPayload,
+    is_overnight: params.isOvernight,
+    user_id: user?.id,
+  });
+  if (bookingError) throw bookingError;
+
+  // Atomically claim the slot only if it's still available — prevents a race
+  // between two residents booking the same spot at the same moment.
+  const { data: updated, error: slotError } = await supabase
+    .from('parking_slots')
+    .update({ status: 'occupied', booked_by: user?.id, booking_id: bookingId })
+    .eq('id', params.slotId)
+    .eq('status', 'available')
+    .select();
+
+  if (slotError || !updated || updated.length === 0) {
+    await supabase.from('bookings').delete().eq('id', bookingId);
+    throw new Error('This parking spot was just taken by someone else. Please pick another.');
+  }
+
+  return { id: bookingId, qrCode: qrPayload };
+}
+
+// ── Facilities (Amenities booking) ──────────────────────────
+
+export interface Facility {
+  id: string;
+  name: string;
+  icon: string;
+  category: string;
+  capacity: number;
+  sessionDuration: number;
+  status: 'active' | 'maintenance' | 'closed';
+  description: string;
+}
+
+function toFacility(row: Record<string, unknown>): Facility {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    icon: row.icon as string,
+    category: row.category as string,
+    capacity: row.capacity as number,
+    sessionDuration: row.session_duration as number,
+    status: row.status as Facility['status'],
+    description: row.description as string,
+  };
+}
+
+export async function fetchFacilities(): Promise<Facility[]> {
+  const { data, error } = await supabase.from('facilities').select('*').order('name');
+  if (error) throw error;
+  return (data ?? []).map(toFacility);
+}
+
+export async function fetchFacilitySlots(facilityId: string, date: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('facility_slots')
+    .select('start_time')
+    .eq('facility_id', facilityId)
+    .eq('date', date)
+    .eq('status', 'booked');
+  if (error) throw error;
+  return (data ?? []).map((r) => r.start_time as string);
+}
+
+export async function createFacilityBooking(params: {
+  facilityId: string;
+  date: string;
+  startTime: string;
+  durationHours: number;
+  unit: string;
+}): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('You must be signed in to book a facility.');
+
+  const bookingId = 'fb' + Date.now();
+  const { error: bookingError } = await supabase.from('bookings').insert({
+    id: bookingId,
+    facility_type: params.facilityId,
+    date: params.date,
+    start_time: params.startTime,
+    duration_hours: params.durationHours,
+    status: 'active',
+    resident_unit: params.unit,
+    user_id: user.id,
+  });
+  if (bookingError) throw bookingError;
+
+  const [h, m] = params.startTime.split(':').map(Number);
+  const endMinutes = h * 60 + m + params.durationHours * 60;
+  const endTime = `${String(Math.floor(endMinutes / 60) % 24).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}`;
+
+  const { error: slotError } = await supabase.from('facility_slots').insert({
+    facility_id: params.facilityId,
+    booking_id: bookingId,
+    date: params.date,
+    start_time: params.startTime,
+    end_time: endTime,
+    status: 'booked',
+    booked_by: user.id,
+  });
+  if (slotError) {
+    // Facility bookings must not exist without a reserved slot — roll back.
+    await supabase.from('bookings').delete().eq('id', bookingId);
+    if (slotError.code === '23505') {
+      throw new Error('This time slot was just taken by someone else. Please pick another slot.');
+    }
+    throw slotError;
+  }
 }

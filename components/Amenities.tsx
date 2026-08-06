@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FACILITIES } from '../constants';
 import { Clock, Check, X, Calendar, AlertCircle, ArrowRight, ArrowUpRight, Star } from 'lucide-react';
 import { FacilityType } from '../types';
 import { CustomDatePicker } from './CustomPickers';
 import { amenityBookingSchema, validate } from '../services/validation';
 import { useI18n } from '../contexts/I18nContext';
+import { useAuth } from '../contexts/AuthContext';
+import { fetchFacilities, fetchFacilitySlots, createFacilityBooking, Facility } from '../services/dataService';
+
+const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
+
+const toMinutes = (hhmm: string): number => {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+};
 
 export const Amenities: React.FC = () => {
   const [selectedFacility, setSelectedFacility] = useState<any | null>(null);
@@ -14,7 +23,33 @@ export const Amenities: React.FC = () => {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'available' | 'popular'>('all');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { t } = useI18n();
+  const { userProfile } = useAuth();
+
+  const [facilities, setFacilities] = useState<Record<string, Facility>>({});
+  const [takenSlots, setTakenSlots] = useState<Set<string>>(new Set());
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+
+  useEffect(() => {
+    fetchFacilities()
+      .then((rows) => setFacilities(Object.fromEntries(rows.map((f) => [f.id, f]))))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!selectedFacility || !bookingDate) {
+      setTakenSlots(new Set());
+      return;
+    }
+    let cancelled = false;
+    setCheckingAvailability(true);
+    fetchFacilitySlots(selectedFacility.id, bookingDate)
+      .then((slots) => { if (!cancelled) setTakenSlots(new Set(slots)); })
+      .catch(() => { if (!cancelled) setTakenSlots(new Set()); })
+      .finally(() => { if (!cancelled) setCheckingAvailability(false); });
+    return () => { cancelled = true; };
+  }, [selectedFacility, bookingDate]);
 
   const getFacilityImage = (type: FacilityType) => {
     switch (type) {
@@ -40,31 +75,15 @@ export const Amenities: React.FC = () => {
   };
 
   const getFacilityStatus = (id: FacilityType): { status: string; available: boolean } => {
-    const statusMap: { [key: string]: { status: string; available: boolean } } = {
-      [FacilityType.GYM]: { status: 'Available', available: true },
-      [FacilityType.SWIMMING_POOL]: { status: 'Available', available: true },
-      [FacilityType.TENNIS]: { status: t.amenities.fullyBooked, available: false },
-      [FacilityType.BBQ]: { status: 'Available', available: true },
-      [FacilityType.PARTY_ROOM]: { status: 'Available', available: true },
-      [FacilityType.SQUASH_COURT]: { status: t.amenities.fullyBooked, available: false },
-      [FacilityType.BASKETBALL_COURT]: { status: 'Available', available: true },
-      [FacilityType.MULTI_PURPOSE_COURT]: { status: 'Available', available: true },
-    };
-    return statusMap[id] || { status: 'Available', available: true };
+    const facility = facilities[id];
+    if (!facility) return { status: 'Available', available: true };
+    if (facility.status === 'active') return { status: 'Available', available: true };
+    return { status: facility.status === 'maintenance' ? 'Maintenance' : t.amenities.fullyBooked, available: false };
   };
 
   const getFacilityDescription = (id: FacilityType): string => {
-    const descMap: { [key: string]: string } = {
-      [FacilityType.GYM]: '2-hour sessions',
-      [FacilityType.SWIMMING_POOL]: '2-hour sessions',
-      [FacilityType.TENNIS]: '1.5-hour courts',
-      [FacilityType.BBQ]: '3-hour slots',
-      [FacilityType.PARTY_ROOM]: '4-hour rental',
-      [FacilityType.SQUASH_COURT]: '1-hour slots',
-      [FacilityType.BASKETBALL_COURT]: '2-hour sessions',
-      [FacilityType.MULTI_PURPOSE_COURT]: '2-hour sessions',
-    };
-    return descMap[id] || '2-hour session';
+    const facility = facilities[id];
+    return facility ? `${facility.sessionDuration}-hour sessions` : '2-hour session';
   };
 
   const categoryFilters: { id: typeof selectedCategory; label: string }[] = [
@@ -76,18 +95,31 @@ export const Amenities: React.FC = () => {
   const closeModal = () => {
     setSelectedFacility(null);
     setBookingSuccess(false);
+    setSubmitError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFieldErrors({});
+    setSubmitError(null);
     const result = validate(amenityBookingSchema, { bookingDate, bookingTime });
     if (!result.success) { setFieldErrors(result.errors); return; }
+
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await createFacilityBooking({
+        facilityId: selectedFacility.id,
+        date: bookingDate,
+        startTime: bookingTime,
+        durationHours: facilities[selectedFacility.id]?.sessionDuration ?? 2,
+        unit: userProfile?.unit ?? '',
+      });
       setBookingSuccess(true);
-    }, 1500);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Booking failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -262,32 +294,51 @@ export const Amenities: React.FC = () => {
 
                       {/* Time Slots */}
                       <div className="space-y-4">
-                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">{t.amenities.selectTimeSlot}</label>
+                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">
+                          {t.amenities.selectTimeSlot} {checkingAvailability && '(checking availability...)'}
+                        </label>
                         <div className="grid grid-cols-3 gap-3">
-                          {['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'].map(time => (
-                            <button
-                              key={time}
-                              type="button"
-                              onClick={() => { setBookingTime(time); setFieldErrors(prev => ({ ...prev, bookingTime: '' })); }}
-                              className={`py-4 rounded-xl text-sm font-bold transition-all duration-300`}
-                              style={bookingTime === time ? {
-                                backgroundColor: '#111111',
-                                color: '#ffffff',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                border: '2px solid #111111'
-                              } : {
-                                backgroundColor: '#f9fafb',
-                                borderColor: '#e5e7eb',
-                                border: '2px solid',
-                                color: '#374151'
-                              }}
-                            >
-                              {time}
-                            </button>
-                          ))}
+                          {TIME_SLOTS.map(time => {
+                            const isTaken = takenSlots.has(time);
+                            return (
+                              <button
+                                key={time}
+                                type="button"
+                                disabled={isTaken}
+                                onClick={() => { setBookingTime(time); setFieldErrors(prev => ({ ...prev, bookingTime: '' })); }}
+                                className={`py-4 rounded-xl text-sm font-bold transition-all duration-300`}
+                                style={isTaken ? {
+                                  backgroundColor: '#f3f4f6',
+                                  borderColor: '#e5e7eb',
+                                  border: '2px solid',
+                                  color: '#9ca3af',
+                                  cursor: 'not-allowed',
+                                  textDecoration: 'line-through'
+                                } : bookingTime === time ? {
+                                  backgroundColor: '#111111',
+                                  color: '#ffffff',
+                                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                  border: '2px solid #111111'
+                                } : {
+                                  backgroundColor: '#f9fafb',
+                                  borderColor: '#e5e7eb',
+                                  border: '2px solid',
+                                  color: '#374151'
+                                }}
+                              >
+                                {time}{isTaken ? ' · Taken' : ''}
+                              </button>
+                            );
+                          })}
                         </div>
                         {fieldErrors.bookingTime && <p className="text-red-500 text-xs mt-1">{fieldErrors.bookingTime}</p>}
                       </div>
+
+                      {submitError && (
+                        <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#fef2f2', borderColor: '#ef4444', color: '#991b1b'}}>
+                          <p className="text-sm font-medium">{submitError}</p>
+                        </div>
+                      )}
 
                       {/* Info Alert */}
                       <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#f9fafb', borderColor: '#111111', color: '#374151'}}>
@@ -297,7 +348,7 @@ export const Amenities: React.FC = () => {
                       </div>
 
                       {/* Submit Button */}
-                      <button 
+                      <button
                         type="submit"
                         disabled={isSubmitting || !bookingDate || !bookingTime}
                         className="w-full font-bold py-5 rounded-xl transition-all shadow-lg text-lg transform hover:-translate-y-1 disabled:transform-none text-white"

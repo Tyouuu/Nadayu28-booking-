@@ -1,25 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Calendar, Car, ChevronLeft, Download, Share2, Moon, Sun, CheckCircle2 } from 'lucide-react';
 import { Booking, FacilityType } from '../types';
-import { bookingsApi } from '../services/api';
+import { fetchParkingSlots, createParkingBooking, ParkingSlot } from '../services/dataService';
 import { CustomDatePicker, CustomTimePicker } from './CustomPickers';
 import { parkingBookingSchema, validate } from '../services/validation';
 import { useI18n } from '../contexts/I18nContext';
-
-const generateParkingSpots = (startNum: number, count: number) => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `P${String(startNum + i).padStart(2, '0')}`,
-    number: startNum + i,
-    status: Math.random() > 0.4 ? 'available' : 'occupied' as 'available' | 'occupied' | 'selected'
-  }));
-};
+import { useAuth } from '../contexts/AuthContext';
 
 const ZONES = ['Visitor Parking', 'Overnight Parking'];
-const SLOTS_DATA: Record<string, { id: string; number: number; status: 'available' | 'occupied' | 'selected' }[]> = {
-  'Visitor Parking': generateParkingSpots(1, 36),
-  'Overnight Parking': generateParkingSpots(37, 36),
-};
 
 export const ParkingBooking: React.FC = () => {
   const [step, setStep] = useState(1);
@@ -34,7 +23,17 @@ export const ParkingBooking: React.FC = () => {
   const [generatedBooking, setGeneratedBooking] = useState<Booking | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [parkingSlots, setParkingSlots] = useState<ParkingSlot[]>([]);
   const { t } = useI18n();
+  const { userProfile } = useAuth();
+
+  const loadSlots = () => { fetchParkingSlots().then(setParkingSlots).catch(() => {}); };
+  useEffect(() => { loadSlots(); }, []);
+
+  const SLOTS_DATA: Record<string, { id: string; number: number; status: 'available' | 'occupied' | 'selected' }[]> = {
+    'Visitor Parking': parkingSlots.filter(s => s.zone === 'Visitor Parking').map(s => ({ id: s.id, number: s.slotNumber, status: s.status === 'available' ? 'available' : 'occupied' })),
+    'Overnight Parking': parkingSlots.filter(s => s.zone === 'Overnight Parking').map(s => ({ id: s.id, number: s.slotNumber, status: s.status === 'available' ? 'available' : 'occupied' })),
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,28 +45,17 @@ export const ParkingBooking: React.FC = () => {
     if (!result.success) { setFieldErrors(result.errors); return; }
     setIsLoading(true);
     try {
-      const bookingId = Math.random().toString(36).substr(2, 9).toUpperCase();
       const durationHours = isOvernight ? 48 : parseInt(duration);
-      const qrPayload = JSON.stringify({
-        id: bookingId,
-        plate: plateNumber.toUpperCase(),
-        slot: selectedSlot,
-        date,
-        time: startTime,
-        duration: durationHours,
-        unit: 'A-12-05',
+      const unit = userProfile?.unit ?? '';
+      const { id: bookingId, qrCode } = await createParkingBooking({
+        slotId: selectedSlot!,
         zone: activeZone,
-      });
-      await bookingsApi.create({
-        id: bookingId,
-        facility_type: `PARKING:${activeZone}`,
         date,
-        start_time: startTime,
-        duration_hours: durationHours,
-        resident_unit: 'A-12-05',
-        details: `${plateNumber.toUpperCase()} • ${selectedSlot}`,
-        qr_code: qrPayload,
-        is_overnight: isOvernight,
+        startTime,
+        durationHours,
+        plateNumber,
+        unit,
+        isOvernight,
       });
       setGeneratedBooking({
         id: bookingId,
@@ -76,14 +64,16 @@ export const ParkingBooking: React.FC = () => {
         startTime,
         durationHours,
         status: 'active',
-        residentUnit: 'A-12-05',
+        residentUnit: unit,
         details: `${plateNumber.toUpperCase()} • ${selectedSlot}`,
-        qrCode: qrPayload,
+        qrCode,
         isOvernight,
       });
       setStep(2);
+      loadSlots();
     } catch (err: unknown) {
       setApiError(err instanceof Error ? err.message : 'Booking failed. Please try again.');
+      loadSlots();
     } finally {
       setIsLoading(false);
     }

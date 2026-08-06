@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { CheckCircle, XCircle, Camera, CameraOff, Shield, ScanLine } from 'lucide-react';
-import { bookingsApi } from '../services/api';
+import { validateBookingById } from '../services/dataService';
 
 interface ScannedBooking {
   id: string;
@@ -41,7 +41,7 @@ export const SecurityScanner: React.FC = () => {
 
   const validateBooking = async (payload: ScannedBooking): Promise<boolean> => {
     try {
-      const res = await bookingsApi.validate(payload.id);
+      const res = await validateBookingById(payload.id);
       return res.valid;
     } catch {
       return false;

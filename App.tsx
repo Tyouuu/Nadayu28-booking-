@@ -7,6 +7,7 @@ import { InviteVisitor } from './components/InviteVisitor';
 import { Amenities } from './components/Amenities';
 import { AdminPanel } from './components/AdminPanel';
 import { Reporting } from './components/Reporting';
+import { Maintenance } from './components/Maintenance';
 import { SecurityScanner } from './components/SecurityScanner';
 import { SmartAssistant } from './components/SmartAssistant';
 import { Profile } from './components/Profile';
@@ -35,6 +36,8 @@ const AppContent: React.FC = () => {
         return <Amenities />;
       case 'report':
         return <Reporting />;
+      case 'maintenance':
+        return <Maintenance />;
       case 'management':
         return <AdminPanel />;
       case 'security':

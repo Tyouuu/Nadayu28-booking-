@@ -36,18 +36,29 @@ CREATE POLICY "audit_log_insert" ON public.audit_log
   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 -- ── profiles: allow MANAGEMENT to read and update any profile ──
+-- A policy on `profiles` that subqueries `profiles` directly triggers
+-- Postgres error 42P17 ("infinite recursion detected in policy for
+-- relation"), because the subquery itself re-triggers RLS evaluation on
+-- the same table. Route the check through a SECURITY DEFINER function,
+-- which runs with RLS bypassed internally, to break the recursion.
+CREATE OR REPLACE FUNCTION public.is_management()
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'MANAGEMENT');
+$$;
+
 DROP POLICY IF EXISTS "profiles_select_staff" ON public.profiles;
 DROP POLICY IF EXISTS "profiles_update_staff" ON public.profiles;
 
 CREATE POLICY "profiles_select_staff" ON public.profiles
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'MANAGEMENT')
-  );
+  FOR SELECT USING (public.is_management());
 
 CREATE POLICY "profiles_update_staff" ON public.profiles
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'MANAGEMENT')
-  );
+  FOR UPDATE USING (public.is_management());
 
 -- ── VERIFY ──────────────────────────────────────────────────
 SELECT 'audit_log' AS tbl, COUNT(*) AS rows FROM public.audit_log;

@@ -59,6 +59,9 @@ function toReport(row: Record<string, unknown>): Report {
     description: row.description as string,
     status: row.status as Report['status'],
     residentUnit: row.resident_unit as string,
+    assignedToName: row.assigned_to_name as string | undefined,
+    resolutionNotes: row.resolution_notes as string | undefined,
+    createdAt: row.created_at as string | undefined,
   };
 }
 
@@ -369,4 +372,136 @@ export async function createFacilityBooking(params: {
     }
     throw slotError;
   }
+}
+
+// ── Visitors ──────────────────────────────────────────────────
+
+export interface Visitor {
+  id: string;
+  residentId: string | null;
+  residentUnit: string;
+  visitorName: string;
+  visitorPhone?: string;
+  purpose?: string;
+  expectedArrival: string;
+  expectedDeparture?: string;
+  status: 'scheduled' | 'arrived' | 'departed' | 'flagged';
+  actualArrival?: string;
+  idPhotoPath?: string;
+  qrCode?: string;
+}
+
+function toVisitor(row: Record<string, unknown>): Visitor {
+  return {
+    id: row.id as string,
+    residentId: (row.resident_id as string) ?? null,
+    residentUnit: row.resident_unit as string,
+    visitorName: row.visitor_name as string,
+    visitorPhone: row.visitor_phone as string | undefined,
+    purpose: row.purpose as string | undefined,
+    expectedArrival: row.expected_arrival as string,
+    expectedDeparture: row.expected_departure as string | undefined,
+    status: row.status as Visitor['status'],
+    actualArrival: row.actual_arrival as string | undefined,
+    idPhotoPath: row.id_photo_path as string | undefined,
+    qrCode: row.qr_code as string | undefined,
+  };
+}
+
+export async function createVisitor(params: {
+  visitorName: string;
+  visitorPhone?: string;
+  purpose?: string;
+  expectedArrival: string;
+  expectedDeparture?: string;
+  unit: string;
+}): Promise<{ id: string; qrCode: string }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const id = 'v' + Date.now();
+  const qrPayload = JSON.stringify({ type: 'visitor', id });
+
+  const { error } = await supabase.from('visitors').insert({
+    id,
+    resident_id: user?.id,
+    resident_unit: params.unit,
+    visitor_name: params.visitorName,
+    visitor_phone: params.visitorPhone,
+    purpose: params.purpose,
+    expected_arrival: params.expectedArrival,
+    expected_departure: params.expectedDeparture,
+    qr_code: qrPayload,
+  });
+  if (error) throw error;
+
+  return { id, qrCode: qrPayload };
+}
+
+export async function fetchVisitors(unit?: string): Promise<Visitor[]> {
+  let query = supabase.from('visitors').select('*').order('expected_arrival', { ascending: false });
+  if (unit) query = query.eq('resident_unit', unit);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []).map(toVisitor);
+}
+
+export async function fetchVisitorById(id: string): Promise<Visitor | null> {
+  const { data, error } = await supabase.from('visitors').select('*').eq('id', id).limit(1);
+  if (error || !data || data.length === 0) return null;
+  return toVisitor(data[0]);
+}
+
+export async function uploadVisitorIdPhoto(visitorId: string, file: File): Promise<string> {
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `${visitorId}/${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage.from('visitor-ids').upload(path, file);
+  if (uploadError) throw uploadError;
+
+  const { error: updateError } = await supabase.from('visitors').update({ id_photo_path: path }).eq('id', visitorId);
+  if (updateError) throw updateError;
+
+  return path;
+}
+
+export async function checkInVisitor(visitorId: string): Promise<{ flagged: boolean }> {
+  const { data, error: fetchError } = await supabase
+    .from('visitors')
+    .select('expected_arrival')
+    .eq('id', visitorId)
+    .single();
+  if (fetchError || !data) throw fetchError ?? new Error('Visitor not found');
+
+  const now = new Date();
+  const expected = new Date(data.expected_arrival as string);
+  const diffMinutes = Math.abs(now.getTime() - expected.getTime()) / 60000;
+  const flagged = diffMinutes > 30;
+
+  const { error } = await supabase.from('visitors').update({
+    status: flagged ? 'flagged' : 'arrived',
+    actual_arrival: now.toISOString(),
+  }).eq('id', visitorId);
+  if (error) throw error;
+
+  return { flagged };
+}
+
+export async function markVisitorDeparted(visitorId: string): Promise<void> {
+  const { error } = await supabase.from('visitors').update({ status: 'departed' }).eq('id', visitorId);
+  if (error) throw error;
+}
+
+// ── Maintenance ───────────────────────────────────────────────
+
+export async function updateReport(id: string, fields: {
+  status?: Report['status'];
+  assignedToName?: string;
+  resolutionNotes?: string;
+}): Promise<void> {
+  const update: Record<string, unknown> = {};
+  if (fields.status !== undefined) update.status = fields.status;
+  if (fields.assignedToName !== undefined) update.assigned_to_name = fields.assignedToName;
+  if (fields.resolutionNotes !== undefined) update.resolution_notes = fields.resolutionNotes;
+
+  const { error } = await supabase.from('reports').update(update).eq('id', id);
+  if (error) throw error;
 }

@@ -61,6 +61,9 @@ export interface Report {
   description: string;
   status: 'Received' | 'In Progress' | 'Resolved';
   residentUnit: string;
+  assignedToName?: string;
+  resolutionNotes?: string;
+  createdAt?: string;
 }
 
 export interface User {

@@ -67,3 +67,34 @@ CREATE POLICY "bookings_update_staff" ON public.bookings FOR UPDATE USING (
 
 -- 4. Enable real-time
 ALTER PUBLICATION supabase_realtime ADD TABLE public.bookings;
+
+-- 5. Maintenance / repair tasks (Reporting flow)
+CREATE TABLE IF NOT EXISTS public.maintenance_tasks (
+  id                 TEXT PRIMARY KEY,
+  category           TEXT NOT NULL,
+  subcategory        TEXT,
+  title              TEXT NOT NULL,
+  description        TEXT,
+  location           TEXT DEFAULT 'Common Area',
+  priority           TEXT DEFAULT 'medium',
+  status             TEXT DEFAULT 'reported',
+  images             TEXT[] DEFAULT '{}',
+  resident_unit      TEXT,
+  user_id            UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  expected_response  TEXT,
+  created_at         TIMESTAMPTZ DEFAULT NOW(),
+  updated_at         TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.maintenance_tasks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "maintenance_select" ON public.maintenance_tasks FOR SELECT USING (
+  auth.uid() = user_id OR
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SECURITY','MANAGEMENT'))
+);
+CREATE POLICY "maintenance_insert" ON public.maintenance_tasks FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "maintenance_update_staff" ON public.maintenance_tasks FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SECURITY','MANAGEMENT'))
+);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE public.maintenance_tasks;

@@ -1,11 +1,13 @@
-// PHP backend base URL — update for production
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost/nadayu-api';
+// Vercel Serverless Functions live under /api on the same origin as the
+// frontend, so no base URL is needed in production. VITE_API_BASE_URL can
+// still be set to point at a different host during local development.
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
 async function request<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const res = await fetch(`${API_BASE}/${path}`, {
+  const res = await fetch(`${API_BASE}/api/${path}`, {
     headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options,
   });
@@ -38,26 +40,81 @@ export interface ApiBooking extends BookingPayload {
 
 export const bookingsApi = {
   getByUser: (userId: string) =>
-    request<ApiBooking[]>(`api/bookings?user_id=${userId}`),
+    request<ApiBooking[]>(`bookings?user_id=${userId}`),
 
   getById: (id: string) =>
-    request<ApiBooking[]>(`api/bookings?id=${id}`),
+    request<ApiBooking[]>(`bookings?id=${id}`),
+
+  getByFacilityAndDate: (facilityType: string, date: string) =>
+    request<ApiBooking[]>(`bookings?facility_type=${facilityType}&date=${date}`),
 
   create: (booking: BookingPayload) =>
-    request<ApiBooking[]>('api/bookings', {
+    request<ApiBooking[]>('bookings', {
       method: 'POST',
       body: JSON.stringify(booking),
     }),
 
   updateStatus: (id: string, status: string) =>
-    request<ApiBooking[]>('api/bookings', {
+    request<ApiBooking[]>('bookings', {
       method: 'PATCH',
       body: JSON.stringify({ id, status }),
     }),
 
   validate: (id: string) =>
-    request<{ valid: boolean; booking?: ApiBooking }>('api/validate', {
+    request<{ valid: boolean; booking?: ApiBooking }>('validate', {
       method: 'POST',
       body: JSON.stringify({ id }),
     }),
+};
+
+// ── Maintenance types ────────────────────────────────────────────────
+export interface MaintenancePayload {
+  id: string;
+  category: string;
+  subcategory?: string;
+  title: string;
+  description?: string;
+  location?: string;
+  priority?: string;
+  images?: string[];
+  resident_unit?: string;
+  user_id?: string;
+}
+
+export interface ApiMaintenanceTask extends MaintenancePayload {
+  status: string;
+  expected_response: string;
+  created_at?: string;
+}
+
+export const maintenanceApi = {
+  getByUser: (userId: string) =>
+    request<ApiMaintenanceTask[]>(`maintenance?user_id=${userId}`),
+
+  getRecent: (limit = 10) =>
+    request<ApiMaintenanceTask[]>(`maintenance?limit=${limit}`),
+
+  create: (task: MaintenancePayload) =>
+    request<ApiMaintenanceTask[]>('maintenance', {
+      method: 'POST',
+      body: JSON.stringify(task),
+    }),
+
+  updateStatus: (id: string, status: string) =>
+    request<ApiMaintenanceTask[]>('maintenance', {
+      method: 'PATCH',
+      body: JSON.stringify({ id, status }),
+    }),
+};
+
+// ── Analytics ────────────────────────────────────────────────────────
+export interface AnalyticsResponse {
+  facilityUsage: { name: string; hours: number }[];
+  bookingsByDay: { name: string; bookings: number }[];
+  taskStatusBreakdown: { status: string; count: number }[];
+  recentMaintenanceTasks: ApiMaintenanceTask[];
+}
+
+export const analyticsApi = {
+  get: () => request<AnalyticsResponse>('analytics'),
 };

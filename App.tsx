@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserRole } from './types';
+import { UserRole, CurrentUser } from './types';
 import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ParkingBooking } from './components/ParkingBooking';
@@ -15,18 +15,21 @@ import { Bell } from 'lucide-react';
 
 const App: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<UserRole>(UserRole.RESIDENT);
   const [currentView, setCurrentView] = useState('dashboard');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  const handleLogin = (role: UserRole) => {
-    setCurrentUserRole(role);
+  const handleLogin = (user: CurrentUser) => {
+    setCurrentUser(user);
+    setCurrentUserRole(user.role);
     setIsLoggedIn(true);
-    setCurrentView(role === UserRole.MANAGEMENT ? 'management' : role === UserRole.SECURITY ? 'security' : 'dashboard');
+    setCurrentView(user.role === UserRole.MANAGEMENT ? 'management' : user.role === UserRole.SECURITY ? 'security' : 'dashboard');
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setCurrentUser(null);
     setCurrentView('dashboard');
   };
 
@@ -38,9 +41,9 @@ const App: React.FC = () => {
       case 'parking':
         return <ParkingBooking />;
       case 'amenities':
-        return <Amenities />;
+        return <Amenities currentUser={currentUser!} />;
       case 'report':
-        return <Reporting />;
+        return <Reporting currentUser={currentUser!} />;
       case 'management':
         return <AdminPanel />;
       case 'security':

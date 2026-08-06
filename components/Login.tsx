@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { UserRole } from '../types';
+import { UserRole, CurrentUser } from '../types';
 import { Eye, EyeOff, Upload, ArrowRight, ShieldCheck, User, Key, Building, Mail, ChevronLeft, CheckCircle2, Badge, Phone, Smartphone, Fingerprint, Zap, Users, Clock } from 'lucide-react';
 import { signIn, supabase } from '../services/supabase';
 
 interface LoginProps {
-  onLogin: (role: UserRole) => void;
+  onLogin: (user: CurrentUser) => void;
 }
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -57,18 +57,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       const { data, error } = await signIn(loginEmail, loginPassword);
       if (error) throw error;
 
-      // Read profile role from Supabase
+      // Read profile (role, unit, name) from Supabase
       let appRole = UserRole.RESIDENT;
+      let unit = '';
+      let fullName = '';
       if (data.user) {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, unit, full_name')
           .eq('id', data.user.id)
           .single();
         if (profile?.role === 'SECURITY')        appRole = UserRole.SECURITY;
         else if (profile?.role === 'MANAGEMENT') appRole = UserRole.MANAGEMENT;
+        unit = profile?.unit ?? '';
+        fullName = profile?.full_name ?? '';
       }
-      onLogin(appRole);
+      onLogin({ id: data.user!.id, unit, name: fullName, role: appRole });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed. Please try again.';
       setAuthError(msg);

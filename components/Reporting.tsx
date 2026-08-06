@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { Camera, AlertTriangle, CheckCircle2, ChevronRight, X, Zap, Wrench, AlertCircle, Plus } from 'lucide-react';
-import { taskManagementService } from '../services/taskManagementService';
+import { maintenanceApi } from '../services/api';
+import { CurrentUser } from '../types';
 
-export const Reporting: React.FC = () => {
+interface ReportingProps {
+  currentUser: CurrentUser;
+}
+
+export const Reporting: React.FC<ReportingProps> = ({ currentUser }) => {
   const [step, setStep] = useState<'category' | 'details' | 'form' | 'success'>('category');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string>('');
@@ -10,6 +15,8 @@ export const Reporting: React.FC = () => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [referenceId, setReferenceId] = useState('');
   const [responseTime, setResponseTime] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const issueCategories = [
     { 
@@ -94,7 +101,7 @@ export const Reporting: React.FC = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file: File) => {
         const reader = new FileReader();
         reader.onload = () => {
           setUploadedImages(prev => [...prev, reader.result as string]);
@@ -104,22 +111,33 @@ export const Reporting: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const selectedCategoryObj = issueCategories.find(c => c.id === selectedCategory);
     const selectedSubObj = selectedCategoryObj?.subcategories.find(s => s.id === selectedSubcategory);
-    
-    // Create task via service
-    const task = taskManagementService.reportTask({
-      type: 'maintenance',
-      title: `${selectedCategoryObj?.label}: ${selectedSubObj?.label || 'Custom'}`,
-      description: description,
-      location: 'Common Area',
-      priority: selectedCategory === 'facility-malfunction' ? 'high' : 'medium',
-      reportedBy: 'Current User',
-    });
 
-    setReferenceId(task.id);
-    setStep('success');
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const [task] = await maintenanceApi.create({
+        id: crypto.randomUUID(),
+        category: selectedCategory,
+        subcategory: selectedSubcategory,
+        title: `${selectedCategoryObj?.label}: ${selectedSubObj?.label || 'Custom'}`,
+        description,
+        location: 'Common Area',
+        priority: selectedCategory === 'facility-malfunction' ? 'high' : 'medium',
+        images: uploadedImages,
+        resident_unit: currentUser.unit,
+        user_id: currentUser.id,
+      });
+
+      setReferenceId(task.id);
+      setStep('success');
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to submit report. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -332,18 +350,24 @@ export const Reporting: React.FC = () => {
                 </div>
               )}
 
+              {submitError && (
+                <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: 'rgba(239,68,68,0.1)', borderColor: '#EF4444', color: '#FCA5A5'}}>
+                  <p className="text-sm font-medium">{submitError}</p>
+                </div>
+              )}
+
               {/* Submit Button - Disabled if no images */}
               <button
                 onClick={handleSubmit}
-                disabled={uploadedImages.length === 0 || !description.trim()}
+                disabled={uploadedImages.length === 0 || !description.trim() || isSubmitting}
                 className={`w-full font-bold py-4 px-8 rounded-2xl transition-all flex items-center justify-center gap-2 ${
-                  uploadedImages.length > 0 && description.trim()
+                  uploadedImages.length > 0 && description.trim() && !isSubmitting
                     ? 'bg-gradient-to-r from-[#E6B325] to-[#D4A017] hover:from-[#F5D547] hover:to-[#E6B325] text-white shadow-lg shadow-[#E6B325]/30 cursor-pointer'
                     : 'bg-[#3D3B65]/50 text-[#B0B0B8] cursor-not-allowed'
                 }`}
               >
-                <CheckCircle2 size={20} /> 
-                {uploadedImages.length === 0 ? 'Add photos to submit' : 'Submit Report'}
+                <CheckCircle2 size={20} />
+                {isSubmitting ? 'Submitting...' : uploadedImages.length === 0 ? 'Add photos to submit' : 'Submit Report'}
               </button>
             </div>
           </div>

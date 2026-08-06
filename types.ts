@@ -4,6 +4,13 @@ export enum UserRole {
   MANAGEMENT = 'MANAGEMENT',
 }
 
+export interface CurrentUser {
+  id: string;
+  unit: string;
+  name: string;
+  role: UserRole;
+}
+
 export enum FacilityType {
   PARKING = 'PARKING',
   GYM = 'GYM',

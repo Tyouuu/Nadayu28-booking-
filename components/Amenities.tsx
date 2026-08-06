@@ -1,16 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FACILITIES } from '../constants';
 import { Clock, Check, X, Calendar, AlertCircle, ArrowRight, ArrowUpRight, Star } from 'lucide-react';
-import { FacilityType } from '../types';
+import { FacilityType, CurrentUser } from '../types';
+import { bookingsApi } from '../services/api';
 
-export const Amenities: React.FC = () => {
+interface AmenitiesProps {
+  currentUser: CurrentUser;
+}
+
+const TIME_SLOTS = ['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'];
+
+const getDurationHours = (id: FacilityType): number => {
+  const durationMap: { [key: string]: number } = {
+    [FacilityType.GYM]: 2,
+    [FacilityType.SWIMMING_POOL]: 2,
+    [FacilityType.TENNIS]: 1.5,
+    [FacilityType.BBQ]: 3,
+    [FacilityType.PARTY_ROOM]: 4,
+    [FacilityType.SQUASH_COURT]: 1,
+    [FacilityType.BASKETBALL_COURT]: 2,
+    [FacilityType.MULTI_PURPOSE_COURT]: 2,
+  };
+  return durationMap[id] ?? 2;
+};
+
+const toMinutes = (hhmm: string): number => {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+};
+
+export const Amenities: React.FC<AmenitiesProps> = ({ currentUser }) => {
   const [selectedFacility, setSelectedFacility] = useState<any | null>(null);
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'available' | 'popular'>('all');
-  
+  const [takenSlots, setTakenSlots] = useState<Set<string>>(new Set());
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedFacility || !bookingDate) {
+      setTakenSlots(new Set());
+      return;
+    }
+    let cancelled = false;
+    setCheckingAvailability(true);
+    bookingsApi
+      .getByFacilityAndDate(selectedFacility.id, bookingDate)
+      .then((existing) => {
+        if (cancelled) return;
+        const duration = getDurationHours(selectedFacility.id);
+        const blocked = new Set<string>();
+        for (const slot of TIME_SLOTS) {
+          const slotStart = toMinutes(slot);
+          const slotEnd = slotStart + duration * 60;
+          const overlaps = existing.some((b) => {
+            const existingStart = toMinutes(b.start_time);
+            const existingEnd = existingStart + b.duration_hours * 60;
+            return slotStart < existingEnd && existingStart < slotEnd;
+          });
+          if (overlaps) blocked.add(slot);
+        }
+        setTakenSlots(blocked);
+      })
+      .catch(() => {
+        if (!cancelled) setTakenSlots(new Set());
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingAvailability(false);
+      });
+    return () => { cancelled = true; };
+  }, [selectedFacility, bookingDate]);
+
   const getFacilityImage = (type: FacilityType) => {
     switch (type) {
       case FacilityType.GYM:
@@ -71,16 +134,30 @@ export const Amenities: React.FC = () => {
   const closeModal = () => {
     setSelectedFacility(null);
     setBookingSuccess(false);
+    setSubmitError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bookingDate || !bookingTime) return;
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setSubmitError(null);
+    try {
+      await bookingsApi.create({
+        id: crypto.randomUUID(),
+        facility_type: selectedFacility.id,
+        date: bookingDate,
+        start_time: bookingTime,
+        duration_hours: getDurationHours(selectedFacility.id),
+        resident_unit: currentUser.unit,
+        user_id: currentUser.id,
+      });
       setBookingSuccess(true);
-    }, 1500);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Booking failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -256,31 +333,50 @@ export const Amenities: React.FC = () => {
 
                       {/* Time Slots */}
                       <div className="space-y-4">
-                        <label className="text-xs font-bold uppercase tracking-widest pl-2" style={{color: '#B0B0B8'}}>Select Time Slot</label>
+                        <label className="text-xs font-bold uppercase tracking-widest pl-2" style={{color: '#B0B0B8'}}>
+                          Select Time Slot {checkingAvailability && '(checking availability...)'}
+                        </label>
                         <div className="grid grid-cols-3 gap-3">
-                          {['09:00', '11:00', '13:00', '15:00', '17:00', '19:00'].map(time => (
-                            <button
-                              key={time}
-                              type="button"
-                              onClick={() => setBookingTime(time)}
-                              className={`py-4 rounded-xl text-sm font-bold transition-all duration-300`}
-                              style={bookingTime === time ? {
-                                backgroundImage: 'linear-gradient(to right, #E6B325, #D4A017)',
-                                color: '#fff',
-                                boxShadow: '0 0 20px rgba(230, 179, 37, 0.3)',
-                                border: '2px solid #F5D547'
-                              } : {
-                                backgroundColor: '#2D2B55',
-                                borderColor: '#4A4860',
-                                border: '2px solid',
-                                color: '#B0B0B8'
-                              }}
-                            >
-                              {time}
-                            </button>
-                          ))}
+                          {TIME_SLOTS.map(time => {
+                            const isTaken = takenSlots.has(time);
+                            return (
+                              <button
+                                key={time}
+                                type="button"
+                                disabled={isTaken}
+                                onClick={() => setBookingTime(time)}
+                                className={`py-4 rounded-xl text-sm font-bold transition-all duration-300`}
+                                style={isTaken ? {
+                                  backgroundColor: 'rgba(74,72,96,0.2)',
+                                  borderColor: '#4A4860',
+                                  border: '2px solid',
+                                  color: '#4A4860',
+                                  cursor: 'not-allowed',
+                                  textDecoration: 'line-through'
+                                } : bookingTime === time ? {
+                                  backgroundImage: 'linear-gradient(to right, #E6B325, #D4A017)',
+                                  color: '#fff',
+                                  boxShadow: '0 0 20px rgba(230, 179, 37, 0.3)',
+                                  border: '2px solid #F5D547'
+                                } : {
+                                  backgroundColor: '#2D2B55',
+                                  borderColor: '#4A4860',
+                                  border: '2px solid',
+                                  color: '#B0B0B8'
+                                }}
+                              >
+                                {time}{isTaken ? ' · Taken' : ''}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
+
+                      {submitError && (
+                        <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: 'rgba(239,68,68,0.1)', borderColor: '#EF4444', color: '#FCA5A5'}}>
+                          <p className="text-sm font-medium">{submitError}</p>
+                        </div>
+                      )}
 
                       {/* Info Alert */}
                       <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: 'rgba(230, 179, 37, 0.1)', borderColor: '#E6B325', color: '#F5D547'}}>

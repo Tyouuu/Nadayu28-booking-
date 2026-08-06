@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { MOCK_VIOLATIONS } from '../constants';
-import { fetchViolations, fetchReports } from '../services/dataService';
-import { Violation, Report } from '../types';
+import { fetchViolations, fetchReports, fetchUsers, updateUserRole, fetchAuditLog, AuditLogEntry } from '../services/dataService';
+import { Violation, Report, User, UserRole } from '../types';
 import { Download, Filter, MoreHorizontal, X, AlertTriangle, Calendar, MapPin, DollarSign, Clock } from 'lucide-react';
 
 const parkingData = [
@@ -39,6 +39,30 @@ export const AdminPanel: React.FC = () => {
     r.status === 'Received' && r.createdAt && (Date.now() - new Date(r.createdAt).getTime()) > 24 * 60 * 60 * 1000
   ).length;
 
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'audit'>('overview');
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [savingUserId, setSavingUserId] = useState<string | null>(null);
+  useEffect(() => {
+    fetchUsers().then(setUsers).catch(() => {});
+  }, []);
+
+  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+    setSavingUserId(userId);
+    try {
+      await updateUserRole(userId, newRole);
+      fetchUsers().then(setUsers).catch(() => {});
+    } finally {
+      setSavingUserId(null);
+    }
+  };
+
+  const [auditLog, setAuditLog] = useState<AuditLogEntry[]>([]);
+  const [auditFilter, setAuditFilter] = useState<'all' | 'violation_status_change' | 'report_update' | 'role_change'>('all');
+  useEffect(() => {
+    fetchAuditLog(auditFilter === 'all' ? undefined : auditFilter).then(setAuditLog).catch(() => {});
+  }, [auditFilter]);
+
   return (
     <div className="space-y-5 pb-12">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -52,6 +76,19 @@ export const AdminPanel: React.FC = () => {
         </button>
       </header>
 
+      <div className="flex gap-2">
+        {(['overview', 'users', 'audit'] as const).map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
+              activeTab === tab ? 'bg-[#111111] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            }`}>
+            {tab === 'overview' ? 'Overview' : tab === 'users' ? 'Users' : 'Audit Log'}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'overview' && (
+        <>
       <div className="bg-white border border-gray-100 rounded-2xl p-6 flex items-center gap-4">
         <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
           <Clock size={20} className="text-orange-500" />
@@ -222,6 +259,85 @@ export const AdminPanel: React.FC = () => {
               <button onClick={() => setSelectedViolation(null)} className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+        </>
+      )}
+
+      {activeTab === 'users' && (
+        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="uppercase text-[10px] tracking-widest font-bold text-gray-400 bg-gray-50/50">
+                <tr>
+                  <th className="px-6 py-4">Name</th>
+                  <th className="px-6 py-4">Unit</th>
+                  <th className="px-6 py-4">Email</th>
+                  <th className="px-6 py-4">Role</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {users.map(u => (
+                  <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="px-6 py-4 font-bold text-gray-900">{u.name}</td>
+                    <td className="px-6 py-4 text-gray-500">{u.unit || '-'}</td>
+                    <td className="px-6 py-4 text-gray-400">{u.email || '-'}</td>
+                    <td className="px-6 py-4">
+                      <select value={u.role} disabled={savingUserId === u.id}
+                        onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
+                        className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-900 focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none">
+                        {Object.values(UserRole).map(r => <option key={r} value={r}>{r}</option>)}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'audit' && (
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            {(['all', 'violation_status_change', 'report_update', 'role_change'] as const).map(a => (
+              <button key={a} onClick={() => setAuditFilter(a)}
+                className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
+                  auditFilter === a ? 'bg-[#111111] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                }`}>
+                {a === 'all' ? 'All' : a === 'violation_status_change' ? 'Violation' : a === 'report_update' ? 'Report' : 'Role'}
+              </button>
+            ))}
+          </div>
+          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="uppercase text-[10px] tracking-widest font-bold text-gray-400 bg-gray-50/50">
+                  <tr>
+                    <th className="px-6 py-4">Time</th>
+                    <th className="px-6 py-4">Actor</th>
+                    <th className="px-6 py-4">Action</th>
+                    <th className="px-6 py-4">Field</th>
+                    <th className="px-6 py-4">Before → After</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {auditLog.length === 0 && (
+                    <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400">No audit entries yet.</td></tr>
+                  )}
+                  {auditLog.map(entry => (
+                    <tr key={entry.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-6 py-4 text-gray-400">{new Date(entry.createdAt).toLocaleString()}</td>
+                      <td className="px-6 py-4 font-bold text-gray-900">{entry.actorName}</td>
+                      <td className="px-6 py-4 text-gray-500">{entry.action}</td>
+                      <td className="px-6 py-4 text-gray-500">{entry.field}</td>
+                      <td className="px-6 py-4 text-gray-900 text-xs">{entry.beforeValue ?? '-'} → {entry.afterValue ?? '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

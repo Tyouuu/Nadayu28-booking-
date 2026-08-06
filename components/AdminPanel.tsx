@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { MOCK_VIOLATIONS } from '../constants';
-import { fetchViolations } from '../services/dataService';
-import { Violation } from '../types';
-import { Download, Filter, MoreHorizontal, X, AlertTriangle, Calendar, MapPin, DollarSign } from 'lucide-react';
+import { fetchViolations, fetchReports } from '../services/dataService';
+import { Violation, Report } from '../types';
+import { Download, Filter, MoreHorizontal, X, AlertTriangle, Calendar, MapPin, DollarSign, Clock } from 'lucide-react';
 
 const parkingData = [
   { name: 'Mon', visitors: 12, violations: 1 },
@@ -30,6 +30,15 @@ export const AdminPanel: React.FC = () => {
     fetchViolations().then(setViolations).catch(() => {});
   }, []);
 
+  const [reports, setReports] = useState<Report[]>([]);
+  useEffect(() => {
+    fetchReports().then(setReports).catch(() => {});
+  }, []);
+
+  const overdueCount = reports.filter(r =>
+    r.status === 'Received' && r.createdAt && (Date.now() - new Date(r.createdAt).getTime()) > 24 * 60 * 60 * 1000
+  ).length;
+
   return (
     <div className="space-y-5 pb-12">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -42,6 +51,16 @@ export const AdminPanel: React.FC = () => {
           <Download size={16} /> Export Report
         </button>
       </header>
+
+      <div className="bg-white border border-gray-100 rounded-2xl p-6 flex items-center gap-4">
+        <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <Clock size={20} className="text-orange-500" />
+        </div>
+        <div>
+          <p className="text-2xl font-bold text-gray-900 leading-none">{overdueCount}</p>
+          <p className="text-xs text-gray-400 mt-1">Reports overdue (received &gt;24h ago, unactioned)</p>
+        </div>
+      </div>
 
       {/* Analytics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">

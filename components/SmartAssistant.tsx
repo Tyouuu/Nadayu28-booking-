@@ -79,7 +79,7 @@ Keep answers concise, polite, and helpful.`;
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+    <div className="fixed bottom-20 md:bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
       <div className={`pointer-events-auto transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0 translate-y-10 pointer-events-none'}`}>
         {isOpen && (
           <div className="bg-white rounded-[2rem] shadow-2xl w-80 sm:w-96 flex flex-col overflow-hidden border border-nadayu-border mb-4" style={{ height: '520px' }}>

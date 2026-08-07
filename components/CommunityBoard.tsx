@@ -192,7 +192,7 @@ export const CommunityBoard: React.FC = () => {
           <div className="bg-nadayu-panel rounded-2xl p-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Bell size={28} className="text-nadayu-panel" />
+                <Bell size={28} className="text-white" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white mb-1">Community Board</h1>

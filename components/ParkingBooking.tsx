@@ -87,7 +87,7 @@ export const ParkingBooking: React.FC = () => {
       <div className="bg-nadayu-panel rounded-2xl p-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
-            <Car size={28} className="text-nadayu-panel" />
+            <Car size={28} className="text-white" />
           </div>
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-white">{t.parking.title}</h2>

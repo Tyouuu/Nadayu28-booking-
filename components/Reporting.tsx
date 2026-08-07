@@ -205,7 +205,7 @@ export const Reporting: React.FC = () => {
                 <p className="text-nadayu-muted text-base">{t.reporting.subtitle}</p>
               </div>
               <div className="w-16 h-16 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
-                <AlertTriangle size={32} className="text-nadayu-panel" />
+                <AlertTriangle size={32} className="text-white" />
               </div>
             </div>
 
@@ -248,7 +248,7 @@ export const Reporting: React.FC = () => {
                   <p className="text-nadayu-muted">{t.reporting.subtitle}</p>
                 </div>
                 <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <ChevronRight size={28} className="text-nadayu-panel" />
+                  <ChevronRight size={28} className="text-white" />
                 </div>
               </div>
             </div>
@@ -289,7 +289,7 @@ export const Reporting: React.FC = () => {
                   <p className="text-nadayu-muted">Help us understand the issue better. Photos required for faster resolution.</p>
                 </div>
                 <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Camera size={28} className="text-nadayu-panel" />
+                  <Camera size={28} className="text-white" />
                 </div>
               </div>
             </div>
@@ -332,7 +332,7 @@ export const Reporting: React.FC = () => {
                   />
                   <div className="relative pointer-events-none">
                     <div className="w-16 h-16 bg-nadayu-panel group-hover:bg-nadayu-accent rounded-2xl flex items-center justify-center mx-auto mb-4 transition-colors">
-                      <Camera size={32} className="text-white group-hover:text-nadayu-panel" />
+                      <Camera size={32} className="text-white" />
                     </div>
                     <p className="text-gray-900 font-bold mb-1">Tap to upload photos or videos</p>
                     <p className="text-xs text-gray-500">JPG, PNG, MP4 up to 10MB each • Min 1 photo required</p>

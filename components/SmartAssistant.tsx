@@ -87,7 +87,7 @@ Keep answers concise, polite, and helpful.`;
             <div className="p-5 flex justify-between items-center bg-nadayu-panel">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-nadayu-accent rounded-xl flex items-center justify-center">
-                  <Bot size={20} className="text-nadayu-panel" />
+                  <Bot size={20} className="text-white" />
                 </div>
                 <div>
                   <span className="font-bold text-sm block tracking-wide text-white">Concierge AI</span>

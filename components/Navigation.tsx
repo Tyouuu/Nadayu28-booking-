@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Home, Car, Dumbbell, MessageSquare, AlertTriangle,
-  Shield, BarChart2, LogOut, Menu, X, User, Settings, ChevronRight, Globe, UserPlus, Wrench
+  Shield, BarChart2, LogOut, Menu, X, User, Settings, ChevronRight, Globe, UserPlus, Wrench, FolderOpen
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,6 +16,7 @@ export const Navigation: React.FC = () => {
 
   const navItems = [
     { id: 'dashboard',    label: t.nav.dashboard,      icon: Home,          roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY, UserRole.MANAGEMENT] },
+    { id: 'documents',    label: 'Documents',          icon: FolderOpen,    roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY, UserRole.MANAGEMENT] },
     { id: 'parking',      label: t.nav.visitorParking,  icon: Car,           roles: [UserRole.RESIDENT, UserRole.TENANT] },
     { id: 'invite-visitor', label: 'Invite Visitor',    icon: UserPlus,      roles: [UserRole.RESIDENT, UserRole.TENANT] },
     { id: 'amenities',    label: t.nav.amenities,       icon: Dumbbell,      roles: [UserRole.RESIDENT, UserRole.TENANT] },

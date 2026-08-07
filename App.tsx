@@ -4,6 +4,7 @@ import { Navigation } from './components/Navigation';
 import { Dashboard } from './components/Dashboard';
 import { ParkingBooking } from './components/ParkingBooking';
 import { InviteVisitor } from './components/InviteVisitor';
+import { Documents } from './components/Documents';
 import { Amenities } from './components/Amenities';
 import { AdminPanel } from './components/AdminPanel';
 import { Reporting } from './components/Reporting';
@@ -28,6 +29,8 @@ const AppContent: React.FC = () => {
     switch(currentView) {
       case 'dashboard':
         return <Dashboard />;
+      case 'documents':
+        return <Documents />;
       case 'parking':
         return <ParkingBooking />;
       case 'invite-visitor':

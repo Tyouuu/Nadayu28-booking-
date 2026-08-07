@@ -125,8 +125,8 @@ export const Amenities: React.FC = () => {
   return (
     <div className="pb-12 space-y-6">
       {/* Background Gradient */}
-      <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-[100px] -z-10" style={{backgroundColor: 'rgba(200, 255, 0, 0.03)'}}></div>
-      <div className="absolute top-96 right-0 w-96 h-96 rounded-full blur-[100px] -z-10" style={{backgroundColor: 'rgba(200, 255, 0, 0.03)'}}></div>
+      <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-[100px] -z-10" style={{backgroundColor: 'rgba(181, 101, 47, 0.03)'}}></div>
+      <div className="absolute top-96 right-0 w-96 h-96 rounded-full blur-[100px] -z-10" style={{backgroundColor: 'rgba(181, 101, 47, 0.03)'}}></div>
       
       {/* Hero Section - Premium Dark Theme */}
       <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-sm mb-16 group">
@@ -135,13 +135,13 @@ export const Amenities: React.FC = () => {
             alt="Community Amenities" 
             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[2s]"
          />
-         <div className="absolute inset-0 bg-gradient-to-r backdrop-blur-[1px]" style={{backgroundImage: 'linear-gradient(to right, rgba(17, 17, 17, 0.92), rgba(17, 17, 17, 0.55), rgba(17, 17, 17, 0.1))'}}></div>
-         
+         <div className="absolute inset-0 bg-gradient-to-r backdrop-blur-[1px]" style={{backgroundImage: 'linear-gradient(to right, rgba(43, 36, 28, 0.92), rgba(43, 36, 28, 0.55), rgba(43, 36, 28, 0.1))'}}></div>
+
          {/* Decorative Elements */}
-         <div className="absolute top-6 right-8 w-32 h-32 rounded-full blur-[80px] opacity-30 animate-pulse" style={{backgroundColor: '#C8FF00'}}></div>
-         
+         <div className="absolute top-6 right-8 w-32 h-32 rounded-full blur-[80px] opacity-30 animate-pulse" style={{backgroundColor: '#B5652F'}}></div>
+
          <div className="absolute bottom-0 left-0 p-12 md:p-16 max-w-3xl text-white z-10">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
+            <h1 className="font-serif text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
                {t.amenities.title}
             </h1>
             <p className="text-lg mb-5 max-w-xl leading-relaxed" style={{color: '#B0B0B8'}}>
@@ -154,11 +154,11 @@ export const Amenities: React.FC = () => {
       <div className=" px-4">
          <div className="flex items-end justify-between mb-5">
             <div className="flex items-center gap-4">
-               <div className="w-12 h-12 bg-[#111111] rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Star size={24} className="text-[#C8FF00]" />
+               <div className="w-12 h-12 bg-nadayu-panel rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <Star size={24} className="text-nadayu-accent" />
                </div>
                <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Community Amenities</h3>
+                  <h3 className="font-serif text-3xl font-bold text-gray-900">Community Amenities</h3>
                   <p className="mt-1 text-gray-500">Select and book your preferred facility</p>
                </div>
             </div>
@@ -172,13 +172,13 @@ export const Amenities: React.FC = () => {
                   onClick={() => setSelectedCategory(filter.id)}
                   className="px-6 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-shrink-0"
                   style={selectedCategory === filter.id ? {
-                     backgroundColor: '#111111',
+                     backgroundColor: '#2B241C',
                      color: '#ffffff',
                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
                   } : {
                      backgroundColor: '#ffffff',
-                     color: '#6b7280',
-                     border: '2px solid #e5e7eb'
+                     color: '#6B5D48',
+                     border: '2px solid #E4D9C6'
                   }}
                >
                   {filter.label}
@@ -211,15 +211,15 @@ export const Amenities: React.FC = () => {
                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop';
                      }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t transition-opacity duration-300" style={{backgroundImage: 'linear-gradient(to top, rgba(17, 17, 17, 0.92), rgba(17, 17, 17, 0.4), transparent)'}}></div>
+                  <div className="absolute inset-0 bg-gradient-to-t transition-opacity duration-300" style={{backgroundImage: 'linear-gradient(to top, rgba(43, 36, 28, 0.92), rgba(43, 36, 28, 0.4), transparent)'}}></div>
 
                   <div className="absolute bottom-0 left-0 p-6 w-full">
                      <div className="flex items-center gap-2 mb-3">
                         <span className={`text-xs font-bold px-3 py-1 rounded-full border transition-colors ${
                            getFacilityStatus(facility.id).available
-                              ? 'border-[#C8FF00] text-[#C8FF00]'
-                              : 'border-[#B0B0B8] text-gray-400'
-                        }`} style={{backgroundColor: getFacilityStatus(facility.id).available ? 'rgba(200, 255, 0, 0.15)' : 'rgba(176, 176, 184, 0.15)'}}>
+                              ? 'border-nadayu-success text-nadayu-success'
+                              : 'border-nadayu-muted text-nadayu-muted'
+                        }`} style={{backgroundColor: getFacilityStatus(facility.id).available ? 'rgba(74, 93, 58, 0.15)' : 'rgba(107, 93, 72, 0.15)'}}>
                            {getFacilityStatus(facility.id).status}
                         </span>
                      </div>
@@ -227,7 +227,7 @@ export const Amenities: React.FC = () => {
                      <p className="text-xs mb-4" style={{color: '#B0B0B8'}}>
                         {getFacilityDescription(facility.id)}
                      </p>
-                     <div className="flex items-center gap-2 font-bold text-sm group-hover:translate-x-1 transition-transform" style={{color: '#C8FF00'}}>
+                     <div className="flex items-center gap-2 font-bold text-sm group-hover:translate-x-1 transition-transform" style={{color: '#B5652F'}}>
                         {t.amenities.bookNow} <ArrowRight size={16} />
                      </div>
                   </div>
@@ -242,7 +242,7 @@ export const Amenities: React.FC = () => {
           <div className="rounded-2xl shadow-sm w-full max-w-2xl overflow-hidden relative" style={{backgroundColor: '#ffffff'}}>
             
             {!bookingSuccess && (
-              <button onClick={closeModal} className="absolute top-6 right-6 p-2.5 rounded-full z-50 transition-colors bg-gray-100 hover:bg-gray-200 text-gray-500">
+              <button onClick={closeModal} className="absolute top-6 right-6 p-2.5 rounded-full z-50 transition-colors bg-nadayu-cream hover:bg-nadayu-border text-gray-500">
                 <X size={24} />
               </button>
             )}
@@ -250,16 +250,16 @@ export const Amenities: React.FC = () => {
             {bookingSuccess ? (
               // Success State
               <div className="p-16 flex flex-col items-center justify-center text-center bg-white">
-                <div className="w-24 h-24 text-[#111111] rounded-full flex items-center justify-center mb-5 shadow-xl animate-bounce" style={{backgroundColor: '#C8FF00'}}>
+                <div className="w-24 h-24 text-white rounded-full flex items-center justify-center mb-5 shadow-xl animate-bounce" style={{backgroundColor: '#4A5D3A'}}>
                   <Check size={48} />
                 </div>
-                <h3 className="text-4xl font-bold mb-4 text-gray-900">{t.amenities.bookingConfirmed}</h3>
+                <h3 className="font-serif text-4xl font-bold mb-4 text-gray-900">{t.amenities.bookingConfirmed}</h3>
                 <p className="text-lg mb-5 max-w-md leading-relaxed text-gray-500">
-                  You're all set for <span className="font-bold text-[#111111]">{selectedFacility.name}</span>
+                  You're all set for <span className="font-bold text-nadayu-panel">{selectedFacility.name}</span>
                   <br/>
-                  <span className="font-bold text-[#111111]">{bookingDate}</span> at <span className="font-bold text-[#111111]">{bookingTime}</span>
+                  <span className="font-bold text-nadayu-panel">{bookingDate}</span> at <span className="font-bold text-nadayu-panel">{bookingTime}</span>
                 </p>
-                <button onClick={closeModal} className="bg-[#111111] hover:bg-[#222222] text-white px-12 py-4 rounded-xl font-bold transition-all shadow-lg">
+                <button onClick={closeModal} className="bg-nadayu-panel hover:brightness-110 text-white px-12 py-4 rounded-xl font-bold transition-all shadow-lg">
                   Done
                 </button>
               </div>
@@ -267,11 +267,11 @@ export const Amenities: React.FC = () => {
               // Booking Form
               <div className="relative">
                 {/* Header with Image */}
-                <div className="relative h-56 overflow-hidden" style={{backgroundColor: '#111111'}}>
+                <div className="relative h-56 overflow-hidden" style={{backgroundColor: '#2B241C'}}>
                    <img src={getFacilityImage(selectedFacility.id)} className="w-full h-full object-cover opacity-80" alt="Facility" />
-                   <div className="absolute inset-0 bg-gradient-to-r" style={{backgroundImage: 'linear-gradient(to right, rgba(17, 17, 17, 1), rgba(34, 34, 34, 0.8), transparent)'}}></div>
+                   <div className="absolute inset-0 bg-gradient-to-r" style={{backgroundImage: 'linear-gradient(to right, rgba(43, 36, 28, 1), rgba(58, 50, 38, 0.8), transparent)'}}></div>
                    <div className="absolute bottom-8 left-8 text-white z-10">
-                      <h3 className="text-xl font-bold mb-2">{selectedFacility.name}</h3>
+                      <h3 className="font-serif text-xl font-bold mb-2">{selectedFacility.name}</h3>
                       <p className="flex items-center gap-2" style={{color: '#B0B0B8'}}>
                         <Calendar size={16} /> Select your preferred time slot
                       </p>
@@ -283,7 +283,7 @@ export const Amenities: React.FC = () => {
                    <form onSubmit={handleSubmit} className="space-y-5">
                       {/* Date Input */}
                       <div className="space-y-4">
-                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">{t.amenities.selectDate}</label>
+                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-nadayu-muted">{t.amenities.selectDate}</label>
                         <CustomDatePicker
                           required
                           value={bookingDate}
@@ -294,7 +294,7 @@ export const Amenities: React.FC = () => {
 
                       {/* Time Slots */}
                       <div className="space-y-4">
-                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-gray-400">
+                        <label className="text-xs font-bold uppercase tracking-widest pl-2 text-nadayu-muted">
                           {t.amenities.selectTimeSlot} {checkingAvailability && '(checking availability...)'}
                         </label>
                         <div className="grid grid-cols-3 gap-3">
@@ -308,22 +308,22 @@ export const Amenities: React.FC = () => {
                                 onClick={() => { setBookingTime(time); setFieldErrors(prev => ({ ...prev, bookingTime: '' })); }}
                                 className={`py-4 rounded-xl text-sm font-bold transition-all duration-300`}
                                 style={isTaken ? {
-                                  backgroundColor: '#f3f4f6',
-                                  borderColor: '#e5e7eb',
+                                  backgroundColor: '#F5F0E8',
+                                  borderColor: '#E4D9C6',
                                   border: '2px solid',
-                                  color: '#9ca3af',
+                                  color: '#6B5D48',
                                   cursor: 'not-allowed',
                                   textDecoration: 'line-through'
                                 } : bookingTime === time ? {
-                                  backgroundColor: '#111111',
+                                  backgroundColor: '#2B241C',
                                   color: '#ffffff',
                                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                  border: '2px solid #111111'
+                                  border: '2px solid #2B241C'
                                 } : {
-                                  backgroundColor: '#f9fafb',
-                                  borderColor: '#e5e7eb',
+                                  backgroundColor: '#F5F0E8',
+                                  borderColor: '#E4D9C6',
                                   border: '2px solid',
-                                  color: '#374151'
+                                  color: '#2B241C'
                                 }}
                               >
                                 {time}{isTaken ? ' · Taken' : ''}
@@ -341,7 +341,7 @@ export const Amenities: React.FC = () => {
                       )}
 
                       {/* Info Alert */}
-                      <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#f9fafb', borderColor: '#111111', color: '#374151'}}>
+                      <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#F5F0E8', borderColor: '#2B241C', color: '#2B241C'}}>
                         <p className="text-sm font-medium">
                           {t.amenities.instantQr}
                         </p>
@@ -353,12 +353,12 @@ export const Amenities: React.FC = () => {
                         disabled={isSubmitting || !bookingDate || !bookingTime}
                         className="w-full font-bold py-5 rounded-xl transition-all shadow-lg text-lg transform hover:-translate-y-1 disabled:transform-none text-white"
                         style={{
-                          backgroundColor: '#111111',
+                          backgroundColor: '#2B241C',
                           opacity: (isSubmitting || !bookingDate || !bookingTime) ? 0.5 : 1,
                           cursor: (isSubmitting || !bookingDate || !bookingTime) ? 'not-allowed' : 'pointer'
                         }}
-                        onMouseEnter={(e) => !isSubmitting && (e.currentTarget.style.backgroundColor = '#222222')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#111111')}
+                        onMouseEnter={(e) => !isSubmitting && (e.currentTarget.style.backgroundColor = '#3A3226')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#2B241C')}
                       >
                         {isSubmitting ? 'Processing...' : 'Confirm Booking'}
                       </button>

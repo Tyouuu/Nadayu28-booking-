@@ -199,22 +199,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-nadayu-bg p-4 relative overflow-hidden">
       {/* Background Effects - Subtle Gold Accents */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
 
-      <div className="max-w-6xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[700px] animate-fade-in border border-gray-100">
+      <div className="max-w-6xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row min-h-[700px] animate-fade-in border border-nadayu-border">
 
         {/* LEFT SIDE - VISUAL SHOWCASE */}
-        <div className="hidden md:flex w-1/2 bg-[#111111] relative overflow-hidden flex-col justify-between p-12">
+        <div className="hidden md:flex w-1/2 bg-nadayu-panel relative overflow-hidden flex-col justify-between p-12">
           {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent opacity-80"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-nadayu-panel via-transparent to-transparent opacity-80"></div>
 
           {/* Center Content */}
           <div className="relative z-10 flex flex-col justify-center flex-1">
-            <div className="w-16 h-16 bg-[#C8FF00] rounded-2xl flex items-center justify-center text-[#111111] font-bold text-2xl mb-8">N</div>
-            <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
+            <div className="w-16 h-16 bg-nadayu-accent rounded-2xl flex items-center justify-center text-nadayu-panel font-bold text-2xl mb-8">N</div>
+            <h2 className="font-serif text-5xl font-bold text-white mb-6 leading-tight">
               Nadayu28<br/>Community
             </h2>
             <p className="text-xl text-gray-300 leading-relaxed max-w-sm">
@@ -223,7 +223,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
             {/* Pagination Dots */}
             <div className="flex gap-2 mt-10">
-              <div className="w-2 h-2 bg-[#C8FF00] rounded-full"></div>
+              <div className="w-2 h-2 bg-nadayu-accent rounded-full"></div>
               <div className="w-2 h-2 bg-white/20 rounded-full"></div>
               <div className="w-2 h-2 bg-white/20 rounded-full"></div>
             </div>
@@ -248,24 +248,24 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <div className="animate-fade-in">
                 <button
                   onClick={() => { setShowForgotPassword(false); setResetStatus('idle'); }}
-                  className="flex items-center text-gray-400 hover:text-gray-900 transition-colors mb-8 font-bold text-sm"
+                  className="flex items-center text-nadayu-muted hover:text-gray-900 transition-colors mb-8 font-bold text-sm"
                 >
                   <ChevronLeft size={16} className="mr-2" /> {t.login.signIn}
                 </button>
 
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">{t.login.resetPassword}</h2>
-                <p className="text-gray-400 mb-8 leading-relaxed">Enter your registered email address and we'll send you instructions to reset your password.</p>
+                <h2 className="font-serif text-3xl font-bold text-gray-900 mb-2">{t.login.resetPassword}</h2>
+                <p className="text-nadayu-muted mb-8 leading-relaxed">Enter your registered email address and we'll send you instructions to reset your password.</p>
 
                 {resetStatus === 'sent' ? (
-                  <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 rounded-2xl p-8 text-center animate-scale-in">
-                    <div className="w-16 h-16 bg-[#C8FF00] text-[#111111] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="bg-nadayu-accent/10 border border-nadayu-accent/30 rounded-2xl p-8 text-center animate-scale-in">
+                    <div className="w-16 h-16 bg-nadayu-accent text-nadayu-panel rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 size={32} />
                     </div>
                     <h3 className="font-bold text-gray-900 text-lg mb-2">{t.login.checkEmail}</h3>
-                    <p className="text-gray-400 text-sm mb-6">We've sent password reset instructions to <span className="font-bold text-gray-900">{resetEmail}</span></p>
+                    <p className="text-nadayu-muted text-sm mb-6">We've sent password reset instructions to <span className="font-bold text-gray-900">{resetEmail}</span></p>
                     <button
                       onClick={() => { setShowForgotPassword(false); setResetStatus('idle'); }}
-                      className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all"
                     >
                       {t.login.signIn}
                     </button>
@@ -273,23 +273,23 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 ) : (
                   <form onSubmit={handleResetPassword} className="space-y-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">{t.login.email}</label>
+                      <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.email}</label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-4 text-gray-400" size={18} />
+                        <Mail className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                         <input
                           type="email"
                           required
                           value={resetEmail}
                           onChange={(e) => setResetEmail(e.target.value)}
                           placeholder="you@example.com"
-                          className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                          className="w-full pl-12 pr-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
                         />
                       </div>
                     </div>
                     <button
                       type="submit"
                       disabled={resetStatus === 'sending'}
-                      className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                     >
                       {resetStatus === 'sending' ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -305,20 +305,20 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <>
                 {/* Header */}
                 <div className="mb-8">
-                  <h2 className="text-4xl font-bold text-gray-900 mb-1">
+                  <h2 className="font-serif text-4xl font-bold text-gray-900 mb-1">
                     {mode === 'signin' ? t.login.welcome : t.login.createAccount}
                   </h2>
                   {mode === 'signin' && (
-                    <p className="text-gray-400">{t.login.signIn}</p>
+                    <p className="text-nadayu-muted">{t.login.signIn}</p>
                   )}
                 </div>
 
                 {/* Already have account / New here */}
                 <div className="mb-8">
                   {mode === 'signin' ? (
-                    <span className="text-gray-400 text-sm">{t.login.noAccount} <button onClick={() => setMode('signup')} className="text-[#111111] font-semibold hover:text-gray-700 transition-colors underline">{t.login.createAccount}</button></span>
+                    <span className="text-nadayu-muted text-sm">{t.login.noAccount} <button onClick={() => setMode('signup')} className="text-nadayu-panel font-semibold hover:text-gray-700 transition-colors underline">{t.login.createAccount}</button></span>
                   ) : (
-                    <span className="text-gray-400 text-sm">{t.login.hasAccount} <button onClick={() => setMode('signin')} className="text-[#111111] font-semibold hover:text-gray-700 transition-colors underline">{t.login.signIn}</button></span>
+                    <span className="text-nadayu-muted text-sm">{t.login.hasAccount} <button onClick={() => setMode('signin')} className="text-nadayu-panel font-semibold hover:text-gray-700 transition-colors underline">{t.login.signIn}</button></span>
                   )}
                 </div>
 
@@ -329,8 +329,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                       onClick={() => setMode('signin')}
                       className={`flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all ${
                         mode === 'signin'
-                          ? 'bg-[#111111] border border-[#111111] text-white'
-                          : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
+                          ? 'bg-nadayu-panel border border-nadayu-panel text-white'
+                          : 'bg-nadayu-cream border border-nadayu-border/50 text-nadayu-muted hover:text-gray-900'
                       }`}
                     >
                       {t.login.signIn}
@@ -339,8 +339,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                       onClick={() => setMode('signup')}
                       className={`flex-1 py-2 px-3 text-xs font-bold rounded-xl transition-all ${
                         mode === 'signup'
-                          ? 'bg-[#111111] border border-[#111111] text-white'
-                          : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
+                          ? 'bg-nadayu-panel border border-nadayu-panel text-white'
+                          : 'bg-nadayu-cream border border-nadayu-border/50 text-nadayu-muted hover:text-gray-900'
                       }`}
                     >
                       {t.login.signUp}
@@ -357,8 +357,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         onClick={() => setRole(r)}
                         className={`px-4 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap ${
                           role === r
-                            ? 'bg-[#111111] text-white'
-                            : 'bg-gray-100 text-gray-500 hover:text-gray-900 border border-gray-200'
+                            ? 'bg-nadayu-panel text-white'
+                            : 'bg-nadayu-cream text-gray-500 hover:text-gray-900 border border-nadayu-border'
                         }`}
                       >
                         {r === 'OWNER' ? t.login.owner : r === 'TENANT' ? t.login.tenant : r === 'SECURITY' ? t.login.security : t.login.management}
@@ -374,15 +374,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     {/* Login Method Selection - For Owner & Tenant */}
                     {(role === 'OWNER' || role === 'TENANT') && (
                       <div className="space-y-3 mb-6">
-                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.loginMethod}</label>
+                        <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.loginMethod}</label>
                         <div className="grid grid-cols-2 gap-2">
                           <button
                             type="button"
                             onClick={() => { setLoginMethod('password'); setOtpSent(false); setOtpCode(''); setOtpError(null); }}
                             className={`py-3 px-2 rounded-xl transition-all font-bold text-xs flex flex-col items-center gap-2 ${
                               loginMethod === 'password'
-                                ? 'bg-[#111111] border border-[#111111] text-white'
-                                : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
+                                ? 'bg-nadayu-panel border border-nadayu-panel text-white'
+                                : 'bg-nadayu-cream border border-nadayu-border/50 text-nadayu-muted hover:text-gray-900'
                             }`}
                           >
                             <Key size={16} /> {t.login.passwordLogin}
@@ -392,8 +392,8 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             onClick={() => { setLoginMethod('mobile'); setAuthError(null); }}
                             className={`py-3 px-2 rounded-xl transition-all font-bold text-xs flex flex-col items-center gap-2 ${
                               loginMethod === 'mobile'
-                                ? 'bg-[#111111] border border-[#111111] text-white'
-                                : 'bg-gray-100 border border-gray-200/50 text-gray-400 hover:text-gray-900'
+                                ? 'bg-nadayu-panel border border-nadayu-panel text-white'
+                                : 'bg-nadayu-cream border border-nadayu-border/50 text-nadayu-muted hover:text-gray-900'
                             }`}
                           >
                             <Smartphone size={16} /> {t.login.mobileOtp}
@@ -406,35 +406,35 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     {loginMethod === 'password' && (
                       <>
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-400 uppercase">{getLoginLabel()}</label>
+                          <label className="text-xs font-bold text-nadayu-muted uppercase">{getLoginLabel()}</label>
                           <div className="relative">
-                            <User className="absolute left-4 top-4 text-gray-400" size={18} />
+                            <User className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                             <input
                               type="email"
                               value={loginEmail}
                               onChange={(e) => { setLoginEmail(e.target.value); setFieldErrors(prev => ({ ...prev, email: '' })); }}
                               placeholder={getLoginPlaceholder()}
-                              className={`w-full pl-12 pr-4 py-3 bg-gray-100 border rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.email ? 'border-red-400' : 'border-gray-200/50'}`}
+                              className={`w-full pl-12 pr-4 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.email ? 'border-red-400' : 'border-nadayu-border/50'}`}
                             />
                           </div>
                           {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-400 uppercase">{t.login.password}</label>
+                          <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.password}</label>
                           <div className="relative">
-                            <Key className="absolute left-4 top-4 text-gray-400" size={18} />
+                            <Key className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                             <input
                               type={showPassword ? "text" : "password"}
                               value={loginPassword}
                               onChange={(e) => { setLoginPassword(e.target.value); setFieldErrors(prev => ({ ...prev, password: '' })); }}
                               placeholder="••••••••"
-                              className={`w-full pl-12 pr-12 py-3 bg-gray-100 border rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.password ? 'border-red-400' : 'border-gray-200/50'}`}
+                              className={`w-full pl-12 pr-12 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.password ? 'border-red-400' : 'border-nadayu-border/50'}`}
                             />
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-4 top-4 text-gray-400 hover:text-gray-900 transition-colors"
+                              className="absolute right-4 top-4 text-nadayu-muted hover:text-gray-900 transition-colors"
                             >
                               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
@@ -444,7 +444,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             <button
                               type="button"
                               onClick={() => setShowForgotPassword(true)}
-                              className="text-xs font-bold text-[#4a6600] hover:text-gray-700 transition-colors"
+                              className="text-xs font-bold text-nadayu-accent hover:text-gray-700 transition-colors"
                             >
                               {t.login.forgotPassword}
                             </button>
@@ -457,19 +457,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     {loginMethod === 'mobile' && (
                       <div className="space-y-4 animate-fade-in">
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-400 uppercase">{t.login.phone}</label>
+                          <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.phone}</label>
                           <div className="relative">
-                            <Phone className="absolute left-4 top-4 text-gray-400" size={18} />
+                            <Phone className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                             <input
                               type="tel"
                               value={phoneNumber}
                               onChange={(e) => setPhoneNumber(e.target.value)}
                               placeholder="+60123456789"
                               disabled={otpSent}
-                              className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 disabled:opacity-50"
+                              className="w-full pl-12 pr-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 disabled:opacity-50"
                             />
                           </div>
-                          <p className="text-[10px] text-gray-400">Include country code (e.g. +60 for Malaysia)</p>
+                          <p className="text-[10px] text-nadayu-muted">Include country code (e.g. +60 for Malaysia)</p>
                         </div>
 
                         {!otpSent ? (
@@ -477,30 +477,30 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             type="button"
                             onClick={handleSendOTP}
                             disabled={isLoading}
-                            className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                           >
                             {isLoading ? (
-                              <div className="w-5 h-5 border-2 border-[#111111]/30 border-t-[#111111] rounded-full animate-spin" />
+                              <div className="w-5 h-5 border-2 border-nadayu-panel/30 border-t-nadayu-panel rounded-full animate-spin" />
                             ) : (
                               t.login.sendOtp
                             )}
                           </button>
                         ) : (
                           <div className="space-y-3 animate-fade-in">
-                            <label className="text-xs font-bold text-gray-400 uppercase">{t.login.enterOtp}</label>
+                            <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.enterOtp}</label>
                             <input
                               type="text"
                               placeholder="000000"
                               value={otpCode}
                               onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                               maxLength={6}
-                              className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 text-center tracking-widest"
+                              className="w-full px-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 text-center tracking-widest"
                             />
-                            <p className="text-xs text-gray-400 text-center">Code expires in 5 minutes</p>
+                            <p className="text-xs text-nadayu-muted text-center">Code expires in 5 minutes</p>
                             <button
                               type="button"
                               onClick={() => { setOtpSent(false); setOtpCode(''); setOtpError(null); }}
-                              className="text-xs font-bold text-[#4a6600] hover:text-gray-700 transition-colors"
+                              className="text-xs font-bold text-nadayu-accent hover:text-gray-700 transition-colors"
                             >
                               Change phone number
                             </button>
@@ -523,10 +523,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <button
                       type="submit"
                       disabled={isLoading || (loginMethod === 'mobile' && (!otpSent || otpCode.length !== 6))}
-                      className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
                     >
                       {isLoading ? (
-                        <div className="w-5 h-5 border-2 border-[#111111]/30 border-t-[#111111] rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-nadayu-panel/30 border-t-nadayu-panel rounded-full animate-spin" />
                       ) : (
                         <>{t.login.signIn} <ArrowRight size={18} /></>
                       )}
@@ -535,19 +535,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     {/* OAuth Options */}
                     <div className="relative my-8">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-200/50"></div>
+                        <div className="w-full border-t border-nadayu-border/50"></div>
                       </div>
                       <div className="relative flex justify-center text-xs">
-                        <span className="px-2 bg-white text-gray-400">Or sign in with</span>
+                        <span className="px-2 bg-white text-nadayu-muted">Or sign in with</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <button type="button" className="py-3 border border-gray-200/50 hover:border-[#C8FF00]/30 rounded-xl font-bold text-gray-400 hover:text-[#4a6600] transition-all flex items-center justify-center gap-2">
+                      <button type="button" className="py-3 border border-nadayu-border/50 hover:border-nadayu-accent/30 rounded-xl font-bold text-nadayu-muted hover:text-nadayu-accent transition-all flex items-center justify-center gap-2">
                         <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032 c0-3.331,2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.461,2.268,15.199,1,12.545,1 C6.438,1,1.514,5.924,1.514,12c0,6.075,4.924,11,11.031,11c5.659,0,10.571-4.233,10.571-9.772c0-0.628-0.078-1.274-0.199-1.989H12.545z"/></svg>
                         Google
                       </button>
-                      <button type="button" className="py-3 border border-gray-200/50 hover:border-[#C8FF00]/30 rounded-xl font-bold text-gray-400 hover:text-[#4a6600] transition-all flex items-center justify-center gap-2">
+                      <button type="button" className="py-3 border border-nadayu-border/50 hover:border-nadayu-accent/30 rounded-xl font-bold text-nadayu-muted hover:text-nadayu-accent transition-all flex items-center justify-center gap-2">
                         <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.48-3.24-1.84-.37-.69-.37-1.52-.03-2.47 1.23-3.27 3.45-6.71 3.73-7.89.05-.29-.13-.61-.37-.75-.51-.32-1.3.09-1.42.79-.13.69-.45 1.48-.89 2.25-1.04 1.81-1.65 2.47-2.86 2.18-1.04-.23-1.51-1.08-2.09-2.47-.3-.75-.63-1.46-.95-2.15-1.05-2.29-1.21-2.94-.97-4.03.07-.32.36-.68.75-.72 1.04-.1 1.17.59 1.95 2.39 1.36 3.23 1.65 4.2 2.95 4.18 1.28-.02 1.94-.92 2.24-2.33.12-.5.22-.94.32-1.31.18-.67.47-1.39 1.15-1.64 1.24-.4 2.12.32 2.06 1.39-.09 1.5-1.39 3.89-2.8 6.14-.5.86-.71 1.62-.43 2.3.28.68 1.08.82 1.79.3.85-.63 1.62-1.55 2.28-2.58z"/></svg>
                         Apple
                       </button>
@@ -560,47 +560,47 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <form onSubmit={handleRegister} className="space-y-5 animate-fade-in max-h-[600px] overflow-y-auto pr-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.firstName} *</label>
+                        <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.firstName} *</label>
                         <input
                           type="text"
                           placeholder="e.g. Ahmad"
                           value={regFirstName}
                           onChange={e => setRegFirstName(e.target.value)}
                           required
-                          className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                          className="w-full px-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.lastName}</label>
+                        <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.lastName}</label>
                         <input
                           type="text"
                           placeholder="e.g. Razali"
                           value={regLastName}
                           onChange={e => setRegLastName(e.target.value)}
-                          className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                          className="w-full px-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">{t.login.email} *</label>
+                      <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.email} *</label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-4 text-gray-400" size={18} />
+                        <Mail className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                         <input
                           type="email"
                           placeholder="you@example.com"
                           value={regEmail}
                           onChange={e => setRegEmail(e.target.value)}
                           required
-                          className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                          className="w-full pl-12 pr-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase">{t.login.password} *</label>
+                      <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.password} *</label>
                       <div className="relative">
-                        <Key className="absolute left-4 top-4 text-gray-400" size={18} />
+                        <Key className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder="Min 6 characters"
@@ -608,12 +608,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                           onChange={e => setRegPassword(e.target.value)}
                           required
                           minLength={6}
-                          className="w-full pl-12 pr-12 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                          className="w-full pl-12 pr-12 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-4 text-gray-400 hover:text-[#4a6600] transition-colors"
+                          className="absolute right-4 top-4 text-nadayu-muted hover:text-nadayu-accent transition-colors"
                         >
                           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
@@ -622,28 +622,28 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.unitNumber}</label>
+                        <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.unitNumber}</label>
                         <div className="relative">
-                          <Building className="absolute left-4 top-4 text-gray-400" size={18} />
+                          <Building className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                           <input
                             type="text"
                             placeholder="e.g. A-08-03"
                             value={regUnit}
                             onChange={e => setRegUnit(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                            className="w-full pl-12 pr-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-400 uppercase">{t.login.phone}</label>
+                        <label className="text-xs font-bold text-nadayu-muted uppercase">{t.login.phone}</label>
                         <div className="relative">
-                          <Phone className="absolute left-4 top-4 text-gray-400" size={18} />
+                          <Phone className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                           <input
                             type="tel"
                             placeholder="012-3456789"
                             value={regPhone}
                             onChange={e => setRegPhone(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                            className="w-full pl-12 pr-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                           />
                         </div>
                       </div>
@@ -651,15 +651,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                     {/* Terms & Conditions */}
                     <div className="flex items-start gap-3 pt-2">
-                      <input type="checkbox" id="terms" className="w-5 h-5 accent-[#C8FF00] rounded mt-0.5" />
-                      <label htmlFor="terms" className="text-xs text-gray-400">
-                        I agree to the <button type="button" className="text-[#4a6600] hover:text-gray-700 font-bold">Terms & Conditions</button>
+                      <input type="checkbox" id="terms" className="w-5 h-5 accent-nadayu-accent rounded mt-0.5" />
+                      <label htmlFor="terms" className="text-xs text-nadayu-muted">
+                        I agree to the <button type="button" className="text-nadayu-accent hover:text-gray-700 font-bold">Terms & Conditions</button>
                       </label>
                     </div>
 
                     {/* TENANT REGISTRATION - INVITATION OR APPLICATION */}
                     {role === 'TENANT' && (
-                      <div className="space-y-4 pt-4 border-t border-gray-200/50 animate-fade-in">
+                      <div className="space-y-4 pt-4 border-t border-nadayu-border/50 animate-fade-in">
                         <div className="flex gap-4 mb-4">
                           <label className="flex items-center gap-2 cursor-pointer flex-1">
                             <input
@@ -667,7 +667,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                               name="tenantRegMethod"
                               checked={tenantRegMethod === 'invite'}
                               onChange={() => setTenantRegMethod('invite')}
-                              className="accent-[#C8FF00]"
+                              className="accent-nadayu-accent"
                             />
                             <span className="text-sm font-medium text-gray-900">Invitation Code</span>
                           </label>
@@ -677,7 +677,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                               name="tenantRegMethod"
                               checked={tenantRegMethod === 'apply'}
                               onChange={() => setTenantRegMethod('apply')}
-                              className="accent-[#C8FF00]"
+                              className="accent-nadayu-accent"
                             />
                             <span className="text-sm font-medium text-gray-900">Self-Apply</span>
                           </label>
@@ -685,26 +685,26 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                         {tenantRegMethod === 'invite' ? (
                           <div className="space-y-2 animate-fade-in">
-                            <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-3 rounded-lg">
-                              <p className="text-xs text-[#4a6600]">Enter the invitation code sent by the property owner</p>
+                            <div className="bg-nadayu-accent/10 border border-nadayu-accent/30 p-3 rounded-lg">
+                              <p className="text-xs text-nadayu-accent">Enter the invitation code sent by the property owner</p>
                             </div>
-                            <label className="text-xs font-bold text-gray-400 uppercase">Invitation Code</label>
+                            <label className="text-xs font-bold text-nadayu-muted uppercase">Invitation Code</label>
                             <input
                               type="text"
                               placeholder="e.g. ND28-XYZ-999"
                               value={invitationCode}
                               onChange={(e) => setInvitationCode(e.target.value)}
-                              className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
+                              className="w-full px-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium text-gray-900 placeholder-gray-400 transition-all"
                             />
-                            <p className="text-[10px] text-gray-400">Code format: NADAYU-XXXXX (provided by owner)</p>
+                            <p className="text-[10px] text-nadayu-muted">Code format: NADAYU-XXXXX (provided by owner)</p>
                           </div>
                         ) : (
                           <div className="space-y-2 animate-fade-in">
-                            <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-3 rounded-lg">
-                              <p className="text-xs text-[#4a6600]">Upload your tenancy agreement for administrator approval</p>
+                            <div className="bg-nadayu-accent/10 border border-nadayu-accent/30 p-3 rounded-lg">
+                              <p className="text-xs text-nadayu-accent">Upload your tenancy agreement for administrator approval</p>
                             </div>
-                            <label className="text-xs font-bold text-gray-400 uppercase">Tenancy Agreement</label>
-                            <div className="border-2 border-dashed border-[#C8FF00]/50 hover:border-[#C8FF00] rounded-xl p-4 text-center hover:bg-[#C8FF00]/5 transition-all cursor-pointer">
+                            <label className="text-xs font-bold text-nadayu-muted uppercase">Tenancy Agreement</label>
+                            <div className="border-2 border-dashed border-nadayu-accent/50 hover:border-nadayu-accent rounded-xl p-4 text-center hover:bg-nadayu-accent/5 transition-all cursor-pointer">
                               <input
                                 type="file"
                                 accept=".pdf,.doc,.docx,image/*"
@@ -712,11 +712,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                                 id="tenancyUpload"
                               />
                               <label htmlFor="tenancyUpload" className="cursor-pointer">
-                                <Upload className="mx-auto text-[#4a6600] mb-2" size={20} />
-                                <p className="text-xs font-bold text-[#4a6600]">Upload Agreement</p>
+                                <Upload className="mx-auto text-nadayu-accent mb-2" size={20} />
+                                <p className="text-xs font-bold text-nadayu-accent">Upload Agreement</p>
                               </label>
                             </div>
-                            <p className="text-[10px] text-gray-400">Status: Awaiting administrator approval</p>
+                            <p className="text-[10px] text-nadayu-muted">Status: Awaiting administrator approval</p>
                           </div>
                         )}
                       </div>
@@ -730,7 +730,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <button
                       type="submit"
                       disabled={isLoading || (role === 'TENANT' && tenantRegMethod === 'invite' && !invitationCode)}
-                      className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all mt-8 disabled:opacity-50"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all mt-8 disabled:opacity-50"
                     >
                       {isLoading ? 'Processing...' : t.login.createAccount}
                     </button>
@@ -738,19 +738,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     {/* OAuth Options */}
                     <div className="relative my-6">
                       <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-200/50"></div>
+                        <div className="w-full border-t border-nadayu-border/50"></div>
                       </div>
                       <div className="relative flex justify-center text-xs">
-                        <span className="px-2 bg-white text-gray-400">Or register with</span>
+                        <span className="px-2 bg-white text-nadayu-muted">Or register with</span>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <button type="button" className="py-3 border border-gray-200/50 hover:border-[#C8FF00]/30 rounded-xl font-bold text-gray-400 hover:text-[#4a6600] transition-all flex items-center justify-center gap-2">
+                      <button type="button" className="py-3 border border-nadayu-border/50 hover:border-nadayu-accent/30 rounded-xl font-bold text-nadayu-muted hover:text-nadayu-accent transition-all flex items-center justify-center gap-2">
                         <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032 c0-3.331,2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.461,2.268,15.199,1,12.545,1 C6.438,1,1.514,5.924,1.514,12c0,6.075,4.924,11,11.031,11c5.659,0,10.571-4.233,10.571-9.772c0-0.628-0.078-1.274-0.199-1.989H12.545z"/></svg>
                         Google
                       </button>
-                      <button type="button" className="py-3 border border-gray-200/50 hover:border-[#C8FF00]/30 rounded-xl font-bold text-gray-400 hover:text-[#4a6600] transition-all flex items-center justify-center gap-2">
+                      <button type="button" className="py-3 border border-nadayu-border/50 hover:border-nadayu-accent/30 rounded-xl font-bold text-nadayu-muted hover:text-nadayu-accent transition-all flex items-center justify-center gap-2">
                         <svg className="w-5 h-5" viewBox="0 0 24 24"><path fill="currentColor" d="M17.05 20.28c-.98.95-2.05.48-3.24-1.84-.37-.69-.37-1.52-.03-2.47 1.23-3.27 3.45-6.71 3.73-7.89.05-.29-.13-.61-.37-.75-.51-.32-1.3.09-1.42.79-.13.69-.45 1.48-.89 2.25-1.04 1.81-1.65 2.47-2.86 2.18-1.04-.23-1.51-1.08-2.09-2.47-.3-.75-.63-1.46-.95-2.15-1.05-2.29-1.21-2.94-.97-4.03.07-.32.36-.68.75-.72 1.04-.1 1.17.59 1.95 2.39 1.36 3.23 1.65 4.2 2.95 4.18 1.28-.02 1.94-.92 2.24-2.33.12-.5.22-.94.32-1.31.18-.67.47-1.39 1.15-1.64 1.24-.4 2.12.32 2.06 1.39-.09 1.5-1.39 3.89-2.8 6.14-.5.86-.71 1.62-.43 2.3.28.68 1.08.82 1.79.3.85-.63 1.62-1.55 2.28-2.58z"/></svg>
                         Apple
                       </button>
@@ -761,14 +761,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 {/* REGISTRATION SUCCESS */}
                 {mode === 'signup' && regSuccess && (
                   <div className="text-center animate-fade-in py-8">
-                    <div className="w-16 h-16 bg-[#C8FF00]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 className="text-[#4a6600]" size={32} />
+                    <div className="w-16 h-16 bg-nadayu-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle2 className="text-nadayu-accent" size={32} />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{t.login.registerSuccess}</h3>
-                    <p className="text-gray-400 text-sm mb-6">{t.login.checkEmail}</p>
+                    <p className="text-nadayu-muted text-sm mb-6">{t.login.checkEmail}</p>
                     <button
                       onClick={() => { setMode('signin'); setRegSuccess(false); setLoginEmail(regEmail); }}
-                      className="bg-[#C8FF00] hover:brightness-95 text-[#111111] px-6 py-3 rounded-xl font-bold transition-all"
+                      className="bg-nadayu-accent hover:brightness-95 text-nadayu-panel px-6 py-3 rounded-xl font-bold transition-all"
                     >
                       {t.login.signIn}
                     </button>
@@ -782,48 +782,48 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <div className="animate-fade-in">
                 <button
                   onClick={() => setMode('signin')}
-                  className="flex items-center text-gray-400 hover:text-gray-900 transition-colors mb-8 font-bold text-sm"
+                  className="flex items-center text-nadayu-muted hover:text-gray-900 transition-colors mb-8 font-bold text-sm"
                 >
                   <ChevronLeft size={16} className="mr-2" /> Back
                 </button>
 
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Visitor Access</h2>
-                <p className="text-gray-400 mb-8 leading-relaxed">Enter your temporary visitor credentials to access the facility</p>
+                <h2 className="font-serif text-3xl font-bold text-gray-900 mb-2">Visitor Access</h2>
+                <p className="text-nadayu-muted mb-8 leading-relaxed">Enter your temporary visitor credentials to access the facility</p>
 
                 <form onSubmit={handleLogin} className="space-y-5">
-                  <div className="bg-[#C8FF00]/10 border border-[#C8FF00]/30 p-4 rounded-xl flex gap-3 mb-6">
-                    <Users className="text-[#4a6600] flex-shrink-0 mt-0.5" size={18} />
-                    <div className="text-xs text-[#4a6600] leading-relaxed">
+                  <div className="bg-nadayu-accent/10 border border-nadayu-accent/30 p-4 rounded-xl flex gap-3 mb-6">
+                    <Users className="text-nadayu-accent flex-shrink-0 mt-0.5" size={18} />
+                    <div className="text-xs text-nadayu-accent leading-relaxed">
                       <strong>Temporary Access:</strong> Your account is automatically created based on pre-registration and expires at the scheduled visit end time.
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Visitor Code</label>
+                    <label className="text-xs font-bold text-nadayu-muted uppercase">Visitor Code</label>
                     <div className="relative">
-                      <Badge className="absolute left-4 top-4 text-gray-400" size={18} />
+                      <Badge className="absolute left-4 top-4 text-nadayu-muted" size={18} />
                       <input
                         type="text"
                         placeholder="e.g. VISIT-ABC123"
-                        className="w-full pl-12 pr-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
+                        className="w-full pl-12 pr-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-gray-400 uppercase">Verification Code</label>
+                    <label className="text-xs font-bold text-nadayu-muted uppercase">Verification Code</label>
                     <input
                       type="text"
                       placeholder="000000"
                       maxLength={6}
-                      className="w-full px-4 py-3 bg-gray-100 border border-gray-200/50 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none transition-all font-medium text-gray-900 placeholder-gray-400 text-center tracking-widest"
+                      className="w-full px-4 py-3 bg-nadayu-cream border border-nadayu-border/50 rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 text-center tracking-widest"
                     />
                   </div>
 
-                  <div className="bg-gray-100 border border-gray-200/50 p-4 rounded-xl">
+                  <div className="bg-nadayu-cream border border-nadayu-border/50 p-4 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <Clock className="text-gray-400" size={18} />
-                      <div className="text-xs text-gray-400">
+                      <Clock className="text-nadayu-muted" size={18} />
+                      <div className="text-xs text-nadayu-muted">
                         <p className="font-bold">Visit Time: 2:00 PM - 5:00 PM</p>
                         <p>Expires automatically after visit ends</p>
                       </div>
@@ -833,16 +833,16 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-[#C8FF00] hover:brightness-95 text-[#111111] py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
+                    className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
                   >
                     {isLoading ? (
-                      <div className="w-5 h-5 border-2 border-[#111111]/30 border-t-[#111111] rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-nadayu-panel/30 border-t-nadayu-panel rounded-full animate-spin" />
                     ) : (
                       <>Access Facility <ArrowRight size={18} /></>
                     )}
                   </button>
 
-                  <p className="text-xs text-gray-400 text-center mt-6">For security purposes, your access will be automatically revoked at the scheduled time</p>
+                  <p className="text-xs text-nadayu-muted text-center mt-6">For security purposes, your access will be automatically revoked at the scheduled time</p>
                 </form>
               </div>
             )}
@@ -853,7 +853,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       {/* Visitor Access Button - Bottom Right */}
       <button
         onClick={() => setMode('visitor')}
-        className="fixed bottom-8 right-8 bg-[#C8FF00] hover:brightness-95 text-[#111111] px-6 py-3 rounded-full font-bold transition-all flex items-center gap-2"
+        className="fixed bottom-8 right-8 bg-nadayu-accent hover:brightness-95 text-nadayu-panel px-6 py-3 rounded-full font-bold transition-all flex items-center gap-2"
       >
         <Users size={18} /> Visitor Access
       </button>

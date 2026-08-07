@@ -36,15 +36,15 @@ export const Navigation: React.FC = () => {
   const nextLocale = locales[(locales.indexOf(locale) + 1) % locales.length];
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full bg-[#111111] overflow-hidden">
+    <div className="flex flex-col h-full bg-nadayu-panel overflow-hidden">
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#C8FF00] flex items-center justify-center flex-shrink-0">
+          <div className="w-9 h-9 rounded-full bg-nadayu-accent flex items-center justify-center flex-shrink-0">
             <span className="font-extrabold text-black text-base leading-none">N</span>
           </div>
           <div>
-            <p className="text-white font-bold text-sm leading-tight">Nadayu28</p>
+            <p className="font-serif text-white font-bold text-sm leading-tight">Nadayu28</p>
             <p className="text-[#555] text-[10px] mt-0.5 tracking-wide">Community Portal</p>
           </div>
         </div>
@@ -60,7 +60,7 @@ export const Navigation: React.FC = () => {
               key={item.id}
               onClick={() => navigate(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-left group ${
-                active ? 'bg-[#C8FF00] text-black' : 'text-[#777] hover:text-white hover:bg-white/[0.06]'
+                active ? 'bg-nadayu-accent text-black' : 'text-[#777] hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               <item.icon size={17} strokeWidth={active ? 2.5 : 1.8} className="flex-shrink-0" />
@@ -111,26 +111,26 @@ export const Navigation: React.FC = () => {
   return (
     <>
       {/* Mobile topbar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-100 z-30 flex items-center justify-between px-4">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-nadayu-border z-30 flex items-center justify-between px-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-[#C8FF00] rounded-full flex items-center justify-center">
+          <div className="w-7 h-7 bg-nadayu-accent rounded-full flex items-center justify-center">
             <span className="font-extrabold text-black text-xs">N</span>
           </div>
-          <span className="font-bold text-gray-900 text-sm">Nadayu28</span>
+          <span className="font-serif font-bold text-gray-900 text-sm">Nadayu28</span>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setLocale(nextLocale)} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors text-xs font-bold uppercase">
+          <button onClick={() => setLocale(nextLocale)} className="p-1.5 rounded-lg text-nadayu-muted hover:bg-nadayu-cream transition-colors text-xs font-bold uppercase">
             {locale}
           </button>
-          <button onClick={() => setIsMobileOpen(!isMobileOpen)} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 transition-colors">
+          <button onClick={() => setIsMobileOpen(!isMobileOpen)} className="p-1.5 rounded-lg text-nadayu-muted hover:bg-nadayu-cream transition-colors">
             {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden md:block w-56 flex-shrink-0">
-        <div className="fixed inset-y-0 left-0 w-56">
+      <div className="hidden md:block w-48 flex-shrink-0">
+        <div className="fixed inset-y-0 left-0 w-48">
           <Sidebar />
         </div>
       </div>
@@ -139,7 +139,7 @@ export const Navigation: React.FC = () => {
       {isMobileOpen && (
         <>
           <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={() => setIsMobileOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-56 z-30 md:hidden"><Sidebar /></div>
+          <div className="fixed inset-y-0 left-0 w-48 z-30 md:hidden"><Sidebar /></div>
         </>
       )}
     </>

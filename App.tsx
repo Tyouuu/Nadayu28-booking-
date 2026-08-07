@@ -61,10 +61,10 @@ const AppContent: React.FC = () => {
   // Show loading spinner while checking session
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-nadayu-bg">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-200 border-t-[#C8FF00] rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400 text-sm">Loading...</p>
+          <div className="w-12 h-12 border-4 border-nadayu-border border-t-nadayu-accent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-nadayu-muted text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -78,7 +78,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-white text-gray-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="flex min-h-screen bg-nadayu-bg text-gray-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Navigation />
 
       <main className="flex-1 transition-all duration-300 ease-in-out relative">

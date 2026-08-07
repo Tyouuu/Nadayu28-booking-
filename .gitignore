@@ -31,3 +31,7 @@ dist-ssr
 # IDE / temp files
 .claude/
 *.mjs.bak
+
+.vercel
+.env*
+.superpowers/

@@ -626,3 +626,81 @@ export async function updateUserRole(userId: string, newRole: UserRole): Promise
     });
   }
 }
+
+// ── Documents ─────────────────────────────────────────────────
+
+export interface Document {
+  id: string;
+  title: string;
+  category: string;
+  filePath: string;
+  fileName: string;
+  uploadedBy: string | null;
+  uploadedByName: string;
+  createdAt: string;
+}
+
+function toDocument(row: Record<string, unknown>): Document {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    category: row.category as string,
+    filePath: row.file_path as string,
+    fileName: row.file_name as string,
+    uploadedBy: (row.uploaded_by as string) ?? null,
+    uploadedByName: row.uploaded_by_name as string,
+    createdAt: row.created_at as string,
+  };
+}
+
+export async function fetchDocuments(category?: string): Promise<Document[]> {
+  let query = supabase.from('documents').select('*').order('created_at', { ascending: false });
+  if (category) query = query.eq('category', category);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []).map(toDocument);
+}
+
+export async function uploadDocument(params: { title: string; category: string; file: File }): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+
+  const id = 'd' + Date.now();
+  const path = `${id}/${params.file.name}`;
+
+  const { error: uploadError } = await supabase.storage.from('documents').upload(path, params.file);
+  if (uploadError) throw uploadError;
+
+  const { error: insertError } = await supabase.from('documents').insert({
+    id,
+    title: params.title,
+    category: params.category,
+    file_path: path,
+    file_name: params.file.name,
+    uploaded_by: user?.id,
+    uploaded_by_name: profile?.full_name ?? 'Unknown',
+  });
+  if (insertError) {
+    // Metadata row must not be missing while the file exists — roll back.
+    await supabase.storage.from('documents').remove([path]);
+    throw insertError;
+  }
+}
+
+export async function deleteDocument(id: string): Promise<void> {
+  const { data: doc, error: fetchError } = await supabase.from('documents').select('file_path').eq('id', id).single();
+  if (fetchError) throw fetchError;
+
+  const { error: deleteError } = await supabase.from('documents').delete().eq('id', id);
+  if (deleteError) throw deleteError;
+
+  if (doc) {
+    await supabase.storage.from('documents').remove([doc.file_path]).catch(() => {});
+  }
+}
+
+export async function getDocumentDownloadUrl(filePath: string): Promise<string> {
+  const { data, error } = await supabase.storage.from('documents').createSignedUrl(filePath, 300);
+  if (error) throw error;
+  return data.signedUrl;
+}

@@ -80,25 +80,25 @@ export function CustomDatePicker({ value, onChange, required, className }: DateP
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl font-medium text-base transition-all hover:border-gray-300 focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10 outline-none text-left"
+        className="w-full flex items-center gap-3 px-5 py-4 bg-nadayu-cream border-2 border-nadayu-border rounded-xl font-medium text-base transition-all hover:border-gray-300 focus:border-nadayu-panel focus:ring-2 focus:ring-nadayu-panel/10 outline-none text-left"
       >
-        <Calendar size={18} className="text-gray-400 flex-shrink-0" />
-        <span className={selected ? 'text-gray-900' : 'text-gray-400'}>
+        <Calendar size={18} className="text-nadayu-muted flex-shrink-0" />
+        <span className={selected ? 'text-gray-900' : 'text-nadayu-muted'}>
           {selected ? displayValue : 'Select a date'}
         </span>
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-2 w-[320px] bg-white border border-gray-200 rounded-2xl shadow-xl p-5 animate-fade-in">
+        <div className="absolute z-50 mt-2 w-[320px] bg-white border border-nadayu-border rounded-2xl shadow-xl p-5 animate-fade-in">
           {/* Month/Year Navigation */}
           <div className="flex items-center justify-between mb-4">
-            <button type="button" onClick={prevMonth} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <button type="button" onClick={prevMonth} className="p-2 rounded-xl hover:bg-nadayu-cream transition-colors">
               <ChevronLeft size={18} className="text-gray-600" />
             </button>
             <h4 className="font-bold text-gray-900 text-sm">
               {MONTHS[viewMonth]} {viewYear}
             </h4>
-            <button type="button" onClick={nextMonth} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
+            <button type="button" onClick={nextMonth} className="p-2 rounded-xl hover:bg-nadayu-cream transition-colors">
               <ChevronRight size={18} className="text-gray-600" />
             </button>
           </div>
@@ -106,7 +106,7 @@ export function CustomDatePicker({ value, onChange, required, className }: DateP
           {/* Day Headers */}
           <div className="grid grid-cols-7 mb-2">
             {DAYS.map(d => (
-              <div key={d} className="text-center text-xs font-semibold text-gray-400 py-1">{d}</div>
+              <div key={d} className="text-center text-xs font-semibold text-nadayu-muted py-1">{d}</div>
             ))}
           </div>
 
@@ -128,12 +128,12 @@ export function CustomDatePicker({ value, onChange, required, className }: DateP
                   className={`
                     w-full aspect-square flex items-center justify-center rounded-xl text-sm font-medium transition-all
                     ${sel
-                      ? 'bg-[#111111] text-white shadow-lg'
+                      ? 'bg-nadayu-panel text-white shadow-lg'
                       : tod
-                        ? 'bg-[#C8FF00] text-[#111111] font-bold'
+                        ? 'bg-nadayu-accent text-nadayu-panel font-bold'
                         : past
                           ? 'text-gray-300 cursor-not-allowed'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          : 'text-gray-700 hover:bg-nadayu-cream'
                     }
                   `}
                 >
@@ -144,11 +144,11 @@ export function CustomDatePicker({ value, onChange, required, className }: DateP
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-nadayu-border">
             <button
               type="button"
               onClick={() => { onChange(''); setOpen(false); }}
-              className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs font-semibold text-nadayu-muted hover:text-gray-600 transition-colors"
             >
               Clear
             </button>
@@ -160,7 +160,7 @@ export function CustomDatePicker({ value, onChange, required, className }: DateP
                 onChange(`${today.getFullYear()}-${m}-${d}`);
                 setOpen(false);
               }}
-              className="text-xs font-bold text-[#111111] bg-[#C8FF00] px-3 py-1.5 rounded-lg hover:bg-[#b8ef00] transition-colors"
+              className="text-xs font-bold text-nadayu-panel bg-nadayu-accent px-3 py-1.5 rounded-lg hover:brightness-95 transition-colors"
             >
               Today
             </button>
@@ -257,20 +257,20 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 px-5 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl font-medium text-base transition-all hover:border-gray-300 focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10 outline-none text-left"
+        className="w-full flex items-center gap-3 px-5 py-4 bg-nadayu-cream border-2 border-nadayu-border rounded-xl font-medium text-base transition-all hover:border-gray-300 focus:border-nadayu-panel focus:ring-2 focus:ring-nadayu-panel/10 outline-none text-left"
       >
-        <Clock size={18} className="text-gray-400 flex-shrink-0" />
-        <span className={value ? 'text-gray-900' : 'text-gray-400'}>
+        <Clock size={18} className="text-nadayu-muted flex-shrink-0" />
+        <span className={value ? 'text-gray-900' : 'text-nadayu-muted'}>
           {value ? displayValue : 'Select time'}
         </span>
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-2 w-[260px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+        <div className="absolute z-50 mt-2 w-[260px] bg-white border border-nadayu-border rounded-2xl shadow-xl overflow-hidden animate-fade-in">
           {/* Header */}
-          <div className="bg-[#111111] px-5 py-3 flex items-center justify-between">
+          <div className="bg-nadayu-panel px-5 py-3 flex items-center justify-between">
             <span className="text-white font-bold text-sm">Select Time</span>
-            <span className="text-[#C8FF00] font-mono font-bold text-lg">
+            <span className="text-nadayu-accent font-mono font-bold text-lg">
               {selHour >= 0 ? String(selHour).padStart(2, '0') : '--'}:{selMinute >= 0 ? String(selMinute).padStart(2, '0') : '--'}
             </span>
           </div>
@@ -279,7 +279,7 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
           <div className="flex divide-x divide-gray-100">
             {/* Hours */}
             <div className="flex-1">
-              <div className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider py-2 bg-gray-50">Hour</div>
+              <div className="text-center text-[10px] font-bold text-nadayu-muted uppercase tracking-wider py-2 bg-nadayu-cream">Hour</div>
               <div ref={hourRef} className="h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                 {hours.map(h => {
                   const period = h >= 12 ? 'PM' : 'AM';
@@ -292,13 +292,13 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
                       onClick={() => handleHourClick(h)}
                       className={`w-full px-4 py-2.5 text-sm font-medium transition-all flex items-center justify-between
                         ${selHour === h
-                          ? 'bg-[#111111] text-white'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          ? 'bg-nadayu-panel text-white'
+                          : 'text-gray-700 hover:bg-nadayu-cream'
                         }
                       `}
                     >
                       <span>{h12}</span>
-                      <span className={`text-[10px] font-bold ${selHour === h ? 'text-[#C8FF00]' : 'text-gray-400'}`}>{period}</span>
+                      <span className={`text-[10px] font-bold ${selHour === h ? 'text-nadayu-accent' : 'text-nadayu-muted'}`}>{period}</span>
                     </button>
                   );
                 })}
@@ -307,7 +307,7 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
 
             {/* Minutes */}
             <div className="flex-1">
-              <div className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-wider py-2 bg-gray-50">Min</div>
+              <div className="text-center text-[10px] font-bold text-nadayu-muted uppercase tracking-wider py-2 bg-nadayu-cream">Min</div>
               <div ref={minuteRef} className="h-[200px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
                 {minutes.map(m => (
                   <button
@@ -317,8 +317,8 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
                     onClick={() => handleMinuteClick(m)}
                     className={`w-full px-4 py-2.5 text-sm font-medium transition-all text-center
                       ${selMinute === m
-                        ? 'bg-[#111111] text-white'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-nadayu-panel text-white'
+                        : 'text-gray-700 hover:bg-nadayu-cream'
                       }
                     `}
                   >
@@ -330,11 +330,11 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100">
+          <div className="flex items-center justify-between px-4 py-3 bg-nadayu-cream border-t border-nadayu-border">
             <button
               type="button"
               onClick={() => { onChange(''); setSelHour(-1); setSelMinute(-1); setOpen(false); }}
-              className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-xs font-semibold text-nadayu-muted hover:text-gray-600 transition-colors"
             >
               Clear
             </button>
@@ -342,7 +342,7 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
               <button
                 type="button"
                 onClick={() => confirmTime(selHour, selMinute)}
-                className="text-xs font-bold text-[#111111] bg-[#C8FF00] px-3 py-1.5 rounded-lg hover:bg-[#b8ef00] transition-colors"
+                className="text-xs font-bold text-nadayu-panel bg-nadayu-accent px-3 py-1.5 rounded-lg hover:brightness-95 transition-colors"
               >
                 Confirm
               </button>

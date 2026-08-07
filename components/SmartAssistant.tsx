@@ -82,42 +82,42 @@ Keep answers concise, polite, and helpful.`;
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
       <div className={`pointer-events-auto transition-all duration-300 origin-bottom-right ${isOpen ? 'scale-100 opacity-100' : 'scale-90 opacity-0 translate-y-10 pointer-events-none'}`}>
         {isOpen && (
-          <div className="bg-white rounded-[2rem] shadow-2xl w-80 sm:w-96 flex flex-col overflow-hidden border border-gray-100 mb-4" style={{ height: '520px' }}>
+          <div className="bg-white rounded-[2rem] shadow-2xl w-80 sm:w-96 flex flex-col overflow-hidden border border-nadayu-border mb-4" style={{ height: '520px' }}>
             {/* Header */}
-            <div className="p-5 flex justify-between items-center bg-[#111111]">
+            <div className="p-5 flex justify-between items-center bg-nadayu-panel">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-[#C8FF00] rounded-xl flex items-center justify-center">
-                  <Bot size={20} className="text-[#111111]" />
+                <div className="w-10 h-10 bg-nadayu-accent rounded-xl flex items-center justify-center">
+                  <Bot size={20} className="text-nadayu-panel" />
                 </div>
                 <div>
-                  <span className="font-bold text-sm block tracking-wide text-white">Concierge AI</span>
-                  <span className="text-[10px] flex items-center gap-1.5 font-medium text-gray-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#C8FF00] animate-pulse"></span> Online
+                  <span className="font-serif font-bold text-sm block tracking-wide text-white">Concierge AI</span>
+                  <span className="text-[10px] flex items-center gap-1.5 font-medium text-nadayu-muted">
+                    <span className="w-1.5 h-1.5 rounded-full bg-nadayu-accent animate-pulse"></span> Online
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-full text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                className="p-2 rounded-full text-nadayu-muted hover:text-white hover:bg-white/10 transition-colors"
               >
                 <X size={18} />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-nadayu-cream scrollbar-hide">
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                   <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} max-w-[90%]`}>
                     {msg.role === 'assistant' && (
-                      <div className="w-8 h-8 bg-[#111111] rounded-full flex items-center justify-center flex-shrink-0 mr-3 mt-1">
-                        <Sparkles size={14} className="text-[#C8FF00]" />
+                      <div className="w-8 h-8 bg-nadayu-panel rounded-full flex items-center justify-center flex-shrink-0 mr-3 mt-1">
+                        <Sparkles size={14} className="text-nadayu-accent" />
                       </div>
                     )}
                     <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                       msg.role === 'user'
-                        ? 'bg-[#111111] text-white rounded-tr-sm'
-                        : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm shadow-sm'
+                        ? 'bg-nadayu-panel text-white rounded-tr-sm'
+                        : 'bg-white border border-nadayu-border text-gray-800 rounded-tl-sm shadow-sm'
                     }`}>
                       {msg.text}
                     </div>
@@ -126,10 +126,10 @@ Keep answers concise, polite, and helpful.`;
               ))}
               {isLoading && (
                 <div className="flex justify-start items-center">
-                  <div className="w-8 h-8 bg-[#111111] rounded-full flex items-center justify-center flex-shrink-0 mr-3">
-                    <Sparkles size={14} className="text-[#C8FF00]" />
+                  <div className="w-8 h-8 bg-nadayu-panel rounded-full flex items-center justify-center flex-shrink-0 mr-3">
+                    <Sparkles size={14} className="text-nadayu-accent" />
                   </div>
-                  <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-white border border-gray-100 shadow-sm">
+                  <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-white border border-nadayu-border shadow-sm">
                     <div className="flex space-x-1.5">
                       <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"></div>
                       <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.15s' }}></div>
@@ -142,7 +142,7 @@ Keep answers concise, polite, and helpful.`;
             </div>
 
             {/* Input */}
-            <div className="p-4 bg-white border-t border-gray-100">
+            <div className="p-4 bg-white border-t border-nadayu-border">
               <div className="relative flex items-center">
                 <input
                   type="text"
@@ -150,12 +150,12 @@ Keep answers concise, polite, and helpful.`;
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask anything..."
-                  className="flex-1 border border-gray-200 rounded-full pl-5 pr-14 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#111111] focus:ring-2 focus:ring-[#111111]/10 transition-all bg-gray-50"
+                  className="flex-1 border border-nadayu-border rounded-full pl-5 pr-14 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-nadayu-panel focus:ring-2 focus:ring-nadayu-panel/10 transition-all bg-nadayu-cream"
                 />
                 <button
                   onClick={handleSend}
                   disabled={isLoading || !input.trim()}
-                  className="absolute right-1.5 p-2.5 bg-[#111111] text-white rounded-full transition-all hover:bg-[#C8FF00] hover:text-[#111111] disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="absolute right-1.5 p-2.5 bg-nadayu-panel text-white rounded-full transition-all hover:bg-nadayu-accent hover:text-nadayu-panel disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Send size={16} className={input.trim() ? "translate-x-0.5 translate-y-0.5" : ""} />
                 </button>
@@ -169,11 +169,11 @@ Keep answers concise, polite, and helpful.`;
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
-            className="group relative bg-[#111111] text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-[#C8FF00] hover:text-[#111111] flex items-center justify-center ring-4 ring-white"
+            className="group relative bg-nadayu-panel text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-nadayu-accent hover:text-nadayu-panel flex items-center justify-center ring-4 ring-white"
           >
             <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
             <MessageCircle size={28} />
-            <span className="absolute right-full mr-4 px-4 py-2 rounded-xl text-xs font-bold shadow-xl bg-[#111111] text-white opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 whitespace-nowrap pointer-events-none">
+            <span className="absolute right-full mr-4 px-4 py-2 rounded-xl text-xs font-bold shadow-xl bg-nadayu-panel text-white opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 whitespace-nowrap pointer-events-none">
               Need Help?
             </span>
           </button>

@@ -111,10 +111,10 @@ export const CommunityBoard: React.FC = () => {
 
   const getPublisherColor = (type: string) => {
     const colors: { [key: string]: { bg: string; text: string; border: string } } = {
-      'property-center': { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-200' },
-      'management': { bg: 'bg-gray-100', text: 'text-gray-700', border: 'border-gray-200' },
-      'security': { bg: 'bg-[#111111]/10', text: 'text-[#111111]', border: 'border-[#111111]/20' },
-      'resident': { bg: 'bg-gray-100', text: 'text-gray-600', border: 'border-gray-200' },
+      'property-center': { bg: 'bg-nadayu-cream', text: 'text-gray-700', border: 'border-nadayu-border' },
+      'management': { bg: 'bg-nadayu-cream', text: 'text-gray-700', border: 'border-nadayu-border' },
+      'security': { bg: 'bg-nadayu-panel/10', text: 'text-nadayu-panel', border: 'border-nadayu-panel/20' },
+      'resident': { bg: 'bg-nadayu-cream', text: 'text-gray-600', border: 'border-nadayu-border' },
     };
     return colors[type] || colors['resident'];
   };
@@ -178,35 +178,35 @@ export const CommunityBoard: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.hasRead).length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-nadayu-bg">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C8FF00]/5 rounded-full blur-[100px] -z-10"></div>
+        <div className="absolute top-0 left-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
         
         {/* HEADER */}
         <div className="mb-5">
-          <div className="bg-[#111111] rounded-2xl p-8 flex items-center justify-between">
+          <div className="bg-nadayu-panel rounded-2xl p-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
-                <Bell size={28} className="text-[#111111]" />
+              <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
+                <Bell size={28} className="text-nadayu-panel" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white mb-1">Community Board</h1>
-                <p className="text-gray-400">Stay informed with community updates, events, and announcements</p>
+                <h1 className="font-serif text-3xl font-bold text-white mb-1">Community Board</h1>
+                <p className="text-nadayu-muted">Stay informed with community updates, events, and announcements</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               {unreadCount > 0 && (
                 <div className="px-4 py-2 bg-white/10 rounded-full flex items-center gap-2">
-                  <div className="w-2 h-2 bg-[#C8FF00] rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-nadayu-accent rounded-full animate-pulse"></div>
                   <span className="text-sm font-bold text-white">{unreadCount} unread</span>
                 </div>
               )}
-              <button className="px-6 py-3 bg-[#C8FF00] hover:brightness-95 text-[#111111] font-bold rounded-2xl transition-all flex items-center gap-2">
+              <button className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-nadayu-panel font-bold rounded-2xl transition-all flex items-center gap-2">
                 <Plus size={20} /> Post Update
               </button>
             </div>
@@ -215,13 +215,13 @@ export const CommunityBoard: React.FC = () => {
 
         {/* SEARCH BAR */}
         <div className="relative mb-5">
-          <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-nadayu-muted" />
           <input
             type="text"
             placeholder="Search community updates..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-6 py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#C8FF00]/20 focus:border-[#C8FF00] outline-none font-medium transition-colors shadow-sm"
+            className="w-full pl-12 pr-6 py-4 bg-white border border-nadayu-border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors shadow-sm"
           />
         </div>
 
@@ -233,8 +233,8 @@ export const CommunityBoard: React.FC = () => {
               onClick={() => setSelectedCategory(tab.id)}
               className={`px-6 py-3 rounded-full font-bold transition-all flex items-center gap-2 whitespace-nowrap flex-shrink-0 ${
                 selectedCategory === tab.id
-                  ? 'bg-[#111111] text-white shadow-md'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:border-[#C8FF00] hover:text-gray-900'
+                  ? 'bg-nadayu-panel text-white shadow-md'
+                  : 'bg-white border border-nadayu-border text-gray-600 hover:border-nadayu-accent hover:text-gray-900'
               }`}
             >
               <span className="text-lg">{tab.icon}</span>
@@ -245,7 +245,7 @@ export const CommunityBoard: React.FC = () => {
 
         {/* TIME FILTER */}
         <div className="flex items-center gap-3 mb-5">
-          <Clock size={18} className="text-gray-400" />
+          <Clock size={18} className="text-nadayu-muted" />
           <div className="flex gap-2">
             {timeFilters.map(filter => (
               <button
@@ -253,8 +253,8 @@ export const CommunityBoard: React.FC = () => {
                 onClick={() => setSelectedTimeFilter(filter.id)}
                 className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                   selectedTimeFilter === filter.id
-                    ? 'bg-[#111111] text-white border border-[#111111]'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-400'
+                    ? 'bg-nadayu-panel text-white border border-nadayu-panel'
+                    : 'bg-white border border-nadayu-border text-gray-600 hover:border-gray-400'
                 }`}
               >
                 {filter.label}
@@ -273,8 +273,8 @@ export const CommunityBoard: React.FC = () => {
                   key={notification.id}
                   className={`bg-white border rounded-2xl p-6 transition-all duration-300 hover:shadow-md ${
                     notification.isUrgent
-                      ? 'border-gray-200 shadow-sm'
-                      : 'border-gray-100 hover:shadow-md'
+                      ? 'border-nadayu-border shadow-sm'
+                      : 'border-nadayu-border hover:shadow-md'
                   } ${!notification.hasRead ? 'ring-1 ring-gray-200' : ''}`}
                 >
                   {/* HEADER */}
@@ -294,13 +294,13 @@ export const CommunityBoard: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        <div className="text-xs text-gray-400 mt-0.5">
+                        <div className="text-xs text-nadayu-muted mt-0.5">
                           {formatTimeAgo(notification.postTime)}
                         </div>
                       </div>
                     </div>
                     {!notification.hasRead && (
-                      <div className="w-2 h-2 bg-[#C8FF00] rounded-full flex-shrink-0 mt-2"></div>
+                      <div className="w-2 h-2 bg-nadayu-accent rounded-full flex-shrink-0 mt-2"></div>
                     )}
                   </div>
 
@@ -320,7 +320,7 @@ export const CommunityBoard: React.FC = () => {
                       {notification.attachments.map((attachment, idx) => (
                         <button
                           key={idx}
-                          className="px-4 py-2 bg-gray-100 border border-gray-200 hover:border-gray-300 hover:bg-gray-150 rounded-lg text-sm font-bold text-gray-700 transition-all"
+                          className="px-4 py-2 bg-nadayu-cream border border-nadayu-border hover:border-gray-300 hover:bg-gray-150 rounded-lg text-sm font-bold text-gray-700 transition-all"
                         >
                           📎 {attachment.name}
                         </button>
@@ -330,33 +330,33 @@ export const CommunityBoard: React.FC = () => {
 
                   {/* READ STATS (for urgent/important) */}
                   {(notification.isUrgent || notification.readCount! > 200) && (
-                    <div className="mb-6 p-3 bg-white border border-gray-100 rounded-xl text-xs text-gray-500 flex items-center gap-2">
-                      <CheckCircle2 size={14} className="text-[#C8FF00]" />
+                    <div className="mb-6 p-3 bg-white border border-nadayu-border rounded-xl text-xs text-gray-500 flex items-center gap-2">
+                      <CheckCircle2 size={14} className="text-nadayu-accent" />
                       Read by {notification.readCount} of {notification.totalResidents} residents
                     </div>
                   )}
 
                   {/* INTERACTIVE FOOTER */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-4 border-t border-nadayu-border">
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => handleLike(notification.id)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold ${
                           notification.hasLiked
-                            ? 'bg-[#111111] border border-[#111111] text-[#C8FF00]'
-                            : 'bg-gray-50 border border-gray-200 text-gray-500 hover:border-[#111111]'
+                            ? 'bg-nadayu-panel border border-nadayu-panel text-nadayu-accent'
+                            : 'bg-nadayu-cream border border-nadayu-border text-gray-500 hover:border-nadayu-panel'
                         }`}
                       >
                         <Heart size={18} fill={notification.hasLiked ? 'currentColor' : 'none'} />
                         <span className="text-sm">{notification.likes}</span>
                       </button>
 
-                      <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 hover:border-[#111111] text-gray-500 hover:text-gray-900 rounded-lg transition-all font-bold">
+                      <button className="flex items-center gap-2 px-4 py-2 bg-nadayu-cream border border-nadayu-border hover:border-nadayu-panel text-gray-500 hover:text-gray-900 rounded-lg transition-all font-bold">
                         <MessageCircle size={18} />
                         <span className="text-sm">{notification.comments}</span>
                       </button>
 
-                      <button className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 hover:border-[#111111] text-gray-500 hover:text-gray-900 rounded-lg transition-all font-bold">
+                      <button className="flex items-center gap-2 px-4 py-2 bg-nadayu-cream border border-nadayu-border hover:border-nadayu-panel text-gray-500 hover:text-gray-900 rounded-lg transition-all font-bold">
                         <Share2 size={18} />
                         <span className="text-sm">Share</span>
                       </button>
@@ -365,7 +365,7 @@ export const CommunityBoard: React.FC = () => {
                     {!notification.hasRead && (
                       <button
                         onClick={() => handleReadConfirm(notification.id)}
-                        className="px-4 py-2 bg-[#C8FF00] hover:brightness-95 text-[#111111] font-bold rounded-lg transition-all text-sm flex items-center gap-2"
+                        className="px-4 py-2 bg-nadayu-accent hover:brightness-95 text-nadayu-panel font-bold rounded-lg transition-all text-sm flex items-center gap-2"
                       >
                         <CheckCircle2 size={16} /> Mark as Read
                       </button>
@@ -377,7 +377,7 @@ export const CommunityBoard: React.FC = () => {
           </div>
         ) : (
           <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-nadayu-cream rounded-full flex items-center justify-center mx-auto mb-6">
               <Bell size={48} className="text-gray-300" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">No Updates Available</h3>
@@ -389,7 +389,7 @@ export const CommunityBoard: React.FC = () => {
                 setSelectedCategory('all');
                 setSelectedTimeFilter('30days');
               }}
-              className="px-6 py-3 bg-[#C8FF00] hover:brightness-95 text-[#111111] font-bold rounded-2xl transition-all inline-flex items-center gap-2"
+              className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-nadayu-panel font-bold rounded-2xl transition-all inline-flex items-center gap-2"
             >
               View All Updates
             </button>

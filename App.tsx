@@ -87,7 +87,7 @@ const AppContent: React.FC = () => {
     <div className="flex min-h-screen bg-nadayu-bg text-gray-900 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Navigation />
 
-      <main className="flex-1 transition-all duration-300 ease-in-out relative">
+      <main className="flex-1 min-w-0 transition-all duration-300 ease-in-out relative">
         {/* Top spacing for mobile only */}
         <div className="pt-20 md:pt-0 h-full">
             {/* Main scrollable area */}

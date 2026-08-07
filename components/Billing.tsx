@@ -62,29 +62,31 @@ export const Billing: React.FC = () => {
 
       <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Payment History</h3>
       <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
-        <table className="w-full text-sm text-left">
-          <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
-            <tr>
-              <th className="px-6 py-4">Period</th>
-              <th className="px-6 py-4">Amount</th>
-              <th className="px-6 py-4">Paid Date</th>
-              <th className="px-6 py-4">Method</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {history.length === 0 && (
-              <tr><td colSpan={4} className="px-6 py-12 text-center text-nadayu-muted">No payment history yet.</td></tr>
-            )}
-            {history.map(inv => (
-              <tr key={inv.id}>
-                <td className="px-6 py-4 font-bold text-gray-900">{inv.period}</td>
-                <td className="px-6 py-4 text-gray-900">RM {inv.amount.toFixed(2)}</td>
-                <td className="px-6 py-4 text-nadayu-muted">{inv.paidDate ? new Date(inv.paidDate).toLocaleDateString('en-GB') : '-'}</td>
-                <td className="px-6 py-4 text-nadayu-muted capitalize">{inv.paymentMethod?.replace('_', ' ') ?? '-'}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
+              <tr>
+                <th className="px-6 py-4">Period</th>
+                <th className="px-6 py-4">Amount</th>
+                <th className="px-6 py-4">Paid Date</th>
+                <th className="px-6 py-4">Method</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {history.length === 0 && (
+                <tr><td colSpan={4} className="px-6 py-12 text-center text-nadayu-muted">No payment history yet.</td></tr>
+              )}
+              {history.map(inv => (
+                <tr key={inv.id}>
+                  <td className="px-6 py-4 font-bold text-gray-900">{inv.period}</td>
+                  <td className="px-6 py-4 text-gray-900">RM {inv.amount.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-nadayu-muted">{inv.paidDate ? new Date(inv.paidDate).toLocaleDateString('en-GB') : '-'}</td>
+                  <td className="px-6 py-4 text-nadayu-muted capitalize">{inv.paymentMethod?.replace('_', ' ') ?? '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

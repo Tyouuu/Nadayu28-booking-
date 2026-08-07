@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <meta name="theme-color" content="#111111" />
+    <meta name="theme-color" content="#2B241C" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Nadayu28" />
@@ -12,18 +12,23 @@
     <link rel="apple-touch-icon" href="/icons/icon.svg" />
     <title>Nadayu28 Community Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              serif: ['Fraunces', 'Georgia', 'serif'],
             },
             colors: {
-              primary: '#0f172a', // Slate 900
-              accent: '#4f46e5', // Indigo 600
-              nadayu: '#1e293b',
+              'nadayu-bg':      '#FBF8F2',
+              'nadayu-panel':   '#2B241C',
+              'nadayu-accent':  '#B5652F',
+              'nadayu-success': '#4A5D3A',
+              'nadayu-border':  '#E4D9C6',
+              'nadayu-muted':   '#6B5D48',
+              'nadayu-cream':   '#F5F0E8',
             },
             animation: {
               'fade-in': 'fadeIn 0.8s ease-in-out',

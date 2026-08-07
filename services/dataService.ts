@@ -704,3 +704,109 @@ export async function getDocumentDownloadUrl(filePath: string): Promise<string> 
   if (error) throw error;
   return data.signedUrl;
 }
+
+// ── Billing ──────────────────────────────────────────────────
+
+export interface Invoice {
+  id: string;
+  unit: string;
+  period: string;
+  amount: number;
+  dueDate: string;
+  status: 'unpaid' | 'paid';
+  paidDate: string | null;
+  paymentMethod: 'bank_transfer' | 'cash' | 'cheque' | 'other' | null;
+  paymentReference: string | null;
+}
+
+function toInvoice(row: Record<string, unknown>): Invoice {
+  return {
+    id: row.id as string,
+    unit: row.unit as string,
+    period: row.period as string,
+    amount: Number(row.amount),
+    dueDate: row.due_date as string,
+    status: row.status as Invoice['status'],
+    paidDate: (row.paid_date as string) ?? null,
+    paymentMethod: (row.payment_method as Invoice['paymentMethod']) ?? null,
+    paymentReference: (row.payment_reference as string) ?? null,
+  };
+}
+
+export interface FeeSchedule {
+  unit: string;
+  monthlyAmount: number;
+}
+
+function toFeeSchedule(row: Record<string, unknown>): FeeSchedule {
+  return {
+    unit: row.unit as string,
+    monthlyAmount: Number(row.monthly_amount),
+  };
+}
+
+export async function fetchInvoices(unit: string): Promise<Invoice[]> {
+  await supabase.rpc('ensure_invoices_for_unit', { p_unit: unit });
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*')
+    .eq('unit', unit)
+    .order('period', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(toInvoice);
+}
+
+export async function fetchAllInvoices(): Promise<Invoice[]> {
+  const { data: schedules } = await supabase.from('fee_schedules').select('unit');
+  for (const s of schedules ?? []) {
+    await supabase.rpc('ensure_invoices_for_unit', { p_unit: (s as { unit: string }).unit });
+  }
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*')
+    .order('period', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(toInvoice);
+}
+
+export async function fetchAllFeeSchedules(): Promise<FeeSchedule[]> {
+  const { data, error } = await supabase.from('fee_schedules').select('*').order('unit');
+  if (error) throw error;
+  return (data ?? []).map(toFeeSchedule);
+}
+
+export async function setFeeSchedule(unit: string, monthlyAmount: number): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { error } = await supabase.from('fee_schedules').upsert({
+    unit,
+    monthly_amount: monthlyAmount,
+    updated_by: user?.id,
+    updated_at: new Date().toISOString(),
+  });
+  if (error) throw error;
+}
+
+export async function recordInvoicePayment(invoiceId: string, payment: {
+  paidDate: string;
+  method: 'bank_transfer' | 'cash' | 'cheque' | 'other';
+  reference: string;
+}): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { error } = await supabase.from('invoices').update({
+    status: 'paid',
+    paid_date: payment.paidDate,
+    payment_method: payment.method,
+    payment_reference: payment.reference,
+    recorded_by: user?.id,
+  }).eq('id', invoiceId);
+  if (error) throw error;
+
+  await logAudit({
+    action: 'invoice_payment_recorded',
+    entityType: 'invoice',
+    entityId: invoiceId,
+    field: 'status',
+    before: 'unpaid',
+    after: 'paid',
+  });
+}

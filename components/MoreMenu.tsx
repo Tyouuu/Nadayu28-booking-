@@ -1,5 +1,5 @@
 import React from 'react';
-import { FolderOpen, User, MessageSquare, Dumbbell, ChevronRight } from 'lucide-react';
+import { FolderOpen, User, MessageSquare, Dumbbell, ChevronRight, Receipt } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -7,12 +7,14 @@ import { useNavigation } from '../contexts/NavigationContext';
 const MORE_ITEMS: Record<UserRole, { id: string; label: string; icon: React.ElementType }[]> = {
   [UserRole.RESIDENT]: [
     { id: 'documents', label: 'Documents', icon: FolderOpen },
+    { id: 'billing', label: 'Billing', icon: Receipt },
     { id: 'amenities', label: 'Amenities', icon: Dumbbell },
     { id: 'community', label: 'Community Board', icon: MessageSquare },
     { id: 'account', label: 'My Account', icon: User },
   ],
   [UserRole.TENANT]: [
     { id: 'documents', label: 'Documents', icon: FolderOpen },
+    { id: 'billing', label: 'Billing', icon: Receipt },
     { id: 'amenities', label: 'Amenities', icon: Dumbbell },
     { id: 'community', label: 'Community Board', icon: MessageSquare },
     { id: 'account', label: 'My Account', icon: User },

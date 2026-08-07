@@ -17,6 +17,7 @@ import { ManagementProfile } from './components/ManagementProfile';
 import { Login } from './components/Login';
 import { CommunityBoard } from './components/CommunityBoard';
 import { MoreMenu } from './components/MoreMenu';
+import { Billing } from './components/Billing';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
 import { I18nProvider } from './contexts/I18nContext';
@@ -56,6 +57,8 @@ const AppContent: React.FC = () => {
         return <CommunityBoard />;
       case 'more':
         return <MoreMenu />;
+      case 'billing':
+        return <Billing />;
       default:
         return <Dashboard />;
     }

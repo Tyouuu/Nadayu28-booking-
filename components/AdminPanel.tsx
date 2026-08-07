@@ -73,11 +73,11 @@ export const AdminPanel: React.FC = () => {
     <div className="space-y-5 pb-12">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <p className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Administration</p>
-          <h2 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Management Dashboard</h2>
-          <p className="text-gray-400 text-sm mt-1">Resource utilization overview and enforcement tracking.</p>
+          <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">Administration</p>
+          <h2 className="font-serif text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Management Dashboard</h2>
+          <p className="text-nadayu-muted text-sm mt-1">Resource utilization overview and enforcement tracking.</p>
         </div>
-        <button className="flex items-center gap-2 bg-[#111111] text-white px-5 py-3 rounded-xl font-bold text-sm hover:bg-[#222] transition-colors">
+        <button className="flex items-center gap-2 bg-nadayu-panel text-white px-5 py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-colors">
           <Download size={16} /> Export Report
         </button>
       </header>
@@ -86,7 +86,7 @@ export const AdminPanel: React.FC = () => {
         {(['overview', 'users', 'audit'] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
-              activeTab === tab ? 'bg-[#111111] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              activeTab === tab ? 'bg-nadayu-panel text-white' : 'bg-nadayu-cream text-gray-500 hover:bg-gray-200'
             }`}>
             {tab === 'overview' ? 'Overview' : tab === 'users' ? 'Users' : 'Audit Log'}
           </button>
@@ -95,20 +95,20 @@ export const AdminPanel: React.FC = () => {
 
       {activeTab === 'overview' && (
         <>
-      <div className="bg-white border border-gray-100 rounded-2xl p-6 flex items-center gap-4">
+      <div className="bg-white border border-nadayu-border rounded-2xl p-6 flex items-center gap-4">
         <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
           <Clock size={20} className="text-orange-500" />
         </div>
         <div>
           <p className="text-2xl font-bold text-gray-900 leading-none">{overdueCount}</p>
-          <p className="text-xs text-gray-400 mt-1">Reports overdue (received &gt;24h ago, unactioned)</p>
+          <p className="text-xs text-nadayu-muted mt-1">Reports overdue (received &gt;24h ago, unactioned)</p>
         </div>
       </div>
 
       {/* Analytics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Visitor Traffic */}
-        <div className="bg-[#111111] rounded-2xl p-6">
+        <div className="bg-nadayu-panel rounded-2xl p-6">
           <div className="flex justify-between items-center mb-5">
             <div>
               <h3 className="text-lg font-bold text-white">Visitor Traffic</h3>
@@ -129,19 +129,19 @@ export const AdminPanel: React.FC = () => {
                     boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
                     padding: '10px 14px',
                     fontWeight: 600,
-                    backgroundColor: '#222',
+                    backgroundColor: '#3A3226',
                     color: '#fff',
                   }}
                 />
-                <Line type="monotone" dataKey="visitors" stroke="#C8FF00" strokeWidth={3} dot={{ r: 4, fill: '#C8FF00', strokeWidth: 2, stroke: '#111' }} activeDot={{ r: 7 }} />
-                <Line type="monotone" dataKey="violations" stroke="#ff6b6b" strokeWidth={3} dot={{ r: 4, fill: '#ff6b6b', strokeWidth: 2, stroke: '#111' }} />
+                <Line type="monotone" dataKey="visitors" stroke="#B5652F" strokeWidth={3} dot={{ r: 4, fill: '#B5652F', strokeWidth: 2, stroke: '#2B241C' }} activeDot={{ r: 7 }} />
+                <Line type="monotone" dataKey="violations" stroke="#ff6b6b" strokeWidth={3} dot={{ r: 4, fill: '#ff6b6b', strokeWidth: 2, stroke: '#2B241C' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <div className="flex justify-center gap-4 mt-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#C8FF00]/15">
-              <div className="w-2 h-2 rounded-full bg-[#C8FF00]"></div>
-              <span className="text-[11px] font-bold text-[#C8FF00]">Visitors</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-nadayu-accent/15">
+              <div className="w-2 h-2 rounded-full bg-nadayu-accent"></div>
+              <span className="text-[11px] font-bold text-nadayu-accent">Visitors</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/15">
               <div className="w-2 h-2 rounded-full bg-red-400"></div>
@@ -151,7 +151,7 @@ export const AdminPanel: React.FC = () => {
         </div>
 
         {/* Facility Usage */}
-        <div className="bg-[#111111] rounded-2xl p-6">
+        <div className="bg-nadayu-panel rounded-2xl p-6">
           <div className="flex justify-between items-center mb-5">
             <div>
               <h3 className="text-lg font-bold text-white">Facility Usage</h3>
@@ -165,8 +165,8 @@ export const AdminPanel: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
                 <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} dy={10} />
                 <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} dx={-10} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, backgroundColor: '#222', color: '#fff' }} />
-                <Bar dataKey="hours" fill="#C8FF00" radius={[8, 8, 8, 8]} barSize={48} />
+                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, backgroundColor: '#3A3226', color: '#fff' }} />
+                <Bar dataKey="hours" fill="#B5652F" radius={[8, 8, 8, 8]} barSize={48} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -174,16 +174,16 @@ export const AdminPanel: React.FC = () => {
       </div>
 
       {/* Enforcement Table */}
-      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+      <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
         <div className="px-6 pt-5 pb-4 border-b border-gray-50 flex justify-between items-center">
           <div>
             <h3 className="text-sm font-semibold text-gray-900">Recent Violations</h3>
-            <p className="text-xs text-gray-400 mt-0.5">Action required items</p>
+            <p className="text-xs text-nadayu-muted mt-0.5">Action required items</p>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="uppercase text-[10px] tracking-widest font-bold text-gray-400 bg-gray-50/50">
+            <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
               <tr>
                 <th className="px-6 py-4">Unit</th>
                 <th className="px-6 py-4">Type</th>
@@ -195,22 +195,22 @@ export const AdminPanel: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {violations.map((v) => (
-                <tr key={v.id} className="hover:bg-gray-50/50 transition-colors group">
+                <tr key={v.id} className="hover:bg-nadayu-cream/50 transition-colors group">
                   <td className="px-6 py-4 font-bold text-gray-900">{v.unit}</td>
                   <td className="px-6 py-4 text-gray-500">{v.type}</td>
-                  <td className="px-6 py-4 text-gray-400">{v.date}</td>
+                  <td className="px-6 py-4 text-nadayu-muted">{v.date}</td>
                   <td className="px-6 py-4 font-bold text-gray-900">RM {v.amount}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                       v.status === 'paid'
-                        ? 'bg-[#C8FF00]/15 text-[#4a6600]'
+                        ? 'bg-nadayu-success/15 text-nadayu-success'
                         : 'bg-orange-50 text-orange-500'
                     }`}>
                       {v.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button onClick={() => setSelectedViolation(v)} className="font-bold text-xs text-gray-400 opacity-0 group-hover:opacity-100 hover:text-[#111111] transition-all">View Details</button>
+                    <button onClick={() => setSelectedViolation(v)} className="font-bold text-xs text-nadayu-muted opacity-0 group-hover:opacity-100 hover:text-nadayu-panel transition-all">View Details</button>
                   </td>
                 </tr>
               ))}
@@ -223,9 +223,9 @@ export const AdminPanel: React.FC = () => {
       {selectedViolation && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedViolation(null)}>
           <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="bg-[#111111] p-6 flex items-center justify-between">
+            <div className="bg-nadayu-panel p-6 flex items-center justify-between">
               <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                <AlertTriangle size={18} className="text-[#C8FF00]" />
+                <AlertTriangle size={18} className="text-nadayu-accent" />
                 Violation Details
               </h3>
               <button onClick={() => setSelectedViolation(null)} className="text-gray-500 hover:text-white transition-colors">
@@ -240,29 +240,29 @@ export const AdminPanel: React.FC = () => {
                 { label: 'Amount', value: `RM ${selectedViolation.amount}`, icon: DollarSign },
               ].map(item => (
                 <div key={item.label} className="flex items-center gap-4 py-2">
-                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <item.icon size={16} className="text-gray-400" />
+                  <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center flex-shrink-0">
+                    <item.icon size={16} className="text-nadayu-muted" />
                   </div>
                   <div>
-                    <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{item.label}</p>
+                    <p className="text-[11px] font-bold text-nadayu-muted uppercase tracking-wider">{item.label}</p>
                     <p className="text-sm font-semibold text-gray-900">{item.value}</p>
                   </div>
                 </div>
               ))}
               <div className="flex items-center gap-3 pt-2">
-                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Status:</span>
+                <span className="text-[11px] font-bold text-nadayu-muted uppercase tracking-wider">Status:</span>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                  selectedViolation.status === 'paid' ? 'bg-[#C8FF00]/15 text-[#4a6600]' : 'bg-orange-50 text-orange-500'
+                  selectedViolation.status === 'paid' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-orange-50 text-orange-500'
                 }`}>{selectedViolation.status}</span>
               </div>
             </div>
             <div className="px-6 pb-6 flex gap-3">
               {selectedViolation.status === 'pending' && (
-                <button onClick={() => handleMarkPaid(selectedViolation.id)} className="flex-1 bg-[#111111] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#222] transition-colors">
+                <button onClick={() => handleMarkPaid(selectedViolation.id)} className="flex-1 bg-nadayu-panel text-white py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-colors">
                   Mark as Paid
                 </button>
               )}
-              <button onClick={() => setSelectedViolation(null)} className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">
+              <button onClick={() => setSelectedViolation(null)} className="flex-1 bg-nadayu-cream text-gray-600 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">
                 Close
               </button>
             </div>
@@ -273,10 +273,10 @@ export const AdminPanel: React.FC = () => {
       )}
 
       {activeTab === 'users' && (
-        <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+        <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="uppercase text-[10px] tracking-widest font-bold text-gray-400 bg-gray-50/50">
+              <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
                 <tr>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Unit</th>
@@ -286,14 +286,14 @@ export const AdminPanel: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {users.map(u => (
-                  <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
+                  <tr key={u.id} className="hover:bg-nadayu-cream/50 transition-colors">
                     <td className="px-6 py-4 font-bold text-gray-900">{u.name}</td>
                     <td className="px-6 py-4 text-gray-500">{u.unit || '-'}</td>
-                    <td className="px-6 py-4 text-gray-400">{u.email || '-'}</td>
+                    <td className="px-6 py-4 text-nadayu-muted">{u.email || '-'}</td>
                     <td className="px-6 py-4">
                       <select value={u.role} disabled={savingUserId === u.id}
                         onChange={(e) => handleRoleChange(u.id, e.target.value as UserRole)}
-                        className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-900 focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none">
+                        className="px-3 py-2 bg-nadayu-cream border border-nadayu-border rounded-lg text-xs font-bold text-gray-900 focus:ring-2 focus:ring-nadayu-accent/30 focus:border-nadayu-accent outline-none">
                         {Object.values(UserRole).map(r => <option key={r} value={r}>{r}</option>)}
                       </select>
                     </td>
@@ -311,16 +311,16 @@ export const AdminPanel: React.FC = () => {
             {(['all', 'violation_status_change', 'report_update', 'role_change'] as const).map(a => (
               <button key={a} onClick={() => setAuditFilter(a)}
                 className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
-                  auditFilter === a ? 'bg-[#111111] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  auditFilter === a ? 'bg-nadayu-panel text-white' : 'bg-nadayu-cream text-gray-500 hover:bg-gray-200'
                 }`}>
                 {a === 'all' ? 'All' : a === 'violation_status_change' ? 'Violation' : a === 'report_update' ? 'Report' : 'Role'}
               </button>
             ))}
           </div>
-          <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+          <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="uppercase text-[10px] tracking-widest font-bold text-gray-400 bg-gray-50/50">
+                <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
                   <tr>
                     <th className="px-6 py-4">Time</th>
                     <th className="px-6 py-4">Actor</th>
@@ -331,11 +331,11 @@ export const AdminPanel: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {auditLog.length === 0 && (
-                    <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400">No audit entries yet.</td></tr>
+                    <tr><td colSpan={5} className="px-6 py-12 text-center text-nadayu-muted">No audit entries yet.</td></tr>
                   )}
                   {auditLog.map(entry => (
-                    <tr key={entry.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 text-gray-400">{new Date(entry.createdAt).toLocaleString()}</td>
+                    <tr key={entry.id} className="hover:bg-nadayu-cream/50 transition-colors">
+                      <td className="px-6 py-4 text-nadayu-muted">{new Date(entry.createdAt).toLocaleString()}</td>
                       <td className="px-6 py-4 font-bold text-gray-900">{entry.actorName}</td>
                       <td className="px-6 py-4 text-gray-500">{entry.action}</td>
                       <td className="px-6 py-4 text-gray-500">{entry.field}</td>

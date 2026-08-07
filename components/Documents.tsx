@@ -61,46 +61,46 @@ export const Documents: React.FC = () => {
 
   return (
     <div className="pb-12">
-      <div className="bg-[#111111] rounded-2xl p-8 flex items-center gap-4 mb-5">
-        <div className="w-14 h-14 bg-[#C8FF00] rounded-2xl flex items-center justify-center flex-shrink-0">
-          <FolderOpen size={28} className="text-[#111111]" />
+      <div className="bg-nadayu-panel rounded-2xl p-8 flex items-center gap-4 mb-5">
+        <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
+          <FolderOpen size={28} className="text-nadayu-panel" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white">Documents</h2>
-          <p className="mt-1 text-sm text-gray-400">Meeting minutes, house rules, and other community documents.</p>
+          <h2 className="font-serif text-3xl font-bold tracking-tight text-white">Documents</h2>
+          <p className="mt-1 text-sm text-nadayu-muted">Meeting minutes, house rules, and other community documents.</p>
         </div>
       </div>
 
       {isManagement && (
-        <div className="bg-white border border-gray-100 rounded-2xl p-6 mb-5">
+        <div className="bg-white border border-nadayu-border rounded-2xl p-6 mb-5">
           <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Upload size={18} /> Upload Document
           </h3>
           <form onSubmit={handleUpload} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Title</label>
+                <label className="text-xs font-semibold text-nadayu-muted uppercase tracking-wider">Title</label>
                 <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. AGM Minutes - March 2026"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none font-medium text-gray-900 transition-all" />
+                  className="w-full px-4 py-3 bg-nadayu-cream border border-nadayu-border rounded-xl focus:ring-2 focus:ring-nadayu-accent/30 focus:border-nadayu-accent outline-none font-medium text-gray-900 transition-all" />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Category</label>
+                <label className="text-xs font-semibold text-nadayu-muted uppercase tracking-wider">Category</label>
                 <select value={category} onChange={(e) => setCategory(e.target.value as typeof CATEGORIES[number])}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#C8FF00]/30 focus:border-[#C8FF00] outline-none font-medium text-gray-900 transition-all">
+                  className="w-full px-4 py-3 bg-nadayu-cream border border-nadayu-border rounded-xl focus:ring-2 focus:ring-nadayu-accent/30 focus:border-nadayu-accent outline-none font-medium text-gray-900 transition-all">
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">File</label>
+              <label className="text-xs font-semibold text-nadayu-muted uppercase tracking-wider">File</label>
               <input type="file" accept=".pdf,.doc,.docx,image/*"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-[#111111] file:text-white hover:file:bg-[#222222]" />
+                className="w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-nadayu-panel file:text-white hover:file:bg-[#222222]" />
             </div>
             {uploadError && <p className="text-sm text-red-500 px-4 py-2 rounded-xl bg-red-50">{uploadError}</p>}
             <button type="submit" disabled={isUploading}
-              className="px-6 py-3 rounded-xl font-bold text-white bg-[#111111] hover:bg-[#222222] transition-all disabled:opacity-50">
+              className="px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all disabled:opacity-50">
               {isUploading ? 'Uploading...' : 'Upload'}
             </button>
           </form>
@@ -111,36 +111,36 @@ export const Documents: React.FC = () => {
         {(['all', ...CATEGORIES] as const).map(c => (
           <button key={c} onClick={() => setCategoryFilter(c)}
             className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
-              categoryFilter === c ? 'bg-[#111111] text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              categoryFilter === c ? 'bg-nadayu-panel text-white' : 'bg-nadayu-cream text-gray-500 hover:bg-gray-200'
             }`}>
             {c === 'all' ? 'All' : c}
           </button>
         ))}
       </div>
 
-      <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden divide-y divide-gray-50">
+      <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden divide-y divide-gray-50">
         {documents.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-12">No documents in this category.</p>
+          <p className="text-sm text-nadayu-muted text-center py-12">No documents in this category.</p>
         )}
         {documents.map(doc => (
-          <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors">
+          <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-nadayu-cream/50 transition-colors">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                <FileText size={18} className="text-gray-400" />
+              <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText size={18} className="text-nadayu-muted" />
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-900">{doc.title}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{doc.category} · {doc.uploadedByName} · {new Date(doc.createdAt).toLocaleDateString()}</p>
+                <p className="text-xs text-nadayu-muted mt-0.5">{doc.category} · {doc.uploadedByName} · {new Date(doc.createdAt).toLocaleDateString()}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <button onClick={() => handleDownload(doc)}
-                className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#111111] px-3 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-nadayu-panel px-3 py-2 rounded-lg bg-nadayu-cream hover:bg-nadayu-cream transition-colors">
                 <Download size={14} /> Download
               </button>
               {isManagement && (
                 <button onClick={() => handleDelete(doc.id)} disabled={deletingId === doc.id}
-                  className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50">
+                  className="p-2 rounded-lg text-nadayu-muted hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50">
                   <Trash2 size={16} />
                 </button>
               )}

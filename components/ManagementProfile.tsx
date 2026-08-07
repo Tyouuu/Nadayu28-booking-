@@ -62,36 +62,36 @@ export const ManagementProfile: React.FC = () => {
     <div className="pb-12">
       <div className="flex items-end justify-between mb-8">
         <div>
-          <p className="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Property Management</p>
-          <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">My Profile</h1>
-          <p className="text-gray-400 text-sm mt-1">Operations Department</p>
+          <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">Property Management</p>
+          <h1 className="font-serif text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">My Profile</h1>
+          <p className="text-nadayu-muted text-sm mt-1">Operations Department</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
         {/* Left Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl border border-gray-100 sticky top-6 space-y-5 p-6">
+          <div className="bg-white rounded-2xl border border-nadayu-border sticky top-6 space-y-5 p-6">
             <div className="relative mx-auto w-fit">
-              <div className="w-24 h-24 rounded-full bg-[#111111] flex items-center justify-center">
-                <Briefcase size={40} className="text-[#C8FF00]" />
+              <div className="w-24 h-24 rounded-full bg-nadayu-panel flex items-center justify-center">
+                <Briefcase size={40} className="text-nadayu-accent" />
               </div>
             </div>
             <div className="text-center">
               <h2 className="text-lg font-bold text-gray-900">{profileData.name.split(' ').slice(0, 2).join(' ')}</h2>
-              <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-[#111111] text-white rounded-full text-xs font-bold">
+              <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-nadayu-panel text-white rounded-full text-xs font-bold">
                 <Briefcase size={11} /> {profileData.position}
               </div>
               <div className="mt-3 space-y-1">
-                <p className="text-gray-400 text-sm flex items-center justify-center gap-1.5"><Mail size={13} /> {profileData.email}</p>
-                <p className="text-gray-400 text-sm flex items-center justify-center gap-1.5"><Phone size={13} /> {profileData.phone}</p>
+                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Mail size={13} /> {profileData.email}</p>
+                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Phone size={13} /> {profileData.phone}</p>
               </div>
             </div>
-            <div className="space-y-1.5 pt-4 border-t border-gray-100">
+            <div className="space-y-1.5 pt-4 border-t border-nadayu-border">
               {tabs.map(tab => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-3 ${
-                    activeTab === tab.id ? 'bg-[#111111] text-white' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-50'
+                    activeTab === tab.id ? 'bg-nadayu-panel text-white' : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
                   }`}>
                   <tab.icon size={16} /> {tab.label}
                   {tab.id === 'approvals' && pendingCount > 0 && (
@@ -108,7 +108,7 @@ export const ManagementProfile: React.FC = () => {
           {activeTab === 'overview' && (
             <>
               {/* Stats - fixed readability */}
-              <div className="bg-[#111111] rounded-2xl p-6">
+              <div className="bg-nadayu-panel rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-white font-semibold text-sm">Today's Overview</h2>
                   <span className="text-gray-600 text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
@@ -122,12 +122,12 @@ export const ManagementProfile: React.FC = () => {
                     <p className="text-xs font-semibold text-red-300 mb-2">Unread Complaints</p>
                     <p className="text-2xl font-bold text-red-400">{stats.unreadComplaints}</p>
                   </div>
-                  <div className="bg-[#C8FF00] rounded-xl p-4">
-                    <p className="text-xs font-semibold text-[#111111]/60 mb-2">Today's Bookings</p>
-                    <p className="text-2xl font-bold text-[#111111]">{stats.todayBookings}</p>
+                  <div className="bg-nadayu-accent rounded-xl p-4">
+                    <p className="text-xs font-semibold text-nadayu-panel/60 mb-2">Today's Bookings</p>
+                    <p className="text-2xl font-bold text-nadayu-panel">{stats.todayBookings}</p>
                   </div>
                   <div className="bg-white/[0.08] rounded-xl p-4">
-                    <p className="text-xs font-semibold text-gray-400 mb-2">Occupancy Rate</p>
+                    <p className="text-xs font-semibold text-nadayu-muted mb-2">Occupancy Rate</p>
                     <p className="text-2xl font-bold text-white">{stats.occupancyRate}%</p>
                   </div>
                 </div>
@@ -141,13 +141,13 @@ export const ManagementProfile: React.FC = () => {
                   { label: 'Post Announcement', desc: 'Community updates', icon: Megaphone, action: () => setCurrentView('management') },
                 ].map(a => (
                   <button key={a.label} onClick={a.action}
-                    className="group flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-4 py-3 text-left hover:border-[#C8FF00] hover:shadow-sm transition-all">
-                    <div className="w-9 h-9 bg-gray-50 group-hover:bg-[#C8FF00] rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                    className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
+                    <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
                       <a.icon size={16} className="text-gray-500 group-hover:text-black transition-colors" />
                     </div>
                     <div>
                       <p className="text-gray-900 text-xs font-semibold">{a.label}</p>
-                      <p className="text-gray-400 text-[10px]">{a.desc}</p>
+                      <p className="text-nadayu-muted text-[10px]">{a.desc}</p>
                     </div>
                   </button>
                 ))}
@@ -155,7 +155,7 @@ export const ManagementProfile: React.FC = () => {
 
               {/* Recent Activity + Reminders */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                <div className="bg-white border border-nadayu-border rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <Clock size={14} className="text-gray-900" />
                     <h3 className="text-sm font-semibold text-gray-900">Recent Activity</h3>
@@ -163,10 +163,10 @@ export const ManagementProfile: React.FC = () => {
                   {recentActivity.map((item, i) => (
                     <div key={i} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        item.type === 'violation' ? 'bg-orange-50' : item.type === 'resolved' ? 'bg-[#C8FF00]/15' : item.type === 'report' ? 'bg-red-50' : 'bg-blue-50'
+                        item.type === 'violation' ? 'bg-orange-50' : item.type === 'resolved' ? 'bg-nadayu-success/15' : item.type === 'report' ? 'bg-red-50' : 'bg-blue-50'
                       }`}>
                         {item.type === 'violation' && <Scale size={11} className="text-orange-400" />}
-                        {item.type === 'resolved' && <CheckCircle2 size={11} className="text-[#4a6600]" />}
+                        {item.type === 'resolved' && <CheckCircle2 size={11} className="text-nadayu-success" />}
                         {item.type === 'report' && <AlertTriangle size={11} className="text-red-400" />}
                         {item.type === 'announcement' && <Megaphone size={11} className="text-blue-400" />}
                       </div>
@@ -177,7 +177,7 @@ export const ManagementProfile: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                <div className="bg-white border border-gray-100 rounded-2xl p-5">
+                <div className="bg-white border border-nadayu-border rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-4">
                     <Bell size={14} className="text-gray-900" />
                     <h3 className="text-sm font-semibold text-gray-900">Reminders</h3>
@@ -188,7 +188,7 @@ export const ManagementProfile: React.FC = () => {
                     { text: 'AGM preparation meeting - March 20', urgent: false },
                   ].map((item, i) => (
                     <div key={i} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${item.urgent ? 'bg-red-400' : 'bg-[#C8FF00]'}`}></span>
+                      <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${item.urgent ? 'bg-red-400' : 'bg-nadayu-accent'}`}></span>
                       <p className="text-gray-600 text-xs flex-1 leading-relaxed">{item.text}</p>
                     </div>
                   ))}
@@ -199,39 +199,39 @@ export const ManagementProfile: React.FC = () => {
 
           {/* Approvals - functional approve/reject */}
           {activeTab === 'approvals' && (
-            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+            <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
               <div className="px-6 pt-5 pb-4 border-b border-gray-50 flex justify-between items-center">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900">Pending Approvals</h3>
-                  <p className="text-xs text-gray-400 mt-0.5">{pendingCount} items need your attention</p>
+                  <p className="text-xs text-nadayu-muted mt-0.5">{pendingCount} items need your attention</p>
                 </div>
               </div>
               <div className="divide-y divide-gray-50">
                 {approvals.map(item => (
-                  <div key={item.id} className={`px-6 py-5 transition-colors ${item.status !== 'pending' ? 'opacity-60' : 'hover:bg-gray-50/50'}`}>
+                  <div key={item.id} className={`px-6 py-5 transition-colors ${item.status !== 'pending' ? 'opacity-60' : 'hover:bg-nadayu-cream/50'}`}>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          item.priority === 'high' ? 'bg-red-50' : item.priority === 'medium' ? 'bg-orange-50' : 'bg-gray-50'
+                          item.priority === 'high' ? 'bg-red-50' : item.priority === 'medium' ? 'bg-orange-50' : 'bg-nadayu-cream'
                         }`}>
                           {item.type === 'Refund Request'
                             ? <FileText size={18} className={item.priority === 'high' ? 'text-red-400' : 'text-orange-400'} />
-                            : <Calendar size={18} className="text-gray-400" />}
+                            : <Calendar size={18} className="text-nadayu-muted" />}
                         </div>
                         <div>
                           <p className="text-sm font-bold text-gray-900">{item.type}</p>
-                          <p className="text-xs text-gray-400">Unit {item.unit} · {item.date}</p>
+                          <p className="text-xs text-nadayu-muted">Unit {item.unit} · {item.date}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {item.status !== 'pending' && (
                           <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${
-                            item.status === 'approved' ? 'bg-[#C8FF00]/15 text-[#4a6600]' : 'bg-red-50 text-red-500'
+                            item.status === 'approved' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-red-50 text-red-500'
                           }`}>{item.status}</span>
                         )}
                         {item.status === 'pending' && (
                           <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${
-                            item.priority === 'high' ? 'bg-red-50 text-red-500' : item.priority === 'medium' ? 'bg-orange-50 text-orange-500' : 'bg-gray-50 text-gray-400'
+                            item.priority === 'high' ? 'bg-red-50 text-red-500' : item.priority === 'medium' ? 'bg-orange-50 text-orange-500' : 'bg-nadayu-cream text-nadayu-muted'
                           }`}>{item.priority}</span>
                         )}
                       </div>
@@ -240,11 +240,11 @@ export const ManagementProfile: React.FC = () => {
                     {item.status === 'pending' && (
                       <div className="flex gap-2 ml-[52px]">
                         <button onClick={() => handleApproval(item.id, 'approved')}
-                          className="px-4 py-2 bg-[#111111] text-white rounded-lg text-xs font-bold hover:bg-[#222] transition-colors flex items-center gap-1.5">
+                          className="px-4 py-2 bg-nadayu-panel text-white rounded-lg text-xs font-bold hover:brightness-110 transition-colors flex items-center gap-1.5">
                           <CheckCircle2 size={13} /> Approve
                         </button>
                         <button onClick={() => handleApproval(item.id, 'rejected')}
-                          className="px-4 py-2 bg-white border border-gray-200 text-gray-500 rounded-lg text-xs font-bold hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-colors">
+                          className="px-4 py-2 bg-white border border-nadayu-border text-gray-500 rounded-lg text-xs font-bold hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-colors">
                           Reject
                         </button>
                       </div>
@@ -257,17 +257,17 @@ export const ManagementProfile: React.FC = () => {
 
           {/* My Details with edit feature */}
           {activeTab === 'settings' && (
-            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
-              <div className="bg-[#111111] p-6 flex items-center justify-between">
+            <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
+              <div className="bg-nadayu-panel p-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-[#C8FF00] rounded-xl flex items-center justify-center">
-                    <User size={18} className="text-[#111111]" />
+                  <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center">
+                    <User size={18} className="text-nadayu-panel" />
                   </div>
                   <h3 className="text-lg font-semibold text-white">Personal Details</h3>
                 </div>
                 <button onClick={() => setIsEditing(!isEditing)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
-                    isEditing ? 'bg-[#C8FF00] text-[#111111]' : 'bg-white/10 text-white hover:bg-white/20'
+                    isEditing ? 'bg-nadayu-accent text-nadayu-panel' : 'bg-white/10 text-white hover:bg-white/20'
                   }`}>
                   {isEditing ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
                 </button>
@@ -283,17 +283,17 @@ export const ManagementProfile: React.FC = () => {
                   { label: 'Joined', key: 'joined' as const, icon: Calendar, editable: false },
                 ]).map(item => (
                   <div key={item.label} className="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
-                    <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <item.icon size={16} className="text-gray-400" />
+                    <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center flex-shrink-0">
+                      <item.icon size={16} className="text-nadayu-muted" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{item.label}</p>
+                      <p className="text-[11px] font-bold text-nadayu-muted uppercase tracking-wider">{item.label}</p>
                       {isEditing && item.editable ? (
                         <input
                           type="text"
                           value={profileData[item.key]}
                           onChange={e => setProfileData({ ...profileData, [item.key]: e.target.value })}
-                          className="w-full mt-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold text-gray-900 outline-none focus:border-[#C8FF00] focus:ring-1 focus:ring-[#C8FF00]/20"
+                          className="w-full mt-1 px-3 py-2 bg-nadayu-cream border border-nadayu-border rounded-lg text-sm font-semibold text-gray-900 outline-none focus:border-nadayu-accent focus:ring-1 focus:ring-nadayu-accent/20"
                         />
                       ) : (
                         <p className="text-sm font-semibold text-gray-900 mt-0.5">{profileData[item.key]}</p>

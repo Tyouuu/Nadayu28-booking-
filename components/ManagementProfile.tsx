@@ -108,27 +108,27 @@ export const ManagementProfile: React.FC = () => {
           {activeTab === 'overview' && (
             <>
               {/* Stats - fixed readability */}
-              <div className="bg-nadayu-panel rounded-2xl p-6">
+              <div className="bg-white border border-nadayu-border rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-white font-semibold text-sm">Today's Overview</h2>
-                  <span className="text-gray-600 text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <h2 className="text-gray-900 font-semibold text-sm">Today's Overview</h2>
+                  <span className="text-nadayu-muted text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 </div>
                 <div className="grid grid-cols-4 gap-3">
-                  <div className="bg-orange-500/15 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-orange-300 mb-2">Pending Violations</p>
-                    <p className="text-2xl font-bold text-orange-400">{stats.pendingViolations}</p>
+                  <div className="bg-orange-50 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-orange-500 mb-2">Pending Violations</p>
+                    <p className="text-2xl font-bold text-orange-600">{stats.pendingViolations}</p>
                   </div>
-                  <div className="bg-red-500/15 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-red-300 mb-2">Unread Complaints</p>
-                    <p className="text-2xl font-bold text-red-400">{stats.unreadComplaints}</p>
+                  <div className="bg-red-50 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-red-500 mb-2">Unread Complaints</p>
+                    <p className="text-2xl font-bold text-red-600">{stats.unreadComplaints}</p>
                   </div>
                   <div className="bg-nadayu-accent rounded-xl p-4">
                     <p className="text-xs font-semibold text-white/70 mb-2">Today's Bookings</p>
                     <p className="text-2xl font-bold text-white">{stats.todayBookings}</p>
                   </div>
-                  <div className="bg-white/[0.08] rounded-xl p-4">
+                  <div className="bg-nadayu-cream rounded-xl p-4">
                     <p className="text-xs font-semibold text-nadayu-muted mb-2">Occupancy Rate</p>
-                    <p className="text-2xl font-bold text-white">{stats.occupancyRate}%</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.occupancyRate}%</p>
                   </div>
                 </div>
               </div>

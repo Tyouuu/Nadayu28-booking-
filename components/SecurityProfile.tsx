@@ -102,27 +102,27 @@ export const SecurityProfile: React.FC = () => {
           {activeTab === 'overview' && (
             <>
               {/* Stats - fixed readability */}
-              <div className="bg-nadayu-panel rounded-2xl p-6">
+              <div className="bg-white border border-nadayu-border rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-white font-semibold text-sm">Today's Stats</h2>
-                  <span className="text-gray-600 text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <h2 className="text-gray-900 font-semibold text-sm">Today's Stats</h2>
+                  <span className="text-nadayu-muted text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 </div>
                 <div className="grid grid-cols-4 gap-3">
-                  <div className="bg-white/[0.08] rounded-xl p-4">
+                  <div className="bg-nadayu-cream rounded-xl p-4">
                     <p className="text-xs font-semibold text-nadayu-muted mb-2">Total Scans</p>
-                    <p className="text-2xl font-bold text-white">{todayStats.scansToday}</p>
+                    <p className="text-2xl font-bold text-gray-900">{todayStats.scansToday}</p>
                   </div>
                   <div className="bg-nadayu-accent rounded-xl p-4">
                     <p className="text-xs font-semibold text-white/70 mb-2">Verified</p>
                     <p className="text-2xl font-bold text-white">{todayStats.verified}</p>
                   </div>
-                  <div className="bg-orange-500/15 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-orange-300 mb-2">Warnings</p>
-                    <p className="text-2xl font-bold text-orange-400">{todayStats.warnings}</p>
+                  <div className="bg-orange-50 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-orange-500 mb-2">Warnings</p>
+                    <p className="text-2xl font-bold text-orange-600">{todayStats.warnings}</p>
                   </div>
-                  <div className="bg-yellow-500/15 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-yellow-300 mb-2">Pending</p>
-                    <p className="text-2xl font-bold text-yellow-400">{todayStats.pending}</p>
+                  <div className="bg-yellow-50 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-yellow-600 mb-2">Pending</p>
+                    <p className="text-2xl font-bold text-yellow-700">{todayStats.pending}</p>
                   </div>
                 </div>
               </div>

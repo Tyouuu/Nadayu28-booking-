@@ -134,7 +134,7 @@ export const InviteVisitor: React.FC = () => {
             <div className="p-6 text-center">
               <div className="border-2 border-dashed border-nadayu-border inline-block mb-5 p-4 rounded-2xl">
                 <div className="bg-white p-2 rounded-lg">
-                  {result?.qrCode && <QRCodeSVG value={result.qrCode} size={160} bgColor="#ffffff" fgColor="#2B241C" level="M" />}
+                  {result?.qrCode && <QRCodeSVG value={result.qrCode} size={160} bgColor="#ffffff" fgColor="#0F172A" level="M" />}
                 </div>
               </div>
               <div className="space-y-3 text-left bg-nadayu-cream p-5 rounded-2xl border border-nadayu-border mb-5">

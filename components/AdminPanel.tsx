@@ -108,33 +108,33 @@ export const AdminPanel: React.FC = () => {
       {/* Analytics Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Visitor Traffic */}
-        <div className="bg-nadayu-panel rounded-2xl p-6">
+        <div className="bg-white border border-nadayu-border rounded-2xl p-6">
           <div className="flex justify-between items-center mb-5">
             <div>
-              <h3 className="text-lg font-bold text-white">Visitor Traffic</h3>
-              <p className="text-sm text-gray-500">Weekly Overview</p>
+              <h3 className="text-lg font-bold text-gray-900">Visitor Traffic</h3>
+              <p className="text-sm text-nadayu-muted">Weekly Overview</p>
             </div>
-            <button className="p-2 rounded-xl text-gray-500 hover:bg-white/10 transition-colors"><MoreHorizontal size={18} /></button>
+            <button className="p-2 rounded-xl text-nadayu-muted hover:bg-nadayu-cream transition-colors"><MoreHorizontal size={18} /></button>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={parkingData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} dx={-10} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis dataKey="name" stroke="#64748B" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+                <YAxis stroke="#64748B" fontSize={12} tickLine={false} axisLine={false} dx={-10} />
                 <Tooltip
                   contentStyle={{
                     borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+                    border: '1px solid #E2E8F0',
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
                     padding: '10px 14px',
                     fontWeight: 600,
-                    backgroundColor: '#3A3226',
-                    color: '#fff',
+                    backgroundColor: '#fff',
+                    color: '#0F172A',
                   }}
                 />
-                <Line type="monotone" dataKey="visitors" stroke="#B5652F" strokeWidth={3} dot={{ r: 4, fill: '#B5652F', strokeWidth: 2, stroke: '#2B241C' }} activeDot={{ r: 7 }} />
-                <Line type="monotone" dataKey="violations" stroke="#ff6b6b" strokeWidth={3} dot={{ r: 4, fill: '#ff6b6b', strokeWidth: 2, stroke: '#2B241C' }} />
+                <Line type="monotone" dataKey="visitors" stroke="#2563EB" strokeWidth={3} dot={{ r: 4, fill: '#2563EB', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 7 }} />
+                <Line type="monotone" dataKey="violations" stroke="#ff6b6b" strokeWidth={3} dot={{ r: 4, fill: '#ff6b6b', strokeWidth: 2, stroke: '#fff' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -151,22 +151,22 @@ export const AdminPanel: React.FC = () => {
         </div>
 
         {/* Facility Usage */}
-        <div className="bg-nadayu-panel rounded-2xl p-6">
+        <div className="bg-white border border-nadayu-border rounded-2xl p-6">
           <div className="flex justify-between items-center mb-5">
             <div>
-              <h3 className="text-lg font-bold text-white">Facility Usage</h3>
-              <p className="text-sm text-gray-500">Hours per Week</p>
+              <h3 className="text-lg font-bold text-gray-900">Facility Usage</h3>
+              <p className="text-sm text-nadayu-muted">Hours per Week</p>
             </div>
-            <button className="p-2 rounded-xl text-gray-500 hover:bg-white/10 transition-colors"><Filter size={18} /></button>
+            <button className="p-2 rounded-xl text-nadayu-muted hover:bg-nadayu-cream transition-colors"><Filter size={18} /></button>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={facilityUsage}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} dy={10} />
-                <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} dx={-10} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, backgroundColor: '#3A3226', color: '#fff' }} />
-                <Bar dataKey="hours" fill="#B5652F" radius={[8, 8, 8, 8]} barSize={48} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis dataKey="name" stroke="#64748B" fontSize={12} tickLine={false} axisLine={false} dy={10} />
+                <YAxis stroke="#64748B" fontSize={12} tickLine={false} axisLine={false} dx={-10} />
+                <Tooltip cursor={{ fill: '#F1F5F9' }} contentStyle={{ borderRadius: '12px', border: '1px solid #E2E8F0', boxShadow: '0 10px 25px rgba(0,0,0,0.08)', fontWeight: 600, backgroundColor: '#fff', color: '#0F172A' }} />
+                <Bar dataKey="hours" fill="#2563EB" radius={[8, 8, 8, 8]} barSize={48} />
               </BarChart>
             </ResponsiveContainer>
           </div>

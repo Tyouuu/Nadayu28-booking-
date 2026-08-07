@@ -302,7 +302,7 @@ export const ParkingBooking: React.FC = () => {
                       value={generatedBooking.qrCode}
                       size={160}
                       bgColor="#ffffff"
-                      fgColor="#2B241C"
+                      fgColor="#0F172A"
                       level="M"
                     />
                   )}

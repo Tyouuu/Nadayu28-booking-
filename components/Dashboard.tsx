@@ -43,10 +43,10 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-nadayu-panel rounded-2xl p-6 mb-5">
+      <div className="bg-white border border-nadayu-border rounded-2xl p-6 mb-5">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-white font-semibold text-sm">{t.dashboard.overview}</h2>
-          <span className="text-gray-600 text-xs">{t.common.thisMonth}</span>
+          <h2 className="text-gray-900 font-semibold text-sm">{t.dashboard.overview}</h2>
+          <span className="text-nadayu-muted text-xs">{t.common.thisMonth}</span>
         </div>
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-nadayu-accent rounded-xl p-5 cursor-pointer hover:brightness-95 transition-all" onClick={() => setCurrentView("parking")}>
@@ -57,21 +57,21 @@ export const Dashboard: React.FC = () => {
             <p className="text-white text-[1.6rem] font-bold leading-none mb-1">Unlimited</p>
             <p className="text-white/50 text-xs mt-2">{t.dashboard.accessActive}</p>
           </div>
-          <div className="bg-white/[0.06] rounded-xl p-5 cursor-pointer hover:bg-white/[0.1] transition-all" onClick={() => setCurrentView("amenities")}>
+          <div className="bg-nadayu-cream rounded-xl p-5 cursor-pointer hover:bg-nadayu-border transition-all" onClick={() => setCurrentView("amenities")}>
             <div className="flex items-center justify-between mb-5">
               <span className="text-nadayu-muted text-xs font-semibold">{t.dashboard.activeBookings}</span>
-              <ArrowUpRight size={14} className="text-gray-600" />
+              <ArrowUpRight size={14} className="text-nadayu-muted" />
             </div>
-            <p className="text-white text-[1.6rem] font-bold leading-none mb-1">{activeBookings.length}</p>
-            <p className="text-gray-500 text-xs mt-2">{t.dashboard.facilitiesReserved}</p>
+            <p className="text-gray-900 text-[1.6rem] font-bold leading-none mb-1">{activeBookings.length}</p>
+            <p className="text-nadayu-muted text-xs mt-2">{t.dashboard.facilitiesReserved}</p>
           </div>
-          <div className="bg-white/[0.06] rounded-xl p-5 cursor-pointer hover:bg-white/[0.1] transition-all" onClick={() => setCurrentView("community")}>
+          <div className="bg-nadayu-cream rounded-xl p-5 cursor-pointer hover:bg-nadayu-border transition-all" onClick={() => setCurrentView("community")}>
             <div className="flex items-center justify-between mb-5">
               <span className="text-nadayu-muted text-xs font-semibold">{t.dashboard.announcements}</span>
-              <ArrowUpRight size={14} className="text-gray-600" />
+              <ArrowUpRight size={14} className="text-nadayu-muted" />
             </div>
-            <p className="text-white text-[1.6rem] font-bold leading-none mb-1">{recentAnnouncements.length}</p>
-            <p className="text-gray-500 text-xs mt-2">{t.dashboard.communityUpdates}</p>
+            <p className="text-gray-900 text-[1.6rem] font-bold leading-none mb-1">{recentAnnouncements.length}</p>
+            <p className="text-nadayu-muted text-xs mt-2">{t.dashboard.communityUpdates}</p>
           </div>
         </div>
       </div>

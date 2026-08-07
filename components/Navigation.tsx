@@ -1,17 +1,18 @@
 import React from 'react';
 import {
   Home, Car, Dumbbell, MessageSquare, AlertTriangle,
-  Shield, BarChart2, LogOut, Menu, X, User, Settings, ChevronRight, Globe, UserPlus, Wrench, FolderOpen
+  Shield, BarChart2, LogOut, User, Settings, ChevronRight, Globe, UserPlus, Wrench, FolderOpen
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '../contexts/NavigationContext';
 import { useI18n, LOCALE_LABELS } from '../contexts/I18nContext';
 import { Locale } from '../i18n/types';
+import { MobileTabBar } from './MobileTabBar';
 
 export const Navigation: React.FC = () => {
   const { currentUserRole, logout } = useAuth();
-  const { currentView, isMobileOpen, setIsMobileOpen, navigate } = useNavigation();
+  const { currentView, navigate } = useNavigation();
   const { locale, t, setLocale } = useI18n();
 
   const navItems = [
@@ -122,9 +123,6 @@ export const Navigation: React.FC = () => {
           <button onClick={() => setLocale(nextLocale)} className="p-1.5 rounded-lg text-nadayu-muted hover:bg-nadayu-cream transition-colors text-xs font-bold uppercase">
             {locale}
           </button>
-          <button onClick={() => setIsMobileOpen(!isMobileOpen)} className="p-1.5 rounded-lg text-nadayu-muted hover:bg-nadayu-cream transition-colors">
-            {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
         </div>
       </div>
 
@@ -135,13 +133,8 @@ export const Navigation: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      {isMobileOpen && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={() => setIsMobileOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-48 z-30 md:hidden"><Sidebar /></div>
-        </>
-      )}
+      {/* Mobile bottom tab bar */}
+      <MobileTabBar />
     </>
   );
 };

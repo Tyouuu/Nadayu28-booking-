@@ -16,6 +16,7 @@ import { SecurityProfile } from './components/SecurityProfile';
 import { ManagementProfile } from './components/ManagementProfile';
 import { Login } from './components/Login';
 import { CommunityBoard } from './components/CommunityBoard';
+import { MoreMenu } from './components/MoreMenu';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
 import { I18nProvider } from './contexts/I18nContext';
@@ -53,6 +54,8 @@ const AppContent: React.FC = () => {
         return <ManagementProfile />;
       case 'community':
         return <CommunityBoard />;
+      case 'more':
+        return <MoreMenu />;
       default:
         return <Dashboard />;
     }
@@ -85,7 +88,7 @@ const AppContent: React.FC = () => {
         {/* Top spacing for mobile only */}
         <div className="pt-20 md:pt-0 h-full">
             {/* Main scrollable area */}
-            <div className="h-full overflow-y-auto p-4 md:p-8">
+            <div className="h-full overflow-y-auto p-4 pb-24 md:p-8">
                <div className="max-w-7xl mx-auto min-h-[calc(100vh-4rem)]">
                  {renderContent()}
                </div>

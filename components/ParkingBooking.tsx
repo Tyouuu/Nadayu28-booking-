@@ -165,7 +165,7 @@ export const ParkingBooking: React.FC = () => {
                         onClick={(e) => { e.stopPropagation(); if (activeZone === zone) setSelectedSlot(slot.id); }}
                         className={"rounded-lg transition-all duration-200 font-bold text-xs " + (isOccupied ? "cursor-not-allowed" : "cursor-pointer") + " " + (activeZone !== zone ? "opacity-40" : "opacity-100")}
                         style={{ aspectRatio: '1 / 1' }}>
-                        <div className={"w-full h-full rounded-lg border-2 flex items-center justify-center transition-all duration-200 " + (isSelected ? "bg-nadayu-accent border-nadayu-accent text-nadayu-panel font-bold" : isOccupied ? (isDark ? "bg-white/5 border-white/10 text-gray-600" : "bg-nadayu-cream border-nadayu-border text-gray-300") : (isDark ? "bg-white/10 border-white/20 text-gray-300 hover:border-nadayu-accent hover:bg-nadayu-accent/15" : "bg-white border-nadayu-border text-gray-700 hover:border-nadayu-accent hover:bg-nadayu-accent/10"))}>
+                        <div className={"w-full h-full rounded-lg border-2 flex items-center justify-center transition-all duration-200 " + (isSelected ? "bg-nadayu-accent border-nadayu-accent text-white font-bold" : isOccupied ? (isDark ? "bg-white/5 border-white/10 text-gray-600" : "bg-nadayu-cream border-nadayu-border text-gray-300") : (isDark ? "bg-white/10 border-white/20 text-gray-300 hover:border-nadayu-accent hover:bg-nadayu-accent/15" : "bg-white border-nadayu-border text-gray-700 hover:border-nadayu-accent hover:bg-nadayu-accent/10"))}>
                           {slot.number}
                         </div>
                       </button>
@@ -289,7 +289,7 @@ export const ParkingBooking: React.FC = () => {
             <div className={"p-6 text-center bg-nadayu-panel"}>
               <h3 className={"font-bold text-2xl tracking-widest mb-1 text-white"}>{t.parking.parkingPass}</h3>
               <p className={"text-xs uppercase tracking-widest text-gray-500"}>Nadayu28 Residences</p>
-              <div className={"inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase bg-nadayu-accent text-nadayu-panel"}>
+              <div className={"inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase bg-nadayu-accent text-white"}>
                 {isOvernight ? <Moon size={12} /> : <Sun size={12} />}
                 {isOvernight ? 'Overnight (48h)' : 'Visitor (6h)'}
               </div>
@@ -341,7 +341,7 @@ export const ParkingBooking: React.FC = () => {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button className="flex-1 bg-nadayu-accent text-nadayu-panel py-3.5 rounded-xl font-bold text-sm hover:brightness-95 transition-all flex items-center justify-center gap-2">
+                <button className="flex-1 bg-nadayu-accent text-white py-3.5 rounded-xl font-bold text-sm hover:brightness-95 transition-all flex items-center justify-center gap-2">
                   <Share2 size={15} /> Share
                 </button>
                 <button className="flex-1 bg-nadayu-cream text-nadayu-panel py-3.5 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all flex items-center justify-center gap-2">

@@ -206,7 +206,7 @@ export const CommunityBoard: React.FC = () => {
                   <span className="text-sm font-bold text-white">{unreadCount} unread</span>
                 </div>
               )}
-              <button className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-nadayu-panel font-bold rounded-2xl transition-all flex items-center gap-2">
+              <button className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-white font-bold rounded-2xl transition-all flex items-center gap-2">
                 <Plus size={20} /> Post Update
               </button>
             </div>
@@ -365,7 +365,7 @@ export const CommunityBoard: React.FC = () => {
                     {!notification.hasRead && (
                       <button
                         onClick={() => handleReadConfirm(notification.id)}
-                        className="px-4 py-2 bg-nadayu-accent hover:brightness-95 text-nadayu-panel font-bold rounded-lg transition-all text-sm flex items-center gap-2"
+                        className="px-4 py-2 bg-nadayu-accent hover:brightness-95 text-white font-bold rounded-lg transition-all text-sm flex items-center gap-2"
                       >
                         <CheckCircle2 size={16} /> Mark as Read
                       </button>
@@ -389,7 +389,7 @@ export const CommunityBoard: React.FC = () => {
                 setSelectedCategory('all');
                 setSelectedTimeFilter('30days');
               }}
-              className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-nadayu-panel font-bold rounded-2xl transition-all inline-flex items-center gap-2"
+              className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-white font-bold rounded-2xl transition-all inline-flex items-center gap-2"
             >
               View All Updates
             </button>

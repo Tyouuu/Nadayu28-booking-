@@ -224,7 +224,7 @@ export const SecurityScanner: React.FC = () => {
                 <p className="text-sm mb-4 px-4 py-2 rounded-xl bg-red-500/10 text-red-400">{errorMsg}</p>
               )}
               <button onClick={startScanner}
-                className="bg-nadayu-accent text-nadayu-panel px-8 py-4 rounded-xl font-bold text-sm transition-all hover:brightness-95 active:scale-95 flex items-center gap-2">
+                className="bg-nadayu-accent text-white px-8 py-4 rounded-xl font-bold text-sm transition-all hover:brightness-95 active:scale-95 flex items-center gap-2">
                 <Camera size={18} /> Open Camera
               </button>
             </div>
@@ -319,7 +319,7 @@ export const SecurityScanner: React.FC = () => {
                     </div>
                   </label>
                   <button onClick={handleMarkArrived} disabled={isUploadingPhoto}
-                    className="w-full bg-nadayu-accent text-nadayu-panel py-3.5 rounded-xl font-bold text-sm hover:brightness-95 transition-all disabled:opacity-50">
+                    className="w-full bg-nadayu-accent text-white py-3.5 rounded-xl font-bold text-sm hover:brightness-95 transition-all disabled:opacity-50">
                     {isUploadingPhoto ? 'Checking in...' : 'Mark Arrived'}
                   </button>
                 </div>

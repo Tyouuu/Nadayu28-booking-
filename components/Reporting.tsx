@@ -179,7 +179,7 @@ export const Reporting: React.FC = () => {
           <p className="text-xs text-gray-500 mb-5">Save your ticket number for tracking status</p>
           <button 
             onClick={resetForm}
-            className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+            className="w-full bg-nadayu-accent hover:brightness-95 text-white px-8 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
           >
             <Plus size={20} /> {t.reporting.submitAnother}
           </button>

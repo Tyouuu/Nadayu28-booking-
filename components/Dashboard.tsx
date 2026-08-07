@@ -51,11 +51,11 @@ export const Dashboard: React.FC = () => {
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-nadayu-accent rounded-xl p-5 cursor-pointer hover:brightness-95 transition-all" onClick={() => setCurrentView("parking")}>
             <div className="flex items-center justify-between mb-5">
-              <span className="text-black/70 text-xs font-semibold">{t.dashboard.visitorParking}</span>
-              <ArrowUpRight size={14} className="text-black/50" />
+              <span className="text-white/70 text-xs font-semibold">{t.dashboard.visitorParking}</span>
+              <ArrowUpRight size={14} className="text-white/50" />
             </div>
-            <p className="text-black text-[1.6rem] font-bold leading-none mb-1">Unlimited</p>
-            <p className="text-black/50 text-xs mt-2">{t.dashboard.accessActive}</p>
+            <p className="text-white text-[1.6rem] font-bold leading-none mb-1">Unlimited</p>
+            <p className="text-white/50 text-xs mt-2">{t.dashboard.accessActive}</p>
           </div>
           <div className="bg-white/[0.06] rounded-xl p-5 cursor-pointer hover:bg-white/[0.1] transition-all" onClick={() => setCurrentView("amenities")}>
             <div className="flex items-center justify-between mb-5">
@@ -80,7 +80,7 @@ export const Dashboard: React.FC = () => {
         {quickActions.map(action => (
           <button key={action.id} onClick={() => setCurrentView(action.id)} className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all duration-200">
             <div className="w-8 h-8 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-200">
-              <action.icon size={15} className="text-gray-500 group-hover:text-black transition-colors duration-200" />
+              <action.icon size={15} className="text-gray-500 group-hover:text-white transition-colors duration-200" />
             </div>
             <div>
               <p className="text-gray-900 text-xs font-semibold leading-tight">{action.label}</p>

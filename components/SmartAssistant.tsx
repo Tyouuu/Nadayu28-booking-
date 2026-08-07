@@ -155,7 +155,7 @@ Keep answers concise, polite, and helpful.`;
                 <button
                   onClick={handleSend}
                   disabled={isLoading || !input.trim()}
-                  className="absolute right-1.5 p-2.5 bg-nadayu-panel text-white rounded-full transition-all hover:bg-nadayu-accent hover:text-nadayu-panel disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="absolute right-1.5 p-2.5 bg-nadayu-panel text-white rounded-full transition-all hover:bg-nadayu-accent hover:text-white disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Send size={16} className={input.trim() ? "translate-x-0.5 translate-y-0.5" : ""} />
                 </button>
@@ -169,7 +169,7 @@ Keep answers concise, polite, and helpful.`;
         {!isOpen && (
           <button
             onClick={() => setIsOpen(true)}
-            className="group relative bg-nadayu-panel text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-nadayu-accent hover:text-nadayu-panel flex items-center justify-center ring-4 ring-white"
+            className="group relative bg-nadayu-panel text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-nadayu-accent hover:text-white flex items-center justify-center ring-4 ring-white"
           >
             <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
             <MessageCircle size={28} />

@@ -213,7 +213,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           {/* Center Content */}
           <div className="relative z-10 flex flex-col justify-center flex-1">
-            <div className="w-16 h-16 bg-nadayu-accent rounded-2xl flex items-center justify-center text-nadayu-panel font-bold text-2xl mb-8">N</div>
+            <div className="w-16 h-16 bg-nadayu-accent rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-8">N</div>
             <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
               Nadayu28<br/>Community
             </h2>
@@ -258,14 +258,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                 {resetStatus === 'sent' ? (
                   <div className="bg-nadayu-accent/10 border border-nadayu-accent/30 rounded-2xl p-8 text-center animate-scale-in">
-                    <div className="w-16 h-16 bg-nadayu-accent text-nadayu-panel rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-nadayu-accent text-white rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 size={32} />
                     </div>
                     <h3 className="font-bold text-gray-900 text-lg mb-2">{t.login.checkEmail}</h3>
                     <p className="text-nadayu-muted text-sm mb-6">We've sent password reset instructions to <span className="font-bold text-gray-900">{resetEmail}</span></p>
                     <button
                       onClick={() => { setShowForgotPassword(false); setResetStatus('idle'); }}
-                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all"
                     >
                       {t.login.signIn}
                     </button>
@@ -289,7 +289,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <button
                       type="submit"
                       disabled={resetStatus === 'sending'}
-                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                     >
                       {resetStatus === 'sending' ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -477,7 +477,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             type="button"
                             onClick={handleSendOTP}
                             disabled={isLoading}
-                            className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+                            className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
                           >
                             {isLoading ? (
                               <div className="w-5 h-5 border-2 border-nadayu-panel/30 border-t-nadayu-panel rounded-full animate-spin" />
@@ -523,7 +523,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <button
                       type="submit"
                       disabled={isLoading || (loginMethod === 'mobile' && (!otpSent || otpCode.length !== 6))}
-                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
                     >
                       {isLoading ? (
                         <div className="w-5 h-5 border-2 border-nadayu-panel/30 border-t-nadayu-panel rounded-full animate-spin" />
@@ -730,7 +730,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <button
                       type="submit"
                       disabled={isLoading || (role === 'TENANT' && tenantRegMethod === 'invite' && !invitationCode)}
-                      className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all mt-8 disabled:opacity-50"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all mt-8 disabled:opacity-50"
                     >
                       {isLoading ? 'Processing...' : t.login.createAccount}
                     </button>
@@ -768,7 +768,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     <p className="text-nadayu-muted text-sm mb-6">{t.login.checkEmail}</p>
                     <button
                       onClick={() => { setMode('signin'); setRegSuccess(false); setLoginEmail(regEmail); }}
-                      className="bg-nadayu-accent hover:brightness-95 text-nadayu-panel px-6 py-3 rounded-xl font-bold transition-all"
+                      className="bg-nadayu-accent hover:brightness-95 text-white px-6 py-3 rounded-xl font-bold transition-all"
                     >
                       {t.login.signIn}
                     </button>
@@ -833,7 +833,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-nadayu-accent hover:brightness-95 text-nadayu-panel py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
+                    className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8"
                   >
                     {isLoading ? (
                       <div className="w-5 h-5 border-2 border-nadayu-panel/30 border-t-nadayu-panel rounded-full animate-spin" />
@@ -853,7 +853,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       {/* Visitor Access Button - Bottom Right */}
       <button
         onClick={() => setMode('visitor')}
-        className="fixed bottom-8 right-8 bg-nadayu-accent hover:brightness-95 text-nadayu-panel px-6 py-3 rounded-full font-bold transition-all flex items-center gap-2"
+        className="fixed bottom-8 right-8 bg-nadayu-accent hover:brightness-95 text-white px-6 py-3 rounded-full font-bold transition-all flex items-center gap-2"
       >
         <Users size={18} /> Visitor Access
       </button>

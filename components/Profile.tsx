@@ -244,7 +244,7 @@ export const Profile: React.FC = () => {
             <div className="bg-nadayu-panel p-6 flex justify-between items-center">
               <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                 <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center">
-                  <User size={18} className="text-nadayu-panel" />
+                  <User size={18} className="text-white" />
                 </div>
                 {accountRole === 'owner' ? 'Account Details' : 'My Profile'}
               </h3>
@@ -252,7 +252,7 @@ export const Profile: React.FC = () => {
                 onClick={() => setIsEditingProfile(!isEditingProfile)}
                 className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold transition-all duration-300 ${
                   isEditingProfile
-                    ? 'bg-nadayu-accent text-nadayu-panel'
+                    ? 'bg-nadayu-accent text-white'
                     : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
@@ -364,7 +364,7 @@ export const Profile: React.FC = () => {
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
                   <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Car size={18} className="text-nadayu-panel" />
+                    <Car size={18} className="text-white" />
                   </div>
                   {accountRole === 'owner' ? 'Manage Vehicles' : 'My Vehicles'}
                 </h3>
@@ -478,7 +478,7 @@ export const Profile: React.FC = () => {
               <div className="relative z-10">
                 <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
                   <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Users size={18} className="text-nadayu-panel" />
+                    <Users size={18} className="text-white" />
                   </div>
                   Manage Tenants
                 </h3>
@@ -623,7 +623,7 @@ export const Profile: React.FC = () => {
           <div className="bg-white rounded-2xl border border-nadayu-border space-y-5 overflow-hidden">
             <div className="bg-nadayu-panel p-6 flex items-center gap-3">
               <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                <Lock size={18} className="text-nadayu-panel" />
+                <Lock size={18} className="text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white">Security & Privacy</h3>
             </div>
@@ -718,7 +718,7 @@ export const Profile: React.FC = () => {
           <div className="bg-white rounded-2xl border border-nadayu-border space-y-6 overflow-hidden">
             <div className="bg-nadayu-panel p-6 flex items-center gap-3">
               <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
-                <History size={18} className="text-nadayu-panel" />
+                <History size={18} className="text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white">{accountRole === 'owner' ? 'Activity Log' : 'My Bookings'}</h3>
             </div>

@@ -130,7 +130,7 @@ export function CustomDatePicker({ value, onChange, required, className }: DateP
                     ${sel
                       ? 'bg-nadayu-panel text-white shadow-lg'
                       : tod
-                        ? 'bg-nadayu-accent text-nadayu-panel font-bold'
+                        ? 'bg-nadayu-accent text-white font-bold'
                         : past
                           ? 'text-gray-300 cursor-not-allowed'
                           : 'text-gray-700 hover:bg-nadayu-cream'
@@ -160,7 +160,7 @@ export function CustomDatePicker({ value, onChange, required, className }: DateP
                 onChange(`${today.getFullYear()}-${m}-${d}`);
                 setOpen(false);
               }}
-              className="text-xs font-bold text-nadayu-panel bg-nadayu-accent px-3 py-1.5 rounded-lg hover:brightness-95 transition-colors"
+              className="text-xs font-bold text-white bg-nadayu-accent px-3 py-1.5 rounded-lg hover:brightness-95 transition-colors"
             >
               Today
             </button>
@@ -342,7 +342,7 @@ export function CustomTimePicker({ value, onChange, required, className }: TimeP
               <button
                 type="button"
                 onClick={() => confirmTime(selHour, selMinute)}
-                className="text-xs font-bold text-nadayu-panel bg-nadayu-accent px-3 py-1.5 rounded-lg hover:brightness-95 transition-colors"
+                className="text-xs font-bold text-white bg-nadayu-accent px-3 py-1.5 rounded-lg hover:brightness-95 transition-colors"
               >
                 Confirm
               </button>

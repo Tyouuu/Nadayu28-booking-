@@ -123,8 +123,8 @@ export const ManagementProfile: React.FC = () => {
                     <p className="text-2xl font-bold text-red-400">{stats.unreadComplaints}</p>
                   </div>
                   <div className="bg-nadayu-accent rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-panel/60 mb-2">Today's Bookings</p>
-                    <p className="text-2xl font-bold text-nadayu-panel">{stats.todayBookings}</p>
+                    <p className="text-xs font-semibold text-white/70 mb-2">Today's Bookings</p>
+                    <p className="text-2xl font-bold text-white">{stats.todayBookings}</p>
                   </div>
                   <div className="bg-white/[0.08] rounded-xl p-4">
                     <p className="text-xs font-semibold text-nadayu-muted mb-2">Occupancy Rate</p>
@@ -143,7 +143,7 @@ export const ManagementProfile: React.FC = () => {
                   <button key={a.label} onClick={a.action}
                     className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
                     <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                      <a.icon size={16} className="text-gray-500 group-hover:text-black transition-colors" />
+                      <a.icon size={16} className="text-gray-500 group-hover:text-white transition-colors" />
                     </div>
                     <div>
                       <p className="text-gray-900 text-xs font-semibold">{a.label}</p>
@@ -261,13 +261,13 @@ export const ManagementProfile: React.FC = () => {
               <div className="bg-nadayu-panel p-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center">
-                    <User size={18} className="text-nadayu-panel" />
+                    <User size={18} className="text-white" />
                   </div>
                   <h3 className="text-lg font-semibold text-white">Personal Details</h3>
                 </div>
                 <button onClick={() => setIsEditing(!isEditing)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
-                    isEditing ? 'bg-nadayu-accent text-nadayu-panel' : 'bg-white/10 text-white hover:bg-white/20'
+                    isEditing ? 'bg-nadayu-accent text-white' : 'bg-white/10 text-white hover:bg-white/20'
                   }`}>
                   {isEditing ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
                 </button>

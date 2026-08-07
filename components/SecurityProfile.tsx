@@ -51,7 +51,7 @@ export const SecurityProfile: React.FC = () => {
           <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">My Profile</h1>
           <p className="text-nadayu-muted text-sm mt-1">Gate A Security · Morning Shift</p>
         </div>
-        <div className="hidden md:flex items-center gap-2 bg-nadayu-accent text-nadayu-panel px-4 py-2 rounded-full text-xs font-bold">
+        <div className="hidden md:flex items-center gap-2 bg-nadayu-accent text-white px-4 py-2 rounded-full text-xs font-bold">
           <span className="w-1.5 h-1.5 bg-nadayu-panel rounded-full animate-pulse"></span>
           On Duty
         </div>
@@ -66,7 +66,7 @@ export const SecurityProfile: React.FC = () => {
                 <Shield size={40} className="text-nadayu-accent" />
               </div>
               <div className="absolute bottom-0 right-0 w-7 h-7 bg-nadayu-accent rounded-full flex items-center justify-center border-2 border-white">
-                <CheckCircle2 size={14} className="text-nadayu-panel" />
+                <CheckCircle2 size={14} className="text-white" />
               </div>
             </div>
             <div className="text-center">
@@ -91,7 +91,7 @@ export const SecurityProfile: React.FC = () => {
               ))}
             </div>
             <button onClick={() => setCurrentView('security')}
-              className="w-full bg-nadayu-accent text-nadayu-panel py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:brightness-95 transition-all">
+              className="w-full bg-nadayu-accent text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:brightness-95 transition-all">
               <Camera size={16} /> Quick Scan
             </button>
           </div>
@@ -113,8 +113,8 @@ export const SecurityProfile: React.FC = () => {
                     <p className="text-2xl font-bold text-white">{todayStats.scansToday}</p>
                   </div>
                   <div className="bg-nadayu-accent rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-panel/60 mb-2">Verified</p>
-                    <p className="text-2xl font-bold text-nadayu-panel">{todayStats.verified}</p>
+                    <p className="text-xs font-semibold text-white/70 mb-2">Verified</p>
+                    <p className="text-2xl font-bold text-white">{todayStats.verified}</p>
                   </div>
                   <div className="bg-orange-500/15 rounded-xl p-4">
                     <p className="text-xs font-semibold text-orange-300 mb-2">Warnings</p>
@@ -132,7 +132,7 @@ export const SecurityProfile: React.FC = () => {
                 <button onClick={() => setCurrentView('security')}
                   className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
                   <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                    <Camera size={16} className="text-gray-500 group-hover:text-black transition-colors" />
+                    <Camera size={16} className="text-gray-500 group-hover:text-white transition-colors" />
                   </div>
                   <div>
                     <p className="text-gray-900 text-xs font-semibold">Quick Scan</p>
@@ -142,7 +142,7 @@ export const SecurityProfile: React.FC = () => {
                 <button onClick={() => setActiveTab('log')}
                   className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
                   <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                    <FileText size={16} className="text-gray-500 group-hover:text-black transition-colors" />
+                    <FileText size={16} className="text-gray-500 group-hover:text-white transition-colors" />
                   </div>
                   <div>
                     <p className="text-gray-900 text-xs font-semibold">Visitor Log</p>
@@ -152,7 +152,7 @@ export const SecurityProfile: React.FC = () => {
                 <button onClick={() => setCurrentView('report')}
                   className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
                   <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                    <AlertTriangle size={16} className="text-gray-500 group-hover:text-black transition-colors" />
+                    <AlertTriangle size={16} className="text-gray-500 group-hover:text-white transition-colors" />
                   </div>
                   <div>
                     <p className="text-gray-900 text-xs font-semibold">Report Issue</p>
@@ -218,14 +218,14 @@ export const SecurityProfile: React.FC = () => {
               <div className="bg-nadayu-panel p-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center">
-                    <User size={18} className="text-nadayu-panel" />
+                    <User size={18} className="text-white" />
                   </div>
                   <h3 className="text-lg font-semibold text-white">Personal Details</h3>
                 </div>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
-                    isEditing ? 'bg-nadayu-accent text-nadayu-panel' : 'bg-white/10 text-white hover:bg-white/20'
+                    isEditing ? 'bg-nadayu-accent text-white' : 'bg-white/10 text-white hover:bg-white/20'
                   }`}>
                   {isEditing ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
                 </button>

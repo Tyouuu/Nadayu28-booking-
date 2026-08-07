@@ -214,7 +214,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
           {/* Center Content */}
           <div className="relative z-10 flex flex-col justify-center flex-1">
             <div className="w-16 h-16 bg-nadayu-accent rounded-2xl flex items-center justify-center text-nadayu-panel font-bold text-2xl mb-8">N</div>
-            <h2 className="font-serif text-5xl font-bold text-white mb-6 leading-tight">
+            <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
               Nadayu28<br/>Community
             </h2>
             <p className="text-xl text-gray-300 leading-relaxed max-w-sm">
@@ -253,7 +253,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <ChevronLeft size={16} className="mr-2" /> {t.login.signIn}
                 </button>
 
-                <h2 className="font-serif text-3xl font-bold text-gray-900 mb-2">{t.login.resetPassword}</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">{t.login.resetPassword}</h2>
                 <p className="text-nadayu-muted mb-8 leading-relaxed">Enter your registered email address and we'll send you instructions to reset your password.</p>
 
                 {resetStatus === 'sent' ? (
@@ -305,7 +305,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <>
                 {/* Header */}
                 <div className="mb-8">
-                  <h2 className="font-serif text-4xl font-bold text-gray-900 mb-1">
+                  <h2 className="text-4xl font-bold text-gray-900 mb-1">
                     {mode === 'signin' ? t.login.welcome : t.login.createAccount}
                   </h2>
                   {mode === 'signin' && (
@@ -787,7 +787,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                   <ChevronLeft size={16} className="mr-2" /> Back
                 </button>
 
-                <h2 className="font-serif text-3xl font-bold text-gray-900 mb-2">Visitor Access</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Visitor Access</h2>
                 <p className="text-nadayu-muted mb-8 leading-relaxed">Enter your temporary visitor credentials to access the facility</p>
 
                 <form onSubmit={handleLogin} className="space-y-5">

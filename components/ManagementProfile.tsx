@@ -63,7 +63,7 @@ export const ManagementProfile: React.FC = () => {
       <div className="flex items-end justify-between mb-8">
         <div>
           <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">Property Management</p>
-          <h1 className="font-serif text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">My Profile</h1>
+          <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">My Profile</h1>
           <p className="text-nadayu-muted text-sm mt-1">Operations Department</p>
         </div>
       </div>

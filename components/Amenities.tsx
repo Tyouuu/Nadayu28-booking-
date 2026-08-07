@@ -141,7 +141,7 @@ export const Amenities: React.FC = () => {
          <div className="absolute top-6 right-8 w-32 h-32 rounded-full blur-[80px] opacity-30 animate-pulse" style={{backgroundColor: '#B5652F'}}></div>
 
          <div className="absolute bottom-0 left-0 p-12 md:p-16 max-w-3xl text-white z-10">
-            <h1 className="font-serif text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
                {t.amenities.title}
             </h1>
             <p className="text-lg mb-5 max-w-xl leading-relaxed" style={{color: '#B0B0B8'}}>
@@ -158,7 +158,7 @@ export const Amenities: React.FC = () => {
                   <Star size={24} className="text-nadayu-accent" />
                </div>
                <div>
-                  <h3 className="font-serif text-3xl font-bold text-gray-900">Community Amenities</h3>
+                  <h3 className="text-3xl font-bold text-gray-900">Community Amenities</h3>
                   <p className="mt-1 text-gray-500">Select and book your preferred facility</p>
                </div>
             </div>
@@ -253,7 +253,7 @@ export const Amenities: React.FC = () => {
                 <div className="w-24 h-24 text-white rounded-full flex items-center justify-center mb-5 shadow-xl animate-bounce" style={{backgroundColor: '#4A5D3A'}}>
                   <Check size={48} />
                 </div>
-                <h3 className="font-serif text-4xl font-bold mb-4 text-gray-900">{t.amenities.bookingConfirmed}</h3>
+                <h3 className="text-4xl font-bold mb-4 text-gray-900">{t.amenities.bookingConfirmed}</h3>
                 <p className="text-lg mb-5 max-w-md leading-relaxed text-gray-500">
                   You're all set for <span className="font-bold text-nadayu-panel">{selectedFacility.name}</span>
                   <br/>
@@ -271,7 +271,7 @@ export const Amenities: React.FC = () => {
                    <img src={getFacilityImage(selectedFacility.id)} className="w-full h-full object-cover opacity-80" alt="Facility" />
                    <div className="absolute inset-0 bg-gradient-to-r" style={{backgroundImage: 'linear-gradient(to right, rgba(43, 36, 28, 1), rgba(58, 50, 38, 0.8), transparent)'}}></div>
                    <div className="absolute bottom-8 left-8 text-white z-10">
-                      <h3 className="font-serif text-xl font-bold mb-2">{selectedFacility.name}</h3>
+                      <h3 className="text-xl font-bold mb-2">{selectedFacility.name}</h3>
                       <p className="flex items-center gap-2" style={{color: '#B0B0B8'}}>
                         <Calendar size={16} /> Select your preferred time slot
                       </p>

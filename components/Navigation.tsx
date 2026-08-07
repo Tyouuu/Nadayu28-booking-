@@ -44,7 +44,7 @@ export const Navigation: React.FC = () => {
             <span className="font-extrabold text-black text-base leading-none">N</span>
           </div>
           <div>
-            <p className="font-serif text-white font-bold text-sm leading-tight">Nadayu28</p>
+            <p className="text-white font-bold text-sm leading-tight">Nadayu28</p>
             <p className="text-[#555] text-[10px] mt-0.5 tracking-wide">Community Portal</p>
           </div>
         </div>
@@ -116,7 +116,7 @@ export const Navigation: React.FC = () => {
           <div className="w-7 h-7 bg-nadayu-accent rounded-full flex items-center justify-center">
             <span className="font-extrabold text-black text-xs">N</span>
           </div>
-          <span className="font-serif font-bold text-gray-900 text-sm">Nadayu28</span>
+          <span className="font-bold text-gray-900 text-sm">Nadayu28</span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setLocale(nextLocale)} className="p-1.5 rounded-lg text-nadayu-muted hover:bg-nadayu-cream transition-colors text-xs font-bold uppercase">

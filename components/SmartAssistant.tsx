@@ -90,7 +90,7 @@ Keep answers concise, polite, and helpful.`;
                   <Bot size={20} className="text-nadayu-panel" />
                 </div>
                 <div>
-                  <span className="font-serif font-bold text-sm block tracking-wide text-white">Concierge AI</span>
+                  <span className="font-bold text-sm block tracking-wide text-white">Concierge AI</span>
                   <span className="text-[10px] flex items-center gap-1.5 font-medium text-nadayu-muted">
                     <span className="w-1.5 h-1.5 rounded-full bg-nadayu-accent animate-pulse"></span> Online
                   </span>

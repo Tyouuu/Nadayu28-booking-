@@ -242,7 +242,7 @@ export const Profile: React.FC = () => {
         {activeTab === 'details' && (
           <div className="bg-white rounded-2xl border border-nadayu-border space-y-5 overflow-hidden">
             <div className="bg-nadayu-panel p-6 flex justify-between items-center">
-              <h3 className="font-serif text-lg font-semibold text-white flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                 <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center">
                   <User size={18} className="text-nadayu-panel" />
                 </div>
@@ -362,7 +362,7 @@ export const Profile: React.FC = () => {
             {/* Add Vehicle Header */}
             <div className="rounded-2xl p-6 shadow-sm border overflow-hidden relative bg-nadayu-panel border-nadayu-panel">
               <div className="relative z-10">
-                <h3 className="font-serif text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
                   <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
                     <Car size={18} className="text-nadayu-panel" />
                   </div>
@@ -476,7 +476,7 @@ export const Profile: React.FC = () => {
             {/* Add Tenant Header */}
             <div className="bg-nadayu-panel rounded-2xl p-6 shadow-sm border border-nadayu-panel overflow-hidden relative">
               <div className="relative z-10">
-                <h3 className="font-serif text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
                   <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
                     <Users size={18} className="text-nadayu-panel" />
                   </div>
@@ -625,7 +625,7 @@ export const Profile: React.FC = () => {
               <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
                 <Lock size={18} className="text-nadayu-panel" />
               </div>
-              <h3 className="font-serif text-lg font-semibold text-white">Security & Privacy</h3>
+              <h3 className="text-lg font-semibold text-white">Security & Privacy</h3>
             </div>
             <div className="px-6 pb-6">
 
@@ -720,7 +720,7 @@ export const Profile: React.FC = () => {
               <div className="w-9 h-9 bg-nadayu-accent rounded-xl flex items-center justify-center flex-shrink-0">
                 <History size={18} className="text-nadayu-panel" />
               </div>
-              <h3 className="font-serif text-lg font-semibold text-white">{accountRole === 'owner' ? 'Activity Log' : 'My Bookings'}</h3>
+              <h3 className="text-lg font-semibold text-white">{accountRole === 'owner' ? 'Activity Log' : 'My Bookings'}</h3>
             </div>
             <div className="px-6 pb-6">
 

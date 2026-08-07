@@ -90,7 +90,7 @@ export const ParkingBooking: React.FC = () => {
             <Car size={28} className="text-nadayu-panel" />
           </div>
           <div>
-            <h2 className="font-serif text-3xl font-bold tracking-tight text-white">{t.parking.title}</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-white">{t.parking.title}</h2>
             <p className="mt-1 text-sm text-nadayu-muted">{t.parking.subtitle}</p>
           </div>
         </div>
@@ -287,7 +287,7 @@ export const ParkingBooking: React.FC = () => {
           </button>
           <div className="bg-white rounded-2xl overflow-hidden border border-nadayu-border">
             <div className={"p-6 text-center bg-nadayu-panel"}>
-              <h3 className={"font-serif font-bold text-2xl tracking-widest mb-1 text-white"}>{t.parking.parkingPass}</h3>
+              <h3 className={"font-bold text-2xl tracking-widest mb-1 text-white"}>{t.parking.parkingPass}</h3>
               <p className={"text-xs uppercase tracking-widest text-gray-500"}>Nadayu28 Residences</p>
               <div className={"inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full text-xs font-bold uppercase bg-nadayu-accent text-nadayu-panel"}>
                 {isOvernight ? <Moon size={12} /> : <Sun size={12} />}

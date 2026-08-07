@@ -66,7 +66,7 @@ export const Documents: React.FC = () => {
           <FolderOpen size={28} className="text-nadayu-panel" />
         </div>
         <div>
-          <h2 className="font-serif text-3xl font-bold tracking-tight text-white">Documents</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-white">Documents</h2>
           <p className="mt-1 text-sm text-nadayu-muted">Meeting minutes, house rules, and other community documents.</p>
         </div>
       </div>

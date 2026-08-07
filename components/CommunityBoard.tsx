@@ -195,7 +195,7 @@ export const CommunityBoard: React.FC = () => {
                 <Bell size={28} className="text-nadayu-panel" />
               </div>
               <div>
-                <h1 className="font-serif text-3xl font-bold text-white mb-1">Community Board</h1>
+                <h1 className="text-3xl font-bold text-white mb-1">Community Board</h1>
                 <p className="text-nadayu-muted">Stay informed with community updates, events, and announcements</p>
               </div>
             </div>

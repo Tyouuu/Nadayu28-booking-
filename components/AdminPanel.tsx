@@ -74,7 +74,7 @@ export const AdminPanel: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">Administration</p>
-          <h2 className="font-serif text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Management Dashboard</h2>
+          <h2 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Management Dashboard</h2>
           <p className="text-nadayu-muted text-sm mt-1">Resource utilization overview and enforcement tracking.</p>
         </div>
         <button className="flex items-center gap-2 bg-nadayu-panel text-white px-5 py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-colors">

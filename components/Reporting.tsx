@@ -161,7 +161,7 @@ export const Reporting: React.FC = () => {
           <div className="w-20 h-20 bg-nadayu-success rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-nadayu-success/30 animate-bounce">
             <CheckCircle2 size={40} className="text-white" />
           </div>
-          <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">{t.reporting.reportSubmitted}</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-3">{t.reporting.reportSubmitted}</h3>
           <p className="text-gray-500 mb-2 leading-relaxed">
             Your issue has been received and assigned to our maintenance team.
           </p>
@@ -201,7 +201,7 @@ export const Reporting: React.FC = () => {
             {/* Dark Header Banner */}
             <div className="bg-nadayu-panel rounded-3xl p-8 mb-6 flex items-center justify-between">
               <div>
-                <h2 className="font-serif text-4xl font-bold text-white mb-2">{t.reporting.title}</h2>
+                <h2 className="text-4xl font-bold text-white mb-2">{t.reporting.title}</h2>
                 <p className="text-nadayu-muted text-base">{t.reporting.subtitle}</p>
               </div>
               <div className="w-16 h-16 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -244,7 +244,7 @@ export const Reporting: React.FC = () => {
               </button>
               <div className="bg-nadayu-panel rounded-3xl p-8 flex items-center justify-between">
                 <div>
-                  <h2 className="font-serif text-3xl font-bold text-white mb-2">{t.reporting.selectCategory}</h2>
+                  <h2 className="text-3xl font-bold text-white mb-2">{t.reporting.selectCategory}</h2>
                   <p className="text-nadayu-muted">{t.reporting.subtitle}</p>
                 </div>
                 <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -285,7 +285,7 @@ export const Reporting: React.FC = () => {
               </button>
               <div className="bg-nadayu-panel rounded-3xl p-8 flex items-center justify-between">
                 <div>
-                  <h2 className="font-serif text-3xl font-bold text-white mb-2">Provide Details</h2>
+                  <h2 className="text-3xl font-bold text-white mb-2">Provide Details</h2>
                   <p className="text-nadayu-muted">Help us understand the issue better. Photos required for faster resolution.</p>
                 </div>
                 <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">

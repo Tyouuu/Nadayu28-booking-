@@ -41,7 +41,7 @@ export const Maintenance: React.FC = () => {
           <Wrench size={28} className="text-nadayu-panel" />
         </div>
         <div>
-          <h2 className="font-serif text-3xl font-bold tracking-tight text-white">Maintenance</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-white">Maintenance</h2>
           <p className="mt-1 text-sm text-nadayu-muted">Track and resolve resident-reported issues.</p>
         </div>
       </div>

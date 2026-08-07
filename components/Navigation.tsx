@@ -41,18 +41,18 @@ export const Navigation: React.FC = () => {
       <div className="px-5 pt-6 pb-5">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-nadayu-accent flex items-center justify-center flex-shrink-0">
-            <span className="font-extrabold text-black text-base leading-none">N</span>
+            <span className="font-extrabold text-white text-base leading-none">N</span>
           </div>
           <div>
             <p className="text-white font-bold text-sm leading-tight">Nadayu28</p>
-            <p className="text-[#555] text-[10px] mt-0.5 tracking-wide">Community Portal</p>
+            <p className="text-slate-500 text-[10px] mt-0.5 tracking-wide">Community Portal</p>
           </div>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pb-2">
-        <p className="px-3 pt-2 pb-1.5 text-[#444] text-[9px] font-bold uppercase tracking-[0.12em]">Navigation</p>
+        <p className="px-3 pt-2 pb-1.5 text-slate-500 text-[9px] font-bold uppercase tracking-[0.12em]">Navigation</p>
         {filtered.map(item => {
           const active = currentView === item.id;
           return (
@@ -60,7 +60,7 @@ export const Navigation: React.FC = () => {
               key={item.id}
               onClick={() => navigate(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 text-left group ${
-                active ? 'bg-nadayu-accent text-black' : 'text-[#777] hover:text-white hover:bg-white/[0.06]'
+                active ? 'bg-nadayu-accent text-white' : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               <item.icon size={17} strokeWidth={active ? 2.5 : 1.8} className="flex-shrink-0" />
@@ -78,28 +78,28 @@ export const Navigation: React.FC = () => {
           onClick={() => setLocale(nextLocale)}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.06] transition-colors group"
         >
-          <Globe size={15} className="text-[#666] flex-shrink-0" />
-          <span className="text-[13px] font-medium text-[#777] flex-1">{LOCALE_LABELS[locale]}</span>
-          <span className="text-[10px] text-[#555] font-bold uppercase">{locale.toUpperCase()}</span>
+          <Globe size={15} className="text-slate-400 flex-shrink-0" />
+          <span className="text-[13px] font-medium text-slate-400 flex-1">{LOCALE_LABELS[locale]}</span>
+          <span className="text-[10px] text-slate-500 font-bold uppercase">{locale.toUpperCase()}</span>
         </button>
 
         <button
           onClick={() => navigate('account')}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.06] transition-colors group"
         >
-          <div className="w-7 h-7 rounded-full bg-[#222] ring-1 ring-white/10 flex items-center justify-center flex-shrink-0">
-            <User size={13} className="text-[#666]" />
+          <div className="w-7 h-7 rounded-full bg-slate-800 ring-1 ring-white/10 flex items-center justify-center flex-shrink-0">
+            <User size={13} className="text-slate-400" />
           </div>
           <div className="flex-1 overflow-hidden text-left">
             <p className="text-white text-xs font-semibold truncate leading-tight">Unit A-12-05</p>
-            <p className="text-[#444] text-[10px] uppercase tracking-wide">{currentUserRole}</p>
+            <p className="text-slate-500 text-[10px] uppercase tracking-wide">{currentUserRole}</p>
           </div>
-          <Settings size={12} className="text-[#444] group-hover:text-[#666] transition-colors flex-shrink-0" />
+          <Settings size={12} className="text-slate-500 group-hover:text-slate-300 transition-colors flex-shrink-0" />
         </button>
 
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#555] hover:text-[#bbb] hover:bg-white/[0.06] transition-all"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition-all"
         >
           <LogOut size={15} />
           <span className="text-[13px] font-medium">{t.nav.signOut}</span>
@@ -114,7 +114,7 @@ export const Navigation: React.FC = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-nadayu-border z-30 flex items-center justify-between px-4">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 bg-nadayu-accent rounded-full flex items-center justify-center">
-            <span className="font-extrabold text-black text-xs">N</span>
+            <span className="font-extrabold text-white text-xs">N</span>
           </div>
           <span className="font-bold text-gray-900 text-sm">Nadayu28</span>
         </div>

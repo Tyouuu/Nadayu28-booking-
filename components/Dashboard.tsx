@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Booking, Announcement } from "../types";
 import { MOCK_ANNOUNCEMENTS, MOCK_BOOKINGS, USE_MOCK_DATA } from "../constants";
-import { fetchBookings, fetchAnnouncements } from "../services/dataService";
+import { fetchBookings, fetchAnnouncements, fetchPackages, Package } from "../services/dataService";
 import { Bell, Clock, ChevronRight, Activity, ArrowUpRight, Car, Dumbbell, MessageSquare, AlertTriangle, Zap, UserPlus } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigation } from "../contexts/NavigationContext";
@@ -13,11 +13,15 @@ export const Dashboard: React.FC = () => {
   const { t } = useI18n();
   const [activeBookings, setActiveBookings] = useState<Booking[]>(USE_MOCK_DATA ? MOCK_BOOKINGS.filter(b => b.status === "active") : []);
   const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>(USE_MOCK_DATA ? MOCK_ANNOUNCEMENTS.slice(0, 3) : []);
+  const [waitingPackages, setWaitingPackages] = useState<Package[]>([]);
 
   useEffect(() => {
     fetchBookings().then(data => setActiveBookings(data.filter(b => b.status === "active"))).catch(() => {});
     fetchAnnouncements().then(data => setRecentAnnouncements(data.slice(0, 3))).catch(() => {});
-  }, []);
+    if (userProfile?.unit) {
+      fetchPackages(userProfile.unit).then(pkgs => setWaitingPackages(pkgs.filter(p => p.status === 'waiting'))).catch(() => {});
+    }
+  }, [userProfile?.unit]);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t.dashboard.goodMorning : hour < 18 ? t.dashboard.goodAfternoon : t.dashboard.goodEvening;
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -139,17 +143,21 @@ export const Dashboard: React.FC = () => {
                 <Bell size={13} className="text-gray-900" />
                 <h3 className="text-gray-900 font-semibold text-sm">{t.dashboard.notifications}</h3>
               </div>
-              <span className="text-[10px] font-bold text-white bg-nadayu-panel px-2 py-0.5 rounded-full">2 {t.dashboard.newNotif}</span>
+              {waitingPackages.length > 0 && (
+                <span className="text-[10px] font-bold text-white bg-nadayu-panel px-2 py-0.5 rounded-full">{waitingPackages.length} {t.dashboard.newNotif}</span>
+              )}
             </div>
             <div>
-              {[
-                { text: "Gymnasium maintenance scheduled tomorrow at 9 AM", time: "2h ago" },
-                { text: "Package delivery confirmed at the main lobby", time: "5h ago" },
-              ].map((n, i) => (
-                <div key={i} className={"flex items-start gap-3 py-3" + (i !== 0 ? " border-t border-gray-50" : "")}>
+              {waitingPackages.length === 0 && (
+                <p className="text-gray-400 text-xs py-3">No new notifications.</p>
+              )}
+              {waitingPackages.map((pkg, i) => (
+                <div key={pkg.id} className={"flex items-start gap-3 py-3" + (i !== 0 ? " border-t border-gray-50" : "")}>
                   <span className="w-1.5 h-1.5 bg-nadayu-accent rounded-full mt-1.5 flex-shrink-0"></span>
-                  <p className="text-gray-600 text-xs flex-1 leading-relaxed">{n.text}</p>
-                  <span className="text-gray-300 text-[10px] flex-shrink-0 ml-3">{n.time}</span>
+                  <p className="text-gray-600 text-xs flex-1 leading-relaxed">
+                    Package waiting for pickup at the lobby{pkg.courier ? ` (${pkg.courier})` : ''}{pkg.description ? ` — ${pkg.description}` : ''}
+                  </p>
+                  <span className="text-gray-300 text-[10px] flex-shrink-0 ml-3">{new Date(pkg.receivedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>
                 </div>
               ))}
             </div>

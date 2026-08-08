@@ -14,9 +14,9 @@ interface ChatMessage {
 }
 
 export async function POST(request: Request) {
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: 'Groq API Key not configured.' }, { status: 500 });
+    return NextResponse.json({ error: 'OpenAI API Key not configured.' }, { status: 500 });
   }
 
   const { userMsg, history } = (await request.json()) as { userMsg: string; history: ChatMessage[] };
@@ -24,14 +24,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'userMsg is required.' }, { status: 400 });
   }
 
-  const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         ...(history ?? []),
@@ -41,11 +41,11 @@ export async function POST(request: Request) {
     }),
   });
 
-  if (!groqResponse.ok) {
-    return NextResponse.json({ error: `API error: ${groqResponse.status}` }, { status: 502 });
+  if (!openaiResponse.ok) {
+    return NextResponse.json({ error: `API error: ${openaiResponse.status}` }, { status: 502 });
   }
 
-  const data = await groqResponse.json();
+  const data = await openaiResponse.json();
   const text = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that request.";
   return NextResponse.json({ text });
 }

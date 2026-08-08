@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { UserPlus, ChevronLeft, Clock, Phone, FileText } from 'lucide-react';

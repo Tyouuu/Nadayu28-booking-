@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { FileText, Upload, Download, Trash2, FolderOpen } from 'lucide-react';
 import { fetchDocuments, uploadDocument, deleteDocument, getDocumentDownloadUrl, Document } from '../services/dataService';

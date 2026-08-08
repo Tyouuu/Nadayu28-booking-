@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
 import { User, Mail, Phone, MapPin, BarChart2, Clock, CheckCircle2, AlertTriangle, FileText, Bell, Briefcase, Calendar, Megaphone, Scale, ClipboardList, Edit2, Save } from 'lucide-react';
-import { useNavigation } from '../contexts/NavigationContext';
+import { useAppNavigate } from '../hooks/useAppNavigate';
 
 interface Approval {
   id: number;
@@ -13,7 +15,7 @@ interface Approval {
 }
 
 export const ManagementProfile: React.FC = () => {
-  const { setCurrentView } = useNavigation();
+  const setCurrentView = useAppNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'approvals' | 'settings'>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({

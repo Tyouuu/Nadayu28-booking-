@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+'use client';
+
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Locale, Translations } from '../i18n/types';
 import { en } from '../i18n/en';
 import { ms } from '../i18n/ms';
@@ -20,14 +22,13 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | null>(null);
 
-function getInitialLocale(): Locale {
-  const saved = localStorage.getItem('nadayu28_locale') as Locale | null;
-  if (saved && translations[saved]) return saved;
-  return 'en';
-}
-
 export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [locale, setLocaleState] = useState<Locale>(getInitialLocale);
+  const [locale, setLocaleState] = useState<Locale>('en');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('nadayu28_locale') as Locale | null;
+    if (saved && translations[saved]) setLocaleState(saved);
+  }, []);
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);

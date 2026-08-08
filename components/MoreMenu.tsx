@@ -1,5 +1,5 @@
 import React from 'react';
-import { FolderOpen, User, MessageSquare, Dumbbell, ChevronRight, Receipt } from 'lucide-react';
+import { FolderOpen, User, MessageSquare, Dumbbell, ChevronRight, Receipt, Package as PackageIcon } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -8,6 +8,7 @@ const MORE_ITEMS: Record<UserRole, { id: string; label: string; icon: React.Elem
   [UserRole.RESIDENT]: [
     { id: 'documents', label: 'Documents', icon: FolderOpen },
     { id: 'billing', label: 'Billing', icon: Receipt },
+    { id: 'packages', label: 'Packages', icon: PackageIcon },
     { id: 'amenities', label: 'Amenities', icon: Dumbbell },
     { id: 'community', label: 'Community Board', icon: MessageSquare },
     { id: 'account', label: 'My Account', icon: User },
@@ -15,15 +16,19 @@ const MORE_ITEMS: Record<UserRole, { id: string; label: string; icon: React.Elem
   [UserRole.TENANT]: [
     { id: 'documents', label: 'Documents', icon: FolderOpen },
     { id: 'billing', label: 'Billing', icon: Receipt },
+    { id: 'packages', label: 'Packages', icon: PackageIcon },
     { id: 'amenities', label: 'Amenities', icon: Dumbbell },
     { id: 'community', label: 'Community Board', icon: MessageSquare },
     { id: 'account', label: 'My Account', icon: User },
   ],
   [UserRole.SECURITY]: [
     { id: 'documents', label: 'Documents', icon: FolderOpen },
+    { id: 'packages', label: 'Packages', icon: PackageIcon },
     { id: 'sec-profile', label: 'Profile', icon: User },
   ],
-  [UserRole.MANAGEMENT]: [],
+  [UserRole.MANAGEMENT]: [
+    { id: 'packages', label: 'Packages', icon: PackageIcon },
+  ],
 };
 
 export const MoreMenu: React.FC = () => {

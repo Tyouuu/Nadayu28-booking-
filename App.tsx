@@ -18,6 +18,7 @@ import { Login } from './components/Login';
 import { CommunityBoard } from './components/CommunityBoard';
 import { MoreMenu } from './components/MoreMenu';
 import { Billing } from './components/Billing';
+import { Packages } from './components/Packages';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NavigationProvider, useNavigation } from './contexts/NavigationContext';
 import { I18nProvider } from './contexts/I18nContext';
@@ -59,6 +60,8 @@ const AppContent: React.FC = () => {
         return <MoreMenu />;
       case 'billing':
         return <Billing />;
+      case 'packages':
+        return <Packages />;
       default:
         return <Dashboard />;
     }

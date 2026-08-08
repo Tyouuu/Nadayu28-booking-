@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Car, UserPlus, AlertTriangle, Shield, Wrench, BarChart2, FolderOpen, User, MoreHorizontal, Receipt } from 'lucide-react';
+import { Home, Car, UserPlus, AlertTriangle, Shield, Wrench, BarChart2, FolderOpen, User, MoreHorizontal, Receipt, Package as PackageIcon } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '../contexts/NavigationContext';
@@ -21,6 +21,7 @@ const TABS_BY_ROLE: Record<UserRole, { direct: TabItem[]; more: TabItem[] }> = {
     more: [
       { id: 'documents', label: 'Documents', icon: FolderOpen },
       { id: 'billing', label: 'Billing', icon: Receipt },
+      { id: 'packages', label: 'Packages', icon: PackageIcon },
       { id: 'amenities', label: 'Amenities', icon: BarChart2 },
       { id: 'community', label: 'Community', icon: MoreHorizontal },
       { id: 'account', label: 'Account', icon: User },
@@ -36,6 +37,7 @@ const TABS_BY_ROLE: Record<UserRole, { direct: TabItem[]; more: TabItem[] }> = {
     more: [
       { id: 'documents', label: 'Documents', icon: FolderOpen },
       { id: 'billing', label: 'Billing', icon: Receipt },
+      { id: 'packages', label: 'Packages', icon: PackageIcon },
       { id: 'amenities', label: 'Amenities', icon: BarChart2 },
       { id: 'community', label: 'Community', icon: MoreHorizontal },
       { id: 'account', label: 'Account', icon: User },
@@ -50,6 +52,7 @@ const TABS_BY_ROLE: Record<UserRole, { direct: TabItem[]; more: TabItem[] }> = {
     ],
     more: [
       { id: 'documents', label: 'Documents', icon: FolderOpen },
+      { id: 'packages', label: 'Packages', icon: PackageIcon },
       { id: 'sec-profile', label: 'Profile', icon: User },
     ],
   },
@@ -61,7 +64,9 @@ const TABS_BY_ROLE: Record<UserRole, { direct: TabItem[]; more: TabItem[] }> = {
       { id: 'management', label: 'Admin', icon: BarChart2 },
       { id: 'mgmt-profile', label: 'Profile', icon: User },
     ],
-    more: [],
+    more: [
+      { id: 'packages', label: 'Packages', icon: PackageIcon },
+    ],
   },
 };
 

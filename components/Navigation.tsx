@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Home, Car, Dumbbell, MessageSquare, AlertTriangle,
-  Shield, BarChart2, LogOut, User, Settings, ChevronRight, Globe, UserPlus, Wrench, FolderOpen, Receipt
+  Shield, BarChart2, LogOut, User, Settings, ChevronRight, Globe, UserPlus, Wrench, FolderOpen, Receipt, Package as PackageIcon
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -19,6 +19,7 @@ export const Navigation: React.FC = () => {
     { id: 'dashboard',    label: t.nav.dashboard,      icon: Home,          roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY, UserRole.MANAGEMENT] },
     { id: 'documents',    label: 'Documents',          icon: FolderOpen,    roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY, UserRole.MANAGEMENT] },
     { id: 'billing',      label: 'Billing',            icon: Receipt,       roles: [UserRole.RESIDENT, UserRole.TENANT] },
+    { id: 'packages',     label: 'Packages',           icon: PackageIcon,   roles: [UserRole.RESIDENT, UserRole.TENANT, UserRole.SECURITY, UserRole.MANAGEMENT] },
     { id: 'parking',      label: t.nav.visitorParking,  icon: Car,           roles: [UserRole.RESIDENT, UserRole.TENANT] },
     { id: 'invite-visitor', label: 'Invite Visitor',    icon: UserPlus,      roles: [UserRole.RESIDENT, UserRole.TENANT] },
     { id: 'amenities',    label: t.nav.amenities,       icon: Dumbbell,      roles: [UserRole.RESIDENT, UserRole.TENANT] },

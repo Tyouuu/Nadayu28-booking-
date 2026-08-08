@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Receipt, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';

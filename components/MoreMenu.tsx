@@ -1,8 +1,10 @@
+'use client';
+
 import React from 'react';
 import { FolderOpen, User, MessageSquare, Dumbbell, ChevronRight, Receipt, Package as PackageIcon } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigation } from '../contexts/NavigationContext';
+import { useAppNavigate } from '../hooks/useAppNavigate';
 
 const MORE_ITEMS: Record<UserRole, { id: string; label: string; icon: React.ElementType }[]> = {
   [UserRole.RESIDENT]: [
@@ -33,7 +35,7 @@ const MORE_ITEMS: Record<UserRole, { id: string; label: string; icon: React.Elem
 
 export const MoreMenu: React.FC = () => {
   const { currentUserRole } = useAuth();
-  const { navigate } = useNavigation();
+  const navigate = useAppNavigate();
   const items = MORE_ITEMS[currentUserRole] || [];
 
   return (

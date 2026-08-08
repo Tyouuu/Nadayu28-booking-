@@ -1,8 +1,11 @@
+'use client';
+
 import React from 'react';
 import { Home, Car, UserPlus, AlertTriangle, Shield, Wrench, BarChart2, FolderOpen, User, MoreHorizontal, Receipt, Package as PackageIcon } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigation } from '../contexts/NavigationContext';
+import { usePathname } from 'next/navigation';
+import { useAppNavigate } from '../hooks/useAppNavigate';
 
 interface TabItem {
   id: string;
@@ -72,7 +75,9 @@ const TABS_BY_ROLE: Record<UserRole, { direct: TabItem[]; more: TabItem[] }> = {
 
 export const MobileTabBar: React.FC = () => {
   const { currentUserRole } = useAuth();
-  const { currentView, navigate } = useNavigation();
+  const pathname = usePathname();
+  const currentView = pathname.slice(1);
+  const navigate = useAppNavigate();
   const config = TABS_BY_ROLE[currentUserRole];
   if (!config) return null;
 

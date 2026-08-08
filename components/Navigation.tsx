@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import {
   Home, Car, Dumbbell, MessageSquare, AlertTriangle,
@@ -5,14 +7,17 @@ import {
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigation } from '../contexts/NavigationContext';
+import { usePathname } from 'next/navigation';
+import { useAppNavigate } from '../hooks/useAppNavigate';
 import { useI18n, LOCALE_LABELS } from '../contexts/I18nContext';
 import { Locale } from '../i18n/types';
 import { MobileTabBar } from './MobileTabBar';
 
 export const Navigation: React.FC = () => {
   const { currentUserRole, logout } = useAuth();
-  const { currentView, navigate } = useNavigation();
+  const pathname = usePathname();
+  const currentView = pathname.slice(1);
+  const navigate = useAppNavigate();
   const { locale, t, setLocale } = useI18n();
 
   const navItems = [

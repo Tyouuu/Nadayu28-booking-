@@ -1,8 +1,8 @@
 import { Booking, FacilityType, Announcement, Violation, Vehicle, Report, User, UserRole, CommunityPost } from './types';
 
 // Set to true to use mock data instead of Supabase.
-// In production, set VITE_USE_MOCK_DATA=false in .env
-export const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true';
+// In production, set NEXT_PUBLIC_USE_MOCK_DATA=false in .env
+export const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
 export const FACILITIES = [
   { id: FacilityType.PARKING, name: 'Visitor Parking', icon: 'Car', quota: 'Unlimited' },

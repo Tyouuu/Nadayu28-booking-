@@ -32,7 +32,7 @@ export const SmartAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const apiKey = import.meta.env.VITE_GROQ_API_KEY || '';
+      const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || '';
       if (!apiKey) throw new Error("Groq API Key not configured.");
 
       const systemPrompt = `You are the AI Concierge for Nadayu28, a residential complex in Malaysia.

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Heart, MessageCircle, CheckCircle2, Clock, Bell, Search, Plus, Share2, Bookmark } from 'lucide-react';
 import { notificationService } from '../services/notificationService';

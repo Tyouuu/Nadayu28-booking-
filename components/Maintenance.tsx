@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Wrench, ChevronDown, ChevronUp } from 'lucide-react';
 import { fetchReports, updateReport } from '../services/dataService';

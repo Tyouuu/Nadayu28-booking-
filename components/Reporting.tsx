@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Camera, AlertTriangle, CheckCircle2, ChevronRight, X, Zap, Wrench, AlertCircle, Plus } from 'lucide-react';
 import { createReport } from '../services/dataService';

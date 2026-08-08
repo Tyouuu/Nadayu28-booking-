@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Car, Plus, Trash2, History, AlertTriangle, FileText, Settings, Camera, Save, Lock, Users, Shield, Eye, EyeOff, Edit2, LogOut, Home, CheckCircle2, Calendar } from 'lucide-react';
-import { MOCK_BOOKINGS, MOCK_VEHICLES } from '../constants';
-import { fetchBookings, fetchVehicles, fetchReports } from '../services/dataService';
-import { Vehicle, Booking, Report } from '../types';
+import { fetchBookings, fetchVehicles, addVehicle, deleteVehicle, fetchReports, updateProfile } from '../services/dataService';
+import { Vehicle, Booking, Report, UserRole } from '../types';
 import { addVehicleSchema, addTenantSchema, validate } from '../services/validation';
 import { useI18n } from '../contexts/I18nContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -18,19 +17,22 @@ interface Tenant {
   joinDate: string;
 }
 
-type AccountRole = 'owner' | 'tenant';
-
 export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'details' | 'vehicles' | 'security' | 'history' | 'tenants'>('details');
-  const [accountRole, setAccountRole] = useState<AccountRole>('owner'); // Change to test different roles
-  const [vehicles, setVehicles] = useState<Vehicle[]>(MOCK_VEHICLES);
-  const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);
+  const { userProfile, currentUserRole, logout } = useAuth();
+  const accountRole = currentUserRole === UserRole.TENANT ? 'tenant' : 'owner';
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isAddingVehicleLoading, setIsAddingVehicleLoading] = useState(false);
+  const [isDeletingVehicleId, setIsDeletingVehicleId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBookings().then(setBookings).catch(() => {});
   }, []);
+  useEffect(() => {
+    if (userProfile?.id) fetchVehicles(userProfile.id).then(setVehicles).catch(() => {});
+  }, [userProfile?.id]);
   const [reports, setReports] = useState<Report[]>([]);
-  const { userProfile } = useAuth();
   useEffect(() => {
     fetchReports(userProfile?.unit).then(setReports).catch(() => {});
   }, [userProfile?.unit]);
@@ -38,34 +40,80 @@ export const Profile: React.FC = () => {
   const [isAddingVehicle, setIsAddingVehicle] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [tenants, setTenants] = useState<Tenant[]>([
-    { id: '1', name: 'John Smith', email: 'john@example.com', unit: 'A-12-05', status: 'active', joinDate: '2024-01-15' },
-    { id: '2', name: 'Sarah Johnson', email: 'sarah@example.com', unit: 'A-12-06', status: 'active', joinDate: '2024-03-20' },
-  ]);
+  const [profileName, setProfileName] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  useEffect(() => {
+    setProfileName(userProfile?.full_name || '');
+    setProfilePhone(userProfile?.phone || '');
+  }, [userProfile?.full_name, userProfile?.phone]);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMsg, setPasswordMsg] = useState<string | null>(null);
+  const [isSavingPassword, setIsSavingPassword] = useState(false);
+  const [tenants, setTenants] = useState<Tenant[]>([]);
   const [newTenant, setNewTenant] = useState({ name: '', email: '', unit: '' });
   const [isAddingTenant, setIsAddingTenant] = useState(false);
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { t } = useI18n();
 
-  const handleAddVehicle = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userProfile?.id) return;
+    setIsSavingProfile(true);
+    try {
+      await updateProfile(userProfile.id, { full_name: profileName, phone: profilePhone });
+      setIsEditingProfile(false);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    setPasswordMsg(null);
+    if (newPassword.length < 6) { setPasswordMsg('Password must be at least 6 characters.'); return; }
+    if (newPassword !== confirmPassword) { setPasswordMsg('Passwords do not match.'); return; }
+    setIsSavingPassword(true);
+    try {
+      const { supabase } = await import('../services/supabase');
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      setPasswordMsg(error ? 'Failed to update password.' : 'Password updated.');
+      if (!error) { setNewPassword(''); setConfirmPassword(''); }
+    } finally {
+      setIsSavingPassword(false);
+    }
+  };
+
+  const handleAddVehicle = async (e: React.FormEvent) => {
     e.preventDefault();
     setFieldErrors({});
     const result = validate(addVehicleSchema, newVehicle);
     if (!result.success) { setFieldErrors(result.errors); return; }
-    const vehicle: Vehicle = {
-      id: Date.now().toString(),
-      plateNumber: newVehicle.plate.toUpperCase(),
-      model: newVehicle.model,
-      isPrimary: vehicles.length === 0
-    };
-    setVehicles([...vehicles, vehicle]);
-    setNewVehicle({ plate: '', model: '' });
-    setIsAddingVehicle(false);
+    if (!userProfile?.id) return;
+    setIsAddingVehicleLoading(true);
+    try {
+      const vehicle = await addVehicle(userProfile.id, {
+        plate: newVehicle.plate.toUpperCase(),
+        model: newVehicle.model,
+        isPrimary: vehicles.length === 0,
+      });
+      setVehicles([...vehicles, vehicle]);
+      setNewVehicle({ plate: '', model: '' });
+      setIsAddingVehicle(false);
+    } finally {
+      setIsAddingVehicleLoading(false);
+    }
   };
 
-  const handleDeleteVehicle = (id: string) => {
-    setVehicles(vehicles.filter(v => v.id !== id));
+  const handleDeleteVehicle = async (id: string) => {
+    setIsDeletingVehicleId(id);
+    try {
+      await deleteVehicle(id);
+      setVehicles(vehicles.filter(v => v.id !== id));
+    } finally {
+      setIsDeletingVehicleId(null);
+    }
   };
 
   const handleAddTenant = (e: React.FormEvent) => {
@@ -115,18 +163,18 @@ export const Profile: React.FC = () => {
 
             {/* Profile Info */}
             <div className="text-center">
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">Alex Tan</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">{userProfile?.full_name || 'Resident'}</h2>
               <div className="flex items-center justify-center gap-2 mb-3">
                 <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                  accountRole === 'owner' 
-                    ? 'bg-nadayu-panel text-white' 
+                  accountRole === 'owner'
+                    ? 'bg-nadayu-panel text-white'
                     : 'bg-nadayu-cream text-gray-600'
                 }`}>
                   {accountRole === 'owner' ? <Shield className="inline mr-1" size={12} /> : <Home className="inline mr-1" size={12} />}
                   {accountRole === 'owner' ? 'Owner' : 'Tenant'}
                 </div>
               </div>
-              <p className="text-nadayu-muted text-sm font-medium">Unit A-12-05</p>
+              <p className="text-nadayu-muted text-sm font-medium">{userProfile?.unit ? `Unit ${userProfile.unit}` : ''}</p>
             </div>
 
             {/* Menu Items */}
@@ -232,7 +280,7 @@ export const Profile: React.FC = () => {
 
             {/* Logout Button */}
             <div className="pt-4 border-t border-nadayu-border">
-              <button className="w-full px-5 py-4 rounded-xl text-sm font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 border border-red-500/20">
+              <button onClick={logout} className="w-full px-5 py-4 rounded-xl text-sm font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 border border-red-500/20">
                 <LogOut size={18} /> Sign Out
               </button>
             </div>
@@ -264,37 +312,27 @@ export const Profile: React.FC = () => {
             <div className="px-6 pb-6">
 
             <div className="border-t border-nadayu-border pt-8">
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-nadayu-muted uppercase tracking-wider">First Name</label>
-                    <input 
-                      type="text" 
-                      defaultValue="Alex" 
-                      disabled={!isEditingProfile}
-                      className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors disabled:opacity-60" 
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-nadayu-muted uppercase tracking-wider">Last Name</label>
-                    <input 
-                      type="text" 
-                      defaultValue="Tan" 
-                      disabled={!isEditingProfile}
-                      className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors disabled:opacity-60" 
-                    />
-                  </div>
+              <form className="space-y-6" onSubmit={handleSaveProfile}>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-nadayu-muted uppercase tracking-wider">Full Name</label>
+                  <input
+                    type="text"
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    disabled={!isEditingProfile}
+                    className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors disabled:opacity-60"
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-nadayu-muted uppercase tracking-wider">{t.profile.emailAddress}</label>
                   <div className="relative">
                     <Mail className="absolute left-5 top-4 text-nadayu-muted" size={20} />
-                    <input 
-                      type="email" 
-                      defaultValue="alex.tan@example.com" 
+                    <input
+                      type="email"
+                      value={userProfile?.email || ''}
                       disabled={true}
-                      className="w-full pl-12 pr-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors disabled:opacity-60" 
+                      className="w-full pl-12 pr-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors disabled:opacity-60"
                     />
                   </div>
                   <p className="text-xs text-nadayu-muted mt-2">Contact admin to change email address</p>
@@ -304,11 +342,13 @@ export const Profile: React.FC = () => {
                   <label className="text-xs font-bold text-nadayu-muted uppercase tracking-wider">Phone Number</label>
                   <div className="relative">
                     <Phone className="absolute left-5 top-4 text-nadayu-muted" size={20} />
-                    <input 
-                      type="tel" 
-                      defaultValue="+60 12-345 6789" 
+                    <input
+                      type="tel"
+                      value={profilePhone}
+                      onChange={(e) => setProfilePhone(e.target.value)}
                       disabled={!isEditingProfile}
-                      className="w-full pl-12 pr-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors disabled:opacity-60" 
+                      placeholder="+60 12-345 6789"
+                      className="w-full pl-12 pr-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors disabled:opacity-60"
                     />
                   </div>
                 </div>
@@ -317,11 +357,11 @@ export const Profile: React.FC = () => {
                   <label className="text-xs font-bold text-nadayu-muted uppercase tracking-wider">Unit Number</label>
                   <div className="relative">
                     <Home className="absolute left-5 top-4 text-nadayu-muted" size={20} />
-                    <input 
-                      type="text" 
-                      defaultValue="A-12-05" 
+                    <input
+                      type="text"
+                      value={userProfile?.unit || ''}
                       disabled={true}
-                      className="w-full pl-12 pr-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors disabled:opacity-60" 
+                      className="w-full pl-12 pr-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors disabled:opacity-60"
                     />
                   </div>
                 </div>
@@ -338,18 +378,19 @@ export const Profile: React.FC = () => {
 
                 {isEditingProfile && (
                   <div className="flex justify-end gap-3 pt-4 border-t border-nadayu-border">
-                    <button 
+                    <button
                       type="button"
-                      onClick={() => setIsEditingProfile(false)}
+                      onClick={() => { setIsEditingProfile(false); setProfileName(userProfile?.full_name || ''); setProfilePhone(userProfile?.phone || ''); }}
                       className="px-6 py-3 rounded-xl font-bold text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream transition-colors border border-nadayu-border"
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       type="submit"
-                      className="px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all shadow-lg flex items-center gap-2"
+                      disabled={isSavingProfile}
+                      className="px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
                     >
-                      <CheckCircle2 size={18} /> Save Changes
+                      <CheckCircle2 size={18} /> {isSavingProfile ? 'Saving...' : 'Save Changes'}
                     </button>
                   </div>
                 )}
@@ -423,11 +464,12 @@ export const Profile: React.FC = () => {
                     >
                       Cancel
                     </button>
-                    <button 
+                    <button
                       type="submit"
-                      className="px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all shadow-lg flex items-center gap-2"
+                      disabled={isAddingVehicleLoading}
+                      className="px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
                     >
-                      <CheckCircle2 size={18} /> Register
+                      <CheckCircle2 size={18} /> {isAddingVehicleLoading ? 'Registering...' : 'Register'}
                     </button>
                   </div>
                 </form>
@@ -453,9 +495,10 @@ export const Profile: React.FC = () => {
                           <p className="text-sm text-nadayu-muted font-medium">{vehicle.model || 'Unknown Model'}</p>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleDeleteVehicle(vehicle.id)}
-                        className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all border border-transparent hover:border-red-500/30"
+                        disabled={isDeletingVehicleId === vehicle.id}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all border border-transparent hover:border-red-500/30 disabled:opacity-50"
                       >
                         <Trash2 size={20} />
                       </button>
@@ -640,12 +683,14 @@ export const Profile: React.FC = () => {
                 </h4>
                 <div className="space-y-4 bg-nadayu-cream p-6 rounded-2xl border border-nadayu-border">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-nadayu-muted uppercase">Current Password</label>
+                    <label className="text-xs font-bold text-nadayu-muted uppercase">New Password</label>
                     <div className="relative">
-                      <input 
-                        type={showPassword ? "text" : "password"} 
-                        placeholder="Enter current password"
-                        className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors"
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Enter new password"
+                        className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors"
                       />
                       <button
                         type="button"
@@ -657,41 +702,23 @@ export const Profile: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-nadayu-muted uppercase">New Password</label>
-                    <input 
-                      type={showPassword ? "text" : "password"} 
-                      placeholder="Enter new password"
-                      className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors"
-                    />
-                  </div>
-                  <div className="space-y-2">
                     <label className="text-xs font-bold text-nadayu-muted uppercase">Confirm Password</label>
-                    <input 
-                      type={showPassword ? "text" : "password"} 
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm new password"
-                      className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none outline-none font-medium transition-colors"
+                      className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors"
                     />
                   </div>
-                  <button className="w-full px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2">
-                    <CheckCircle2 size={18} /> Update Password
+                  {passwordMsg && <p className={`text-sm font-medium ${passwordMsg === 'Password updated.' ? 'text-nadayu-success' : 'text-red-500'}`}>{passwordMsg}</p>}
+                  <button
+                    onClick={handleUpdatePassword}
+                    disabled={isSavingPassword || !newPassword || !confirmPassword}
+                    className="w-full px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <CheckCircle2 size={18} /> {isSavingPassword ? 'Updating...' : 'Update Password'}
                   </button>
-                </div>
-              </div>
-
-              {/* Two-Factor Auth */}
-              <div className="space-y-4">
-                <h4 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                  <Shield size={18} className={accountRole === 'owner' ? 'text-nadayu-panel' : 'text-nadayu-panel'} />
-                  Two-Factor Authentication
-                </h4>
-                <div className="bg-nadayu-cream p-6 rounded-2xl border border-nadayu-border flex justify-between items-center">
-                  <div>
-                    <p className="text-gray-900 font-bold">Secure your account</p>
-                    <p className="text-sm text-nadayu-muted mt-1">Enable 2FA for added security</p>
-                  </div>
-                  <div className="w-12 h-7 bg-nadayu-cream rounded-full border border-nadayu-border cursor-pointer hover:bg-gray-200 transition-colors flex items-center px-1">
-                    <div className="w-5 h-5 bg-slate-400 rounded-full"></div>
-                  </div>
                 </div>
               </div>
 

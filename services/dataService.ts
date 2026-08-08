@@ -102,6 +102,16 @@ export async function fetchAnnouncements(): Promise<Announcement[]> {
   return (data ?? []).map(toAnnouncement);
 }
 
+export async function createAnnouncement(params: { title: string; content: string; priority: Announcement['priority'] }): Promise<void> {
+  const { error } = await supabase.from('announcements').insert({
+    title: params.title,
+    content: params.content,
+    priority: params.priority,
+    date: new Date().toISOString().slice(0, 10),
+  });
+  if (error) throw error;
+}
+
 export async function fetchBookings(unit?: string): Promise<Booking[]> {
   let query = supabase.from('bookings').select('*').order('date', { ascending: false });
   if (unit) query = query.eq('resident_unit', unit);
@@ -134,12 +144,84 @@ export async function fetchVehicles(userId: string): Promise<Vehicle[]> {
   return (data ?? []).map(toVehicle);
 }
 
+export async function addVehicle(userId: string, params: { plate: string; model: string; isPrimary: boolean }): Promise<Vehicle> {
+  const { data, error } = await supabase
+    .from('vehicles')
+    .insert({ user_id: userId, plate: params.plate, model: params.model, is_default: params.isPrimary })
+    .select()
+    .single();
+  if (error) throw error;
+  return toVehicle(data);
+}
+
+export async function deleteVehicle(id: string): Promise<void> {
+  const { error } = await supabase.from('vehicles').delete().eq('id', id);
+  if (error) throw error;
+}
+
 export async function fetchReports(unit?: string): Promise<Report[]> {
   let query = supabase.from('reports').select('*').order('date', { ascending: false });
   if (unit) query = query.eq('resident_unit', unit);
   const { data, error } = await query;
   if (error) throw error;
   return (data ?? []).map(toReport);
+}
+
+export interface DayTraffic {
+  name: string;
+  visitors: number;
+  violations: number;
+}
+
+export function computeVisitorTraffic(visitors: Visitor[], violations: Violation[]): DayTraffic[] {
+  const days: { name: string; key: string }[] = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    days.push({ name: d.toLocaleDateString('en-US', { weekday: 'short' }), key: d.toISOString().slice(0, 10) });
+  }
+
+  return days.map(day => ({
+    name: day.name,
+    visitors: visitors.filter(v => (v.actualArrival ?? v.expectedArrival)?.slice(0, 10) === day.key).length,
+    violations: violations.filter(v => v.date?.slice(0, 10) === day.key).length,
+  }));
+}
+
+const FACILITY_LABELS: Record<string, string> = {
+  PARKING: 'Parking',
+  GYM: 'Gym',
+  BBQ: 'BBQ',
+  PARTY_ROOM: 'Party',
+  TENNIS: 'Tennis',
+  SWIMMING_POOL: 'Pool',
+  SQUASH_COURT: 'Squash',
+  BASKETBALL_COURT: 'Basketball',
+};
+
+export interface FacilityUsage {
+  name: string;
+  hours: number;
+}
+
+export function computeFacilityUsage(bookings: Booking[]): FacilityUsage[] {
+  const byFacility = new Map<string, number>();
+  for (const b of bookings) {
+    if (b.facilityType === FacilityType.PARKING) continue;
+    byFacility.set(b.facilityType, (byFacility.get(b.facilityType) ?? 0) + b.durationHours);
+  }
+  return Array.from(byFacility.entries())
+    .map(([facilityType, hours]) => ({ name: FACILITY_LABELS[facilityType] ?? facilityType, hours }))
+    .sort((a, b) => b.hours - a.hours);
+}
+
+export async function updateProfile(userId: string, params: { full_name: string; phone: string }): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ full_name: params.full_name, phone: params.phone, updated_at: new Date().toISOString() })
+    .eq('id', userId);
+  if (error) throw error;
 }
 
 export async function fetchUsers(): Promise<User[]> {

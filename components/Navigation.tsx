@@ -14,7 +14,7 @@ import { Locale } from '../i18n/types';
 import { MobileTabBar } from './MobileTabBar';
 
 export const Navigation: React.FC = () => {
-  const { currentUserRole, logout } = useAuth();
+  const { currentUserRole, userProfile, logout } = useAuth();
   const pathname = usePathname();
   const currentView = pathname.slice(1);
   const navigate = useAppNavigate();
@@ -99,7 +99,7 @@ export const Navigation: React.FC = () => {
             <User size={13} className="text-slate-400" />
           </div>
           <div className="flex-1 overflow-hidden text-left">
-            <p className="text-white text-xs font-semibold truncate leading-tight">Unit A-12-05</p>
+            <p className="text-white text-xs font-semibold truncate leading-tight">{userProfile?.full_name || (userProfile?.unit ? `Unit ${userProfile.unit}` : 'Account')}</p>
             <p className="text-slate-500 text-[10px] uppercase tracking-wide">{currentUserRole}</p>
           </div>
           <Settings size={12} className="text-slate-500 group-hover:text-slate-300 transition-colors flex-shrink-0" />

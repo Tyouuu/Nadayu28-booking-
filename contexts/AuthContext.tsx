@@ -5,9 +5,12 @@ import { UserRole } from '../types';
 import { supabase } from '../services/supabase';
 
 interface UserProfile {
+  id: string;
   full_name: string;
   unit: string;
   role: string;
+  phone: string | null;
+  email: string | null;
 }
 
 interface AuthContextType {
@@ -30,13 +33,13 @@ function mapRole(roleStr?: string): UserRole {
   }
 }
 
-async function fetchProfile(userId: string): Promise<UserProfile | null> {
+async function fetchProfile(userId: string, email: string | null): Promise<UserProfile | null> {
   const { data } = await supabase
     .from('profiles')
-    .select('full_name, unit, role')
+    .select('id, full_name, unit, role, phone')
     .eq('id', userId)
     .single();
-  return data;
+  return data ? { ...data, email } : null;
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -48,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
+        const profile = await fetchProfile(session.user.id, session.user.email ?? null);
         const role = mapRole(profile?.role);
         setCurrentUserRole(role);
         setUserProfile(profile);
@@ -64,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrentUserRole(UserRole.RESIDENT);
       }
       if (event === 'SIGNED_IN' && session?.user) {
-        const profile = await fetchProfile(session.user.id);
+        const profile = await fetchProfile(session.user.id, session.user.email ?? null);
         const role = mapRole(profile?.role);
         setCurrentUserRole(role);
         setUserProfile(profile);
@@ -78,7 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (role: UserRole) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
-      const profile = await fetchProfile(session.user.id);
+      const profile = await fetchProfile(session.user.id, session.user.email ?? null);
       setUserProfile(profile);
     }
     setCurrentUserRole(role);

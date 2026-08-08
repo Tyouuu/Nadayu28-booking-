@@ -1,109 +1,43 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Heart, MessageCircle, CheckCircle2, Clock, Bell, Search, Plus, Share2, Bookmark } from 'lucide-react';
-import { notificationService } from '../services/notificationService';
-
-interface NotificationCard {
-  id: string;
-  publisher: string;
-  publisherType: 'property-center' | 'management' | 'security' | 'resident';
-  postTime: Date;
-  title: string;
-  summary: string;
-  category: 'property-notice' | 'event' | 'reminder' | 'announcement';
-  isUrgent: boolean;
-  attachments?: { name: string; url: string }[];
-  likes: number;
-  comments: number;
-  hasLiked: boolean;
-  hasRead: boolean;
-  readCount?: number;
-  totalResidents?: number;
-}
+import React, { useState, useEffect } from 'react';
+import { Bell, Search, Plus, Clock, X } from 'lucide-react';
+import { fetchAnnouncements, createAnnouncement } from '../services/dataService';
+import { useAuth } from '../contexts/AuthContext';
+import { UserRole, Announcement } from '../types';
 
 export const CommunityBoard: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'property-notice' | 'event' | 'reminder' | 'announcement'>('all');
-  const [selectedTimeFilter, setSelectedTimeFilter] = useState<'7days' | '30days' | 'all'>('30days');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState<NotificationCard[]>([
-    {
-      id: 'notif-1',
-      publisher: 'Property Center',
-      publisherType: 'property-center',
-      postTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      title: '[Property Notice] Water Shutdown Notice for December 15',
-      summary: 'Water supply will be suspended from 8:00 AM to 6:00 PM on December 15 for Buildings 1-3. Please store water in advance. Emergency hotline: 555-0123',
-      category: 'property-notice',
-      isUrgent: true,
-      attachments: [{ name: 'View Details', url: '#' }, { name: 'Area Map', url: '#' }],
-      likes: 24,
-      comments: 8,
-      hasLiked: false,
-      hasRead: true,
-      readCount: 342,
-      totalResidents: 485,
-    },
-    {
-      id: 'notif-2',
-      publisher: 'Community Events',
-      publisherType: 'management',
-      postTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      title: 'Christmas Gala - December 22 @ 6:00 PM | Community Hall',
-      summary: 'Join us for our annual Christmas celebration! Live music, festive dinner, and family activities. Sign up at the Community Center or reply with "interested" to reserve your spot.',
-      category: 'event',
-      isUrgent: false,
-      attachments: [{ name: 'Event Poster', url: '#' }, { name: 'Menu Preview', url: '#' }],
-      likes: 156,
-      comments: 32,
-      hasLiked: false,
-      hasRead: false,
-      readCount: 198,
-      totalResidents: 485,
-    },
-    {
-      id: 'notif-3',
-      publisher: 'Security Department',
-      publisherType: 'security',
-      postTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      title: '[Important Reminder] Gate Access Update',
-      summary: 'New visitor access control system is now active. Please update your family member access credentials in the mobile app. Questions? Contact security@community.local',
-      category: 'reminder',
-      isUrgent: false,
-      attachments: [{ name: 'How-to Guide', url: '#' }],
-      likes: 45,
-      comments: 12,
-      hasLiked: false,
-      hasRead: false,
-      readCount: 156,
-      totalResidents: 485,
-    },
-    {
-      id: 'notif-4',
-      publisher: 'Management Office',
-      publisherType: 'property-center',
-      postTime: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-      title: 'Annual Property Tax Assessment Released',
-      summary: 'Your 2025 property assessment is now available in the resident portal. Review estimated values and submit disputes by December 25 if needed.',
-      category: 'announcement',
-      isUrgent: false,
-      attachments: [{ name: 'Assessment Document', url: '#' }],
-      likes: 18,
-      comments: 5,
-      hasLiked: false,
-      hasRead: true,
-      readCount: 321,
-      totalResidents: 485,
-    },
-  ]);
+  const { currentUserRole } = useAuth();
+  const isManagement = currentUserRole === UserRole.MANAGEMENT;
 
-  const categoryTabs: { id: typeof selectedCategory; label: string; icon: string }[] = [
-    { id: 'all', label: 'All Updates', icon: '📢' },
-    { id: 'property-notice', label: 'Property Notices', icon: '🏢' },
-    { id: 'event', label: 'Events', icon: '🎉' },
-    { id: 'reminder', label: 'Reminders', icon: '⏰' },
-    { id: 'announcement', label: 'Announcements', icon: '📣' },
-  ];
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [selectedTimeFilter, setSelectedTimeFilter] = useState<'7days' | '30days' | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const load = () => { fetchAnnouncements().then(setAnnouncements).catch(() => {}); };
+  useEffect(() => { load(); }, []);
+
+  const [isPosting, setIsPosting] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newContent, setNewContent] = useState('');
+  const [newPriority, setNewPriority] = useState<Announcement['priority']>('medium');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handlePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim() || !newContent.trim()) return;
+    setIsSubmitting(true);
+    try {
+      await createAnnouncement({ title: newTitle.trim(), content: newContent.trim(), priority: newPriority });
+      setNewTitle('');
+      setNewContent('');
+      setNewPriority('medium');
+      setIsPosting(false);
+      load();
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const timeFilters: { id: typeof selectedTimeFilter; label: string }[] = [
     { id: '7days', label: 'Last 7 Days' },
@@ -111,85 +45,30 @@ export const CommunityBoard: React.FC = () => {
     { id: 'all', label: 'All Time' },
   ];
 
-  const getPublisherColor = (type: string) => {
-    const colors: { [key: string]: { bg: string; text: string; border: string } } = {
-      'property-center': { bg: 'bg-nadayu-cream', text: 'text-gray-700', border: 'border-nadayu-border' },
-      'management': { bg: 'bg-nadayu-cream', text: 'text-gray-700', border: 'border-nadayu-border' },
-      'security': { bg: 'bg-nadayu-panel/10', text: 'text-nadayu-panel', border: 'border-nadayu-panel/20' },
-      'resident': { bg: 'bg-nadayu-cream', text: 'text-gray-600', border: 'border-nadayu-border' },
-    };
-    return colors[type] || colors['resident'];
-  };
-
-  const getPublisherEmoji = (type: string) => {
-    const emojis: { [key: string]: string } = {
-      'property-center': '🏢',
-      'management': '👨‍💼',
-      'security': '🛡️',
-      'resident': '👤',
-    };
-    return emojis[type] || '👤';
-  };
-
-  const formatTimeAgo = (date: Date): string => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours}h ago`;
+  const formatTimeAgo = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    const diffDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   };
 
-  const filteredNotifications = notifications.filter(notif => {
-    const categoryMatch = selectedCategory === 'all' || notif.category === selectedCategory;
-    const timeMatch = (() => {
-      const daysAgo = Math.floor((Date.now() - notif.postTime.getTime()) / (1000 * 60 * 60 * 24));
-      if (selectedTimeFilter === '7days') return daysAgo <= 7;
-      if (selectedTimeFilter === '30days') return daysAgo <= 30;
-      return true;
-    })();
-    const searchMatch = notif.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                       notif.summary.toLowerCase().includes(searchQuery.toLowerCase());
-    return categoryMatch && timeMatch && searchMatch;
+  const filtered = announcements.filter(a => {
+    const daysAgo = Math.floor((Date.now() - new Date(a.date).getTime()) / (1000 * 60 * 60 * 24));
+    const timeMatch = selectedTimeFilter === 'all' ? true : selectedTimeFilter === '7days' ? daysAgo <= 7 : daysAgo <= 30;
+    const searchMatch = a.title.toLowerCase().includes(searchQuery.toLowerCase()) || a.content.toLowerCase().includes(searchQuery.toLowerCase());
+    return timeMatch && searchMatch;
   });
 
-  const handleLike = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === id
-          ? { ...notif, hasLiked: !notif.hasLiked, likes: notif.hasLiked ? notif.likes - 1 : notif.likes + 1 }
-          : notif
-      )
-    );
-  };
-
-  const handleReadConfirm = (id: string) => {
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === id
-          ? { ...notif, hasRead: true }
-          : notif
-      )
-    );
-  };
-
-  const unreadCount = notifications.filter(n => !n.hasRead).length;
+  const priorityStyle = (priority: Announcement['priority']) =>
+    priority === 'high' ? 'bg-red-50 border-red-200 text-red-600'
+      : priority === 'medium' ? 'bg-nadayu-cream border-nadayu-border text-gray-700'
+      : 'bg-nadayu-cream border-nadayu-border text-nadayu-muted';
 
   return (
     <div className="min-h-screen bg-nadayu-bg">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
-      </div>
-
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
-        
-        {/* HEADER */}
         <div className="mb-5">
           <div className="bg-nadayu-panel rounded-2xl p-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -198,24 +77,67 @@ export const CommunityBoard: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white mb-1">Community Board</h1>
-                <p className="text-nadayu-muted">Stay informed with community updates, events, and announcements</p>
+                <p className="text-nadayu-muted">Stay informed with community updates and announcements</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              {unreadCount > 0 && (
-                <div className="px-4 py-2 bg-white/10 rounded-full flex items-center gap-2">
-                  <div className="w-2 h-2 bg-nadayu-accent rounded-full animate-pulse"></div>
-                  <span className="text-sm font-bold text-white">{unreadCount} unread</span>
-                </div>
-              )}
-              <button className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-white font-bold rounded-2xl transition-all flex items-center gap-2">
+            {isManagement && (
+              <button
+                onClick={() => setIsPosting(!isPosting)}
+                className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-white font-bold rounded-2xl transition-all flex items-center gap-2"
+              >
                 <Plus size={20} /> Post Update
               </button>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* SEARCH BAR */}
+        {isPosting && (
+          <div className="bg-white p-6 rounded-2xl shadow-xl border border-nadayu-border mb-5">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="font-bold text-gray-900 text-lg">New Announcement</h4>
+              <button onClick={() => setIsPosting(false)} className="text-nadayu-muted hover:text-gray-900"><X size={20} /></button>
+            </div>
+            <form onSubmit={handlePost} className="space-y-4">
+              <input
+                type="text"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Title"
+                className="w-full px-5 py-3 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium"
+              />
+              <textarea
+                value={newContent}
+                onChange={(e) => setNewContent(e.target.value)}
+                placeholder="Details"
+                rows={3}
+                className="w-full px-5 py-3 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium"
+              />
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold text-nadayu-muted uppercase">Priority</span>
+                {(['low', 'medium', 'high'] as const).map(p => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setNewPriority(p)}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold capitalize transition-all ${newPriority === p ? 'bg-nadayu-panel text-white' : 'bg-nadayu-cream text-gray-600'}`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !newTitle.trim() || !newContent.trim()}
+                  className="px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Posting...' : 'Post'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
         <div className="relative mb-5">
           <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-nadayu-muted" />
           <input
@@ -227,25 +149,6 @@ export const CommunityBoard: React.FC = () => {
           />
         </div>
 
-        {/* CATEGORY TABS */}
-        <div className="flex overflow-x-auto gap-3 mb-5 pb-4 scrollbar-hide">
-          {categoryTabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setSelectedCategory(tab.id)}
-              className={`px-6 py-3 rounded-full font-bold transition-all flex items-center gap-2 whitespace-nowrap flex-shrink-0 ${
-                selectedCategory === tab.id
-                  ? 'bg-nadayu-panel text-white shadow-md'
-                  : 'bg-white border border-nadayu-border text-gray-600 hover:border-nadayu-accent hover:text-gray-900'
-              }`}
-            >
-              <span className="text-lg">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* TIME FILTER */}
         <div className="flex items-center gap-3 mb-5">
           <Clock size={18} className="text-nadayu-muted" />
           <div className="flex gap-2">
@@ -265,135 +168,35 @@ export const CommunityBoard: React.FC = () => {
           </div>
         </div>
 
-        {/* NOTIFICATIONS LIST */}
-        {filteredNotifications.length > 0 ? (
-          <div className="space-y-6">
-            {filteredNotifications.map(notification => {
-              const publisherColor = getPublisherColor(notification.publisherType);
-              return (
-                <div
-                  key={notification.id}
-                  className={`bg-white border rounded-2xl p-6 transition-all duration-300 hover:shadow-md ${
-                    notification.isUrgent
-                      ? 'border-nadayu-border shadow-sm'
-                      : 'border-nadayu-border hover:shadow-md'
-                  } ${!notification.hasRead ? 'ring-1 ring-gray-200' : ''}`}
-                >
-                  {/* HEADER */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${publisherColor.bg}`}>
-                        {getPublisherEmoji(notification.publisherType)}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className={`text-sm font-bold px-3 py-1 rounded-full border ${publisherColor.bg} ${publisherColor.border} ${publisherColor.text}`}>
-                            {notification.publisher}
-                          </span>
-                          {notification.isUrgent && (
-                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-600 flex items-center gap-1">
-                              🔴 Urgent
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs text-nadayu-muted mt-0.5">
-                          {formatTimeAgo(notification.postTime)}
-                        </div>
-                      </div>
-                    </div>
-                    {!notification.hasRead && (
-                      <div className="w-2 h-2 bg-nadayu-accent rounded-full flex-shrink-0 mt-2"></div>
-                    )}
-                  </div>
-
-                  {/* TITLE */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 leading-relaxed">
-                    {notification.title}
-                  </h3>
-
-                  {/* SUMMARY */}
-                  <p className="text-gray-500 mb-4 leading-relaxed text-base">
-                    {notification.summary}
-                  </p>
-
-                  {/* ATTACHMENTS */}
-                  {notification.attachments && notification.attachments.length > 0 && (
-                    <div className="flex items-center gap-3 mb-6 flex-wrap">
-                      {notification.attachments.map((attachment, idx) => (
-                        <button
-                          key={idx}
-                          className="px-4 py-2 bg-nadayu-cream border border-nadayu-border hover:border-gray-300 hover:bg-gray-150 rounded-lg text-sm font-bold text-gray-700 transition-all"
-                        >
-                          📎 {attachment.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* READ STATS (for urgent/important) */}
-                  {(notification.isUrgent || notification.readCount! > 200) && (
-                    <div className="mb-6 p-3 bg-white border border-nadayu-border rounded-xl text-xs text-gray-500 flex items-center gap-2">
-                      <CheckCircle2 size={14} className="text-nadayu-accent" />
-                      Read by {notification.readCount} of {notification.totalResidents} residents
-                    </div>
-                  )}
-
-                  {/* INTERACTIVE FOOTER */}
-                  <div className="flex items-center justify-between pt-4 border-t border-nadayu-border">
-                    <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => handleLike(notification.id)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-bold ${
-                          notification.hasLiked
-                            ? 'bg-nadayu-panel border border-nadayu-panel text-nadayu-accent'
-                            : 'bg-nadayu-cream border border-nadayu-border text-gray-500 hover:border-nadayu-panel'
-                        }`}
-                      >
-                        <Heart size={18} fill={notification.hasLiked ? 'currentColor' : 'none'} />
-                        <span className="text-sm">{notification.likes}</span>
-                      </button>
-
-                      <button className="flex items-center gap-2 px-4 py-2 bg-nadayu-cream border border-nadayu-border hover:border-nadayu-panel text-gray-500 hover:text-gray-900 rounded-lg transition-all font-bold">
-                        <MessageCircle size={18} />
-                        <span className="text-sm">{notification.comments}</span>
-                      </button>
-
-                      <button className="flex items-center gap-2 px-4 py-2 bg-nadayu-cream border border-nadayu-border hover:border-nadayu-panel text-gray-500 hover:text-gray-900 rounded-lg transition-all font-bold">
-                        <Share2 size={18} />
-                        <span className="text-sm">Share</span>
-                      </button>
-                    </div>
-
-                    {!notification.hasRead && (
-                      <button
-                        onClick={() => handleReadConfirm(notification.id)}
-                        className="px-4 py-2 bg-nadayu-accent hover:brightness-95 text-white font-bold rounded-lg transition-all text-sm flex items-center gap-2"
-                      >
-                        <CheckCircle2 size={16} /> Mark as Read
-                      </button>
-                    )}
-                  </div>
+        {filtered.length > 0 ? (
+          <div className="space-y-4">
+            {filtered.map(a => (
+              <div key={a.id} className="bg-white border border-nadayu-border rounded-2xl p-6 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${priorityStyle(a.priority)}`}>
+                    {a.priority}
+                  </span>
+                  <span className="text-xs text-nadayu-muted">{formatTimeAgo(a.date)}</span>
                 </div>
-              );
-            })}
+                <h3 className="text-xl font-bold text-gray-900 mb-2 leading-snug">{a.title}</h3>
+                <p className="text-gray-500 leading-relaxed">{a.content}</p>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-nadayu-cream rounded-full flex items-center justify-center mx-auto mb-6">
               <Bell size={48} className="text-gray-300" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No Updates Available</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">No Updates</h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              There are no community notifications matching your filters. Follow category tags or adjust your time filter to stay updated.
+              No community announcements match your filters.
             </p>
             <button
-              onClick={() => {
-                setSelectedCategory('all');
-                setSelectedTimeFilter('30days');
-              }}
+              onClick={() => { setSelectedTimeFilter('all'); setSearchQuery(''); }}
               className="px-6 py-3 bg-nadayu-accent hover:brightness-95 text-white font-bold rounded-2xl transition-all inline-flex items-center gap-2"
             >
-              View All Updates
+              Reset Filters
             </button>
           </div>
         )}

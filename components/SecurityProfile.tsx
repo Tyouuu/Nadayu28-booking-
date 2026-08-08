@@ -1,42 +1,49 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Shield, User, Clock, CheckCircle2, AlertTriangle, Camera, Bell, MapPin, Calendar, ScanLine, FileText, Phone, Edit2, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, User, Clock, CheckCircle2, AlertTriangle, Camera, ScanLine, FileText, Phone, Mail, Edit2, Save } from 'lucide-react';
 import { useAppNavigate } from '../hooks/useAppNavigate';
+import { useAuth } from '../contexts/AuthContext';
+import { fetchVisitors, updateProfile, Visitor } from '../services/dataService';
 
 export const SecurityProfile: React.FC = () => {
   const setCurrentView = useAppNavigate();
+  const { userProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'log' | 'settings'>('overview');
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: 'Ahmad bin Razak',
-    employeeId: 'SEC-2025-042',
-    phone: '+60 11-2233 4455',
-    station: 'Gate A - Main Entrance',
-    shift: 'Morning (8:00 AM - 4:00 PM)',
-    joined: '15 January 2025',
-  });
+  const [nameInput, setNameInput] = useState('');
+  const [phoneInput, setPhoneInput] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  useEffect(() => {
+    setNameInput(userProfile?.full_name || '');
+    setPhoneInput(userProfile?.phone || '');
+  }, [userProfile?.full_name, userProfile?.phone]);
 
-  const todayStats = {
-    verified: 47,
-    warnings: 2,
-    pending: 1,
-    scansToday: 52,
+  const handleSaveDetails = async () => {
+    if (!userProfile?.id) { setIsEditing(false); return; }
+    setIsSaving(true);
+    try {
+      await updateProfile(userProfile.id, { full_name: nameInput, phone: phoneInput });
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const recentScans = [
-    { id: 1, plate: 'WNB 1234', unit: 'A-12-05', time: '14:32', status: 'approved' },
-    { id: 2, plate: 'BJK 5678', unit: 'B-08-03', time: '14:15', status: 'approved' },
-    { id: 3, plate: 'WAA 9012', unit: 'C-03-01', time: '13:58', status: 'denied' },
-    { id: 4, plate: 'WKL 3456', unit: 'A-15-10', time: '13:40', status: 'approved' },
-    { id: 5, plate: 'BDG 7890', unit: 'B-11-07', time: '13:22', status: 'approved' },
-  ];
+  const [todaysVisitors, setTodaysVisitors] = useState<Visitor[]>([]);
+  useEffect(() => {
+    fetchVisitors().then(list => {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      setTodaysVisitors(list.filter(v => (v.actualArrival ?? v.expectedArrival)?.slice(0, 10) === todayStr));
+    }).catch(() => {});
+  }, []);
 
-  const notifications = [
-    { text: 'Parcel van arriving at Gate A in 15 minutes', time: '15:30', urgent: true },
-    { text: 'Shift change reminder - Evening shift starts at 4:00 PM', time: '16:00', urgent: false },
-    { text: 'Maintenance team scheduled for Block C elevator', time: '17:00', urgent: false },
-  ];
+  const todayStats = {
+    verified: todaysVisitors.filter(v => v.status === 'arrived' || v.status === 'departed').length,
+    warnings: todaysVisitors.filter(v => v.status === 'flagged').length,
+    pending: todaysVisitors.filter(v => v.status === 'scheduled').length,
+    scansToday: todaysVisitors.filter(v => v.status !== 'scheduled').length,
+  };
 
   const tabs = [
     { id: 'overview' as const, label: 'Overview', icon: Shield },
@@ -51,7 +58,7 @@ export const SecurityProfile: React.FC = () => {
         <div>
           <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">Security Personnel</p>
           <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">My Profile</h1>
-          <p className="text-nadayu-muted text-sm mt-1">Gate A Security · Morning Shift</p>
+          <p className="text-nadayu-muted text-sm mt-1">Access Control</p>
         </div>
         <div className="hidden md:flex items-center gap-2 bg-nadayu-accent text-white px-4 py-2 rounded-full text-xs font-bold">
           <span className="w-1.5 h-1.5 bg-nadayu-panel rounded-full animate-pulse"></span>
@@ -72,15 +79,13 @@ export const SecurityProfile: React.FC = () => {
               </div>
             </div>
             <div className="text-center">
-              <h2 className="text-lg font-bold text-gray-900">{profileData.name}</h2>
+              <h2 className="text-lg font-bold text-gray-900">{userProfile?.full_name || 'Security'}</h2>
               <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-nadayu-panel text-white rounded-full text-xs font-bold">
                 <Shield size={11} /> Security Guard
               </div>
               <div className="mt-3 space-y-1">
-                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><MapPin size={13} /> Gate A</p>
-                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Clock size={13} /> 8:00 AM - 4:00 PM</p>
+                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Phone size={13} /> {userProfile?.phone || '—'}</p>
               </div>
-              <p className="text-[11px] text-gray-300 mt-2">ID: {profileData.employeeId}</p>
             </div>
             <div className="space-y-1.5 pt-4 border-t border-nadayu-border">
               {tabs.map(tab => (
@@ -163,22 +168,24 @@ export const SecurityProfile: React.FC = () => {
                 </button>
               </div>
 
-              {/* Notifications */}
+              {/* Flagged visitors */}
               <div className="bg-white border border-nadayu-border rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Bell size={14} className="text-gray-900" />
-                    <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+                    <AlertTriangle size={14} className="text-gray-900" />
+                    <h3 className="text-sm font-semibold text-gray-900">Flagged Today</h3>
                   </div>
-                  <span className="text-[10px] font-bold text-white bg-nadayu-panel px-2 py-0.5 rounded-full">{notifications.length} new</span>
                 </div>
-                {notifications.map((n, i) => (
-                  <div key={i} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${n.urgent ? 'bg-red-400' : 'bg-nadayu-accent'}`}></span>
-                    <p className="text-gray-600 text-xs flex-1 leading-relaxed">{n.text}</p>
-                    <span className="text-gray-300 text-[10px] flex-shrink-0">{n.time}</span>
-                  </div>
-                ))}
+                {todaysVisitors.filter(v => v.status === 'flagged').length === 0 ? (
+                  <p className="text-gray-400 text-xs py-3">No flagged visitors today.</p>
+                ) : (
+                  todaysVisitors.filter(v => v.status === 'flagged').map((v, i) => (
+                    <div key={v.id} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
+                      <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-red-400"></span>
+                      <p className="text-gray-600 text-xs flex-1 leading-relaxed">{v.visitorName} — Unit {v.residentUnit}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </>
           )}
@@ -188,25 +195,28 @@ export const SecurityProfile: React.FC = () => {
               <div className="px-6 pt-5 pb-4 border-b border-gray-50 flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <ScanLine size={14} className="text-gray-900" />
-                  <h3 className="text-sm font-semibold text-gray-900">Recent Scans</h3>
+                  <h3 className="text-sm font-semibold text-gray-900">Today's Visitor Log</h3>
                 </div>
                 <span className="text-xs text-nadayu-muted">Today</span>
               </div>
               <div>
-                {recentScans.map((scan, i) => (
-                  <div key={scan.id} className={`flex items-center gap-4 px-6 py-4 hover:bg-nadayu-cream/50 transition-colors ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${scan.status === 'approved' ? 'bg-nadayu-success/15' : 'bg-red-50'}`}>
-                      {scan.status === 'approved'
-                        ? <CheckCircle2 size={18} className="text-nadayu-success" />
-                        : <AlertTriangle size={18} className="text-red-400" />}
+                {todaysVisitors.length === 0 && (
+                  <p className="px-6 py-12 text-center text-sm text-nadayu-muted">No visitor activity yet today.</p>
+                )}
+                {todaysVisitors.map((v, i) => (
+                  <div key={v.id} className={`flex items-center gap-4 px-6 py-4 hover:bg-nadayu-cream/50 transition-colors ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${v.status === 'flagged' ? 'bg-red-50' : 'bg-nadayu-success/15'}`}>
+                      {v.status === 'flagged'
+                        ? <AlertTriangle size={18} className="text-red-400" />
+                        : <CheckCircle2 size={18} className="text-nadayu-success" />}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-gray-900">{scan.plate}</p>
-                      <p className="text-xs text-nadayu-muted">Unit {scan.unit}</p>
+                      <p className="text-sm font-bold text-gray-900">{v.visitorName}</p>
+                      <p className="text-xs text-nadayu-muted">Unit {v.residentUnit}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-nadayu-muted">{scan.time}</p>
-                      <span className={`text-[10px] font-bold uppercase ${scan.status === 'approved' ? 'text-nadayu-success' : 'text-red-400'}`}>{scan.status}</span>
+                      <p className="text-xs text-nadayu-muted">{new Date(v.actualArrival ?? v.expectedArrival).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
+                      <span className={`text-[10px] font-bold uppercase ${v.status === 'flagged' ? 'text-red-400' : 'text-nadayu-success'}`}>{v.status}</span>
                     </div>
                   </div>
                 ))}
@@ -225,37 +235,35 @@ export const SecurityProfile: React.FC = () => {
                   <h3 className="text-lg font-semibold text-white">Personal Details</h3>
                 </div>
                 <button
-                  onClick={() => setIsEditing(!isEditing)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                  onClick={() => { if (isEditing) { handleSaveDetails(); } else { setIsEditing(true); } }}
+                  disabled={isSaving}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-50 ${
                     isEditing ? 'bg-nadayu-accent text-white' : 'bg-white/10 text-white hover:bg-white/20'
                   }`}>
-                  {isEditing ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+                  {isEditing ? <><Save size={14} /> {isSaving ? 'Saving...' : 'Save'}</> : <><Edit2 size={14} /> Edit</>}
                 </button>
               </div>
               <div className="p-6 space-y-5">
-                {[
-                  { label: 'Full Name', key: 'name' as const, icon: User, editable: true },
-                  { label: 'Employee ID', key: 'employeeId' as const, icon: Shield, editable: false },
-                  { label: 'Phone', key: 'phone' as const, icon: Phone, editable: true },
-                  { label: 'Station', key: 'station' as const, icon: MapPin, editable: false },
-                  { label: 'Shift', key: 'shift' as const, icon: Clock, editable: false },
-                  { label: 'Joined', key: 'joined' as const, icon: Calendar, editable: false },
-                ].map(item => (
+                {([
+                  { label: 'Full Name', value: nameInput, onChange: setNameInput, icon: User, editable: true },
+                  { label: 'Email', value: userProfile?.email || '', onChange: undefined, icon: Mail, editable: false },
+                  { label: 'Phone', value: phoneInput, onChange: setPhoneInput, icon: Phone, editable: true },
+                ]).map(item => (
                   <div key={item.label} className="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
                     <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center flex-shrink-0">
                       <item.icon size={16} className="text-nadayu-muted" />
                     </div>
                     <div className="flex-1">
                       <p className="text-[11px] font-bold text-nadayu-muted uppercase tracking-wider">{item.label}</p>
-                      {isEditing && item.editable ? (
+                      {isEditing && item.editable && item.onChange ? (
                         <input
                           type="text"
-                          value={profileData[item.key]}
-                          onChange={e => setProfileData({ ...profileData, [item.key]: e.target.value })}
+                          value={item.value}
+                          onChange={e => item.onChange!(e.target.value)}
                           className="w-full mt-1 px-3 py-2 bg-nadayu-cream border border-nadayu-border rounded-lg text-sm font-semibold text-gray-900 outline-none focus:border-nadayu-accent focus:ring-1 focus:ring-nadayu-accent/20"
                         />
                       ) : (
-                        <p className="text-sm font-semibold text-gray-900 mt-0.5">{profileData[item.key]}</p>
+                        <p className="text-sm font-semibold text-gray-900 mt-0.5">{item.value || '—'}</p>
                       )}
                     </div>
                   </div>

@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, BarChart2, Clock, CheckCircle2, AlertTriangle, FileText, Bell, Briefcase, Calendar, Megaphone, Scale, ClipboardList, Edit2, Save } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Mail, Phone, BarChart2, Clock, CheckCircle2, AlertTriangle, FileText, Briefcase, Calendar, Megaphone, Scale, ClipboardList, Edit2, Save } from 'lucide-react';
 import { useAppNavigate } from '../hooks/useAppNavigate';
+import { useAuth } from '../contexts/AuthContext';
+import { fetchViolations, fetchReports, fetchBookings, fetchAuditLog, computeArrearsReport, fetchAllInvoices, updateProfile, AuditLogEntry } from '../services/dataService';
 
 interface Approval {
   id: number;
@@ -14,45 +16,67 @@ interface Approval {
   status: 'pending' | 'approved' | 'rejected';
 }
 
+function formatTimeAgo(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  if (diffHours < 1) return 'Just now';
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return diffDays === 1 ? 'Yesterday' : `${diffDays}d ago`;
+}
+
+function describeActivity(entry: AuditLogEntry): string {
+  if (entry.action === 'invoice_payment_recorded') return `Payment recorded for ${entry.entityType} ${entry.entityId.slice(0, 8)}`;
+  if (entry.action === 'violation_status_change') return `Violation ${entry.entityId.slice(0, 8)} marked ${entry.afterValue}`;
+  if (entry.action === 'report_update') return `Report ${entry.entityId.slice(0, 8)} updated to ${entry.afterValue}`;
+  if (entry.action === 'role_change') return `${entry.actorName} changed a user's role to ${entry.afterValue}`;
+  return `${entry.actorName}: ${entry.action}`;
+}
+
 export const ManagementProfile: React.FC = () => {
   const setCurrentView = useAppNavigate();
+  const { userProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'approvals' | 'settings'>('overview');
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: 'Sarah Tan Mei Ling',
-    position: 'Property Manager',
-    department: 'Operations',
-    email: 'sarah.tan@nadayu28.com',
-    phone: '+60 12-888 9999',
-    office: 'Management Office, Level G',
-    joined: '1 March 2024',
-  });
+  const [nameInput, setNameInput] = useState('');
+  const [phoneInput, setPhoneInput] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  useEffect(() => {
+    setNameInput(userProfile?.full_name || '');
+    setPhoneInput(userProfile?.phone || '');
+  }, [userProfile?.full_name, userProfile?.phone]);
 
-  const [approvals, setApprovals] = useState<Approval[]>([
-    { id: 1, type: 'Refund Request', unit: 'A-08-02', desc: 'Late cancellation refund - RM 30', date: '2026-03-07', priority: 'medium', status: 'pending' },
-    { id: 2, type: 'Refund Request', unit: 'B-15-09', desc: 'Double charge on parking - RM 20', date: '2026-03-06', priority: 'high', status: 'pending' },
-    { id: 3, type: 'Special Booking', unit: 'C-03-01', desc: 'Private event - BBQ area full day', date: '2026-03-08', priority: 'low', status: 'pending' },
-  ]);
+  const handleSaveDetails = async () => {
+    if (!userProfile?.id) { setIsEditing(false); return; }
+    setIsSaving(true);
+    try {
+      await updateProfile(userProfile.id, { full_name: nameInput, phone: phoneInput });
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
+  const [approvals, setApprovals] = useState<Approval[]>([]);
   const pendingCount = approvals.filter(a => a.status === 'pending').length;
 
-  const stats = {
-    pendingViolations: 5,
-    unreadComplaints: 3,
-    todayBookings: 12,
-    occupancyRate: 87,
-  };
+  const [stats, setStats] = useState({ pendingViolations: 0, unreadComplaints: 0, todayBookings: 0, unitsInArrears: 0 });
+  const [recentActivity, setRecentActivity] = useState<AuditLogEntry[]>([]);
+
+  useEffect(() => {
+    fetchViolations().then(vs => setStats(s => ({ ...s, pendingViolations: vs.filter(v => v.status === 'pending').length }))).catch(() => {});
+    fetchReports().then(rs => setStats(s => ({ ...s, unreadComplaints: rs.filter(r => r.status === 'Received').length }))).catch(() => {});
+    fetchBookings().then(bs => {
+      const today = new Date().toISOString().slice(0, 10);
+      setStats(s => ({ ...s, todayBookings: bs.filter(b => b.date === today).length }));
+    }).catch(() => {});
+    fetchAllInvoices().then(invs => setStats(s => ({ ...s, unitsInArrears: computeArrearsReport(invs).length }))).catch(() => {});
+    fetchAuditLog().then(entries => setRecentActivity(entries.slice(0, 4))).catch(() => {});
+  }, []);
 
   const handleApproval = (id: number, action: 'approved' | 'rejected') => {
     setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: action } : a));
   };
-
-  const recentActivity = [
-    { text: 'Violation fine issued to Unit B-05-01 - RM 10', time: '2h ago', type: 'violation' },
-    { text: 'Complaint resolved: Noise complaint from A-10-03', time: '4h ago', type: 'resolved' },
-    { text: 'New maintenance report: Elevator Block C', time: '5h ago', type: 'report' },
-    { text: 'Announcement posted: Pool maintenance schedule', time: '1d ago', type: 'announcement' },
-  ];
 
   const tabs = [
     { id: 'overview' as const, label: 'Overview', icon: BarChart2 },
@@ -80,13 +104,13 @@ export const ManagementProfile: React.FC = () => {
               </div>
             </div>
             <div className="text-center">
-              <h2 className="text-lg font-bold text-gray-900">{profileData.name.split(' ').slice(0, 2).join(' ')}</h2>
+              <h2 className="text-lg font-bold text-gray-900">{userProfile?.full_name || 'Management'}</h2>
               <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 bg-nadayu-panel text-white rounded-full text-xs font-bold">
-                <Briefcase size={11} /> {profileData.position}
+                <Briefcase size={11} /> Management
               </div>
               <div className="mt-3 space-y-1">
-                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Mail size={13} /> {profileData.email}</p>
-                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Phone size={13} /> {profileData.phone}</p>
+                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Mail size={13} /> {userProfile?.email || '—'}</p>
+                <p className="text-nadayu-muted text-sm flex items-center justify-center gap-1.5"><Phone size={13} /> {userProfile?.phone || '—'}</p>
               </div>
             </div>
             <div className="space-y-1.5 pt-4 border-t border-nadayu-border">
@@ -129,8 +153,8 @@ export const ManagementProfile: React.FC = () => {
                     <p className="text-2xl font-bold text-white">{stats.todayBookings}</p>
                   </div>
                   <div className="bg-nadayu-cream rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-muted mb-2">Occupancy Rate</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.occupancyRate}%</p>
+                    <p className="text-xs font-semibold text-nadayu-muted mb-2">Units in Arrears</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.unitsInArrears}</p>
                   </div>
                 </div>
               </div>
@@ -155,46 +179,27 @@ export const ManagementProfile: React.FC = () => {
                 ))}
               </div>
 
-              {/* Recent Activity + Reminders */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                <div className="bg-white border border-nadayu-border rounded-2xl p-5">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Clock size={14} className="text-gray-900" />
-                    <h3 className="text-sm font-semibold text-gray-900">Recent Activity</h3>
-                  </div>
-                  {recentActivity.map((item, i) => (
-                    <div key={i} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        item.type === 'violation' ? 'bg-orange-50' : item.type === 'resolved' ? 'bg-nadayu-success/15' : item.type === 'report' ? 'bg-red-50' : 'bg-blue-50'
-                      }`}>
-                        {item.type === 'violation' && <Scale size={11} className="text-orange-400" />}
-                        {item.type === 'resolved' && <CheckCircle2 size={11} className="text-nadayu-success" />}
-                        {item.type === 'report' && <AlertTriangle size={11} className="text-red-400" />}
-                        {item.type === 'announcement' && <Megaphone size={11} className="text-blue-400" />}
+              {/* Recent Activity */}
+              <div className="bg-white border border-nadayu-border rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock size={14} className="text-gray-900" />
+                  <h3 className="text-sm font-semibold text-gray-900">Recent Activity</h3>
+                </div>
+                {recentActivity.length === 0 ? (
+                  <p className="text-gray-400 text-xs py-3">No recent activity.</p>
+                ) : (
+                  recentActivity.map((item, i) => (
+                    <div key={item.id} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-nadayu-cream">
+                        <Scale size={11} className="text-nadayu-muted" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-gray-600 text-xs leading-relaxed">{item.text}</p>
-                        <p className="text-gray-300 text-[10px] mt-1">{item.time}</p>
+                        <p className="text-gray-600 text-xs leading-relaxed">{describeActivity(item)}</p>
+                        <p className="text-gray-300 text-[10px] mt-1">{formatTimeAgo(item.createdAt)}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-                <div className="bg-white border border-nadayu-border rounded-2xl p-5">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Bell size={14} className="text-gray-900" />
-                    <h3 className="text-sm font-semibold text-gray-900">Reminders</h3>
-                  </div>
-                  {[
-                    { text: 'Monthly report deadline - March 10', urgent: true },
-                    { text: 'Fire drill scheduled - March 15 at 10 AM', urgent: false },
-                    { text: 'AGM preparation meeting - March 20', urgent: false },
-                  ].map((item, i) => (
-                    <div key={i} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${item.urgent ? 'bg-red-400' : 'bg-nadayu-accent'}`}></span>
-                      <p className="text-gray-600 text-xs flex-1 leading-relaxed">{item.text}</p>
-                    </div>
-                  ))}
-                </div>
+                  ))
+                )}
               </div>
             </>
           )}
@@ -209,6 +214,9 @@ export const ManagementProfile: React.FC = () => {
                 </div>
               </div>
               <div className="divide-y divide-gray-50">
+                {approvals.length === 0 && (
+                  <p className="px-6 py-12 text-center text-sm text-nadayu-muted">No pending approvals.</p>
+                )}
                 {approvals.map(item => (
                   <div key={item.id} className={`px-6 py-5 transition-colors ${item.status !== 'pending' ? 'opacity-60' : 'hover:bg-nadayu-cream/50'}`}>
                     <div className="flex items-start justify-between mb-2">
@@ -267,22 +275,19 @@ export const ManagementProfile: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-semibold text-white">Personal Details</h3>
                 </div>
-                <button onClick={() => setIsEditing(!isEditing)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                <button onClick={() => { if (isEditing) { handleSaveDetails(); } else { setIsEditing(true); } }}
+                  disabled={isSaving}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all disabled:opacity-50 ${
                     isEditing ? 'bg-nadayu-accent text-white' : 'bg-white/10 text-white hover:bg-white/20'
                   }`}>
-                  {isEditing ? <><Save size={14} /> Save</> : <><Edit2 size={14} /> Edit</>}
+                  {isEditing ? <><Save size={14} /> {isSaving ? 'Saving...' : 'Save'}</> : <><Edit2 size={14} /> Edit</>}
                 </button>
               </div>
               <div className="p-6 space-y-5">
                 {([
-                  { label: 'Full Name', key: 'name' as const, icon: User, editable: true },
-                  { label: 'Position', key: 'position' as const, icon: Briefcase, editable: false },
-                  { label: 'Department', key: 'department' as const, icon: BarChart2, editable: false },
-                  { label: 'Email', key: 'email' as const, icon: Mail, editable: false },
-                  { label: 'Phone', key: 'phone' as const, icon: Phone, editable: true },
-                  { label: 'Office', key: 'office' as const, icon: MapPin, editable: false },
-                  { label: 'Joined', key: 'joined' as const, icon: Calendar, editable: false },
+                  { label: 'Full Name', value: nameInput, onChange: setNameInput, icon: User, editable: true },
+                  { label: 'Email', value: userProfile?.email || '', onChange: undefined, icon: Mail, editable: false },
+                  { label: 'Phone', value: phoneInput, onChange: setPhoneInput, icon: Phone, editable: true },
                 ]).map(item => (
                   <div key={item.label} className="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
                     <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center flex-shrink-0">
@@ -290,15 +295,15 @@ export const ManagementProfile: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <p className="text-[11px] font-bold text-nadayu-muted uppercase tracking-wider">{item.label}</p>
-                      {isEditing && item.editable ? (
+                      {isEditing && item.editable && item.onChange ? (
                         <input
                           type="text"
-                          value={profileData[item.key]}
-                          onChange={e => setProfileData({ ...profileData, [item.key]: e.target.value })}
+                          value={item.value}
+                          onChange={e => item.onChange!(e.target.value)}
                           className="w-full mt-1 px-3 py-2 bg-nadayu-cream border border-nadayu-border rounded-lg text-sm font-semibold text-gray-900 outline-none focus:border-nadayu-accent focus:ring-1 focus:ring-nadayu-accent/20"
                         />
                       ) : (
-                        <p className="text-sm font-semibold text-gray-900 mt-0.5">{profileData[item.key]}</p>
+                        <p className="text-sm font-semibold text-gray-900 mt-0.5">{item.value || '—'}</p>
                       )}
                     </div>
                   </div>

@@ -2,35 +2,27 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { MOCK_VIOLATIONS } from '../constants';
-import { fetchViolations, fetchReports, fetchUsers, updateUserRole, fetchAuditLog, AuditLogEntry, updateViolationStatus, fetchAllInvoices, fetchAllFeeSchedules, setFeeSchedule, recordInvoicePayment, computeArrearsReport, computeCollectionTrend, arrearsToCSV, Invoice, FeeSchedule } from '../services/dataService';
-import { Violation, Report, User, UserRole } from '../types';
+import { fetchViolations, fetchReports, fetchUsers, updateUserRole, fetchAuditLog, AuditLogEntry, updateViolationStatus, fetchAllInvoices, fetchAllFeeSchedules, setFeeSchedule, recordInvoicePayment, computeArrearsReport, computeCollectionTrend, arrearsToCSV, computeVisitorTraffic, computeFacilityUsage, fetchVisitors, fetchBookings, Visitor, Invoice, FeeSchedule } from '../services/dataService';
+import { Violation, Report, User, UserRole, Booking } from '../types';
 import { Download, Filter, MoreHorizontal, X, AlertTriangle, Calendar, MapPin, DollarSign, Clock, Receipt } from 'lucide-react';
 
-const parkingData = [
-  { name: 'Mon', visitors: 12, violations: 1 },
-  { name: 'Tue', visitors: 19, violations: 0 },
-  { name: 'Wed', visitors: 15, violations: 2 },
-  { name: 'Thu', visitors: 22, violations: 1 },
-  { name: 'Fri', visitors: 35, violations: 3 },
-  { name: 'Sat', visitors: 45, violations: 5 },
-  { name: 'Sun', visitors: 40, violations: 4 },
-];
-
-const facilityUsage = [
-  { name: 'Gym', hours: 120 },
-  { name: 'BBQ', hours: 45 },
-  { name: 'Tennis', hours: 80 },
-  { name: 'Party', hours: 20 },
-];
-
 export const AdminPanel: React.FC = () => {
-  const [violations, setViolations] = useState<Violation[]>(MOCK_VIOLATIONS);
+  const [violations, setViolations] = useState<Violation[]>([]);
+  const [violationsError, setViolationsError] = useState(false);
   const [selectedViolation, setSelectedViolation] = useState<Violation | null>(null);
 
   useEffect(() => {
-    fetchViolations().then(setViolations).catch(() => {});
+    fetchViolations().then(setViolations).catch(() => setViolationsError(true));
   }, []);
+
+  const [visitors, setVisitors] = useState<Visitor[]>([]);
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
+  useEffect(() => {
+    fetchVisitors().then(setVisitors).catch(() => {});
+    fetchBookings().then(setAllBookings).catch(() => {});
+  }, []);
+  const parkingData = useMemo(() => computeVisitorTraffic(visitors, violations), [visitors, violations]);
+  const facilityUsage = useMemo(() => computeFacilityUsage(allBookings), [allBookings]);
 
   const [reports, setReports] = useState<Report[]>([]);
   useEffect(() => {
@@ -235,6 +227,11 @@ export const AdminPanel: React.FC = () => {
             <p className="text-xs text-nadayu-muted mt-0.5">Action required items</p>
           </div>
         </div>
+        {violationsError && (
+          <div className="px-6 py-4 bg-red-50 text-red-600 text-sm font-medium flex items-center gap-2">
+            <AlertTriangle size={16} /> Couldn't load violations — please refresh.
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">

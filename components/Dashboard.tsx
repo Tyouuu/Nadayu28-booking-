@@ -1,15 +1,17 @@
+'use client';
+
 import React, { useEffect, useState } from "react";
 import { Booking, Announcement } from "../types";
 import { MOCK_ANNOUNCEMENTS, MOCK_BOOKINGS, USE_MOCK_DATA } from "../constants";
 import { fetchBookings, fetchAnnouncements, fetchPackages, Package } from "../services/dataService";
 import { Bell, Clock, ChevronRight, Activity, ArrowUpRight, Car, Dumbbell, MessageSquare, AlertTriangle, Zap, UserPlus } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import { useNavigation } from "../contexts/NavigationContext";
+import { useAppNavigate } from "../hooks/useAppNavigate";
 import { useI18n } from "../contexts/I18nContext";
 
 export const Dashboard: React.FC = () => {
   const { userProfile } = useAuth();
-  const { setCurrentView } = useNavigation();
+  const setCurrentView = useAppNavigate();
   const { t } = useI18n();
   const [activeBookings, setActiveBookings] = useState<Booking[]>(USE_MOCK_DATA ? MOCK_BOOKINGS.filter(b => b.status === "active") : []);
   const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>(USE_MOCK_DATA ? MOCK_ANNOUNCEMENTS.slice(0, 3) : []);

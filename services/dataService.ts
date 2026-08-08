@@ -811,6 +811,69 @@ export async function recordInvoicePayment(invoiceId: string, payment: {
   });
 }
 
+export interface ArrearsRow {
+  unit: string;
+  totalOwed: number;
+  oldestDueDate: string;
+  daysOverdue: number;
+  overdueCount: number;
+}
+
+export function computeArrearsReport(invoices: Invoice[]): ArrearsRow[] {
+  const now = Date.now();
+  const byUnit = new Map<string, Invoice[]>();
+  for (const inv of invoices) {
+    if (inv.status !== 'unpaid') continue;
+    if (new Date(inv.dueDate).getTime() >= now) continue;
+    const list = byUnit.get(inv.unit) ?? [];
+    list.push(inv);
+    byUnit.set(inv.unit, list);
+  }
+
+  const rows: ArrearsRow[] = [];
+  for (const [unit, overdue] of byUnit) {
+    const totalOwed = overdue.reduce((sum, inv) => sum + inv.amount, 0);
+    const oldestDueDate = overdue.reduce((oldest, inv) => (inv.dueDate < oldest ? inv.dueDate : oldest), overdue[0].dueDate);
+    const daysOverdue = Math.floor((now - new Date(oldestDueDate).getTime()) / (24 * 60 * 60 * 1000));
+    rows.push({ unit, totalOwed, oldestDueDate, daysOverdue, overdueCount: overdue.length });
+  }
+
+  return rows.sort((a, b) => b.daysOverdue - a.daysOverdue);
+}
+
+export interface CollectionPeriod {
+  period: string;
+  billed: number;
+  collected: number;
+  rate: number;
+}
+
+export function computeCollectionTrend(invoices: Invoice[]): CollectionPeriod[] {
+  const byPeriod = new Map<string, Invoice[]>();
+  for (const inv of invoices) {
+    const list = byPeriod.get(inv.period) ?? [];
+    list.push(inv);
+    byPeriod.set(inv.period, list);
+  }
+
+  const periods = Array.from(byPeriod.keys()).sort();
+  const lastSix = periods.slice(-6);
+
+  return lastSix.map(period => {
+    const invs = byPeriod.get(period)!;
+    const billed = invs.reduce((sum, inv) => sum + inv.amount, 0);
+    const collected = invs.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.amount, 0);
+    const rate = billed === 0 ? 0 : Math.round((collected / billed) * 1000) / 10;
+    return { period, billed, collected, rate };
+  });
+}
+
+export function arrearsToCSV(rows: ArrearsRow[]): string {
+  const header = 'Unit,Amount Owed (RM),Oldest Due Date,Days Overdue,Overdue Invoices';
+  const lines = rows.map(r => `${r.unit},${r.totalOwed.toFixed(2)},${r.oldestDueDate},${r.daysOverdue},${r.overdueCount}`);
+  return [header, ...lines].join('\n');
+}
+
 // ── Packages ─────────────────────────────────────────────────
 
 export interface Package {

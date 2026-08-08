@@ -32,44 +32,21 @@ export const SmartAssistant: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_GROQ_API_KEY || '';
-      if (!apiKey) throw new Error("Groq API Key not configured.");
-
-      const systemPrompt = `You are the AI Concierge for Nadayu28, a residential complex in Malaysia.
-Answer questions based on these community rules:
-1. Visitor Parking: Must book 1 hour in advance. Max 24 hours. Unlimited bookings per unit. License plate required.
-2. Amenities (Gym, BBQ, etc.): Unlimited usage. Bookings available 6 AM - 10 PM.
-3. Fines: RM 50 for overstaying parking. RM 20 for late cancellation (less than 24h).
-4. Damages: Any damage to amenities will be charged directly to the resident's account. No deposit required.
-Keep answers concise, polite, and helpful.`;
-
       const chatHistory = messages.map(m => ({
         role: m.role,
         content: m.text,
       }));
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...chatHistory,
-            { role: 'user', content: userMsg },
-          ],
-          max_tokens: 300,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userMsg, history: chatHistory }),
       });
 
       if (!response.ok) throw new Error(`API error: ${response.status}`);
 
       const data = await response.json();
-      const text = data.choices?.[0]?.message?.content || "I'm sorry, I couldn't process that request.";
-      setMessages(prev => [...prev, { role: 'assistant', text }]);
+      setMessages(prev => [...prev, { role: 'assistant', text: data.text }]);
 
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', text: "I'm having trouble connecting. Please try again later." }]);

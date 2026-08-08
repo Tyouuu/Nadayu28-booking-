@@ -810,3 +810,78 @@ export async function recordInvoicePayment(invoiceId: string, payment: {
     after: 'paid',
   });
 }
+
+// ── Packages ─────────────────────────────────────────────────
+
+export interface Package {
+  id: string;
+  unit: string;
+  description: string | null;
+  courier: string | null;
+  receivedAt: string;
+  receivedByName: string;
+  status: 'waiting' | 'collected';
+  collectedAt: string | null;
+  collectedByName: string | null;
+}
+
+function toPackage(row: Record<string, unknown>): Package {
+  return {
+    id: row.id as string,
+    unit: row.unit as string,
+    description: (row.description as string) ?? null,
+    courier: (row.courier as string) ?? null,
+    receivedAt: row.received_at as string,
+    receivedByName: (row.received_by_name as string) ?? 'Unknown',
+    status: row.status as Package['status'],
+    collectedAt: (row.collected_at as string) ?? null,
+    collectedByName: (row.collected_by_name as string) ?? null,
+  };
+}
+
+export async function fetchPackages(unit: string): Promise<Package[]> {
+  const { data, error } = await supabase
+    .from('packages')
+    .select('*')
+    .eq('unit', unit)
+    .order('received_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(toPackage);
+}
+
+export async function fetchAllPackages(): Promise<Package[]> {
+  const { data, error } = await supabase
+    .from('packages')
+    .select('*')
+    .order('received_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(toPackage);
+}
+
+export async function logPackage(params: { unit: string; description?: string; courier?: string }): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+
+  const { error } = await supabase.from('packages').insert({
+    id: 'pkg' + Date.now(),
+    unit: params.unit,
+    description: params.description || null,
+    courier: params.courier || null,
+    received_by: user?.id,
+    received_by_name: profile?.full_name ?? 'Unknown',
+  });
+  if (error) throw error;
+}
+
+export async function markPackageCollected(id: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = await supabase.from('profiles').select('full_name').eq('id', user?.id).single();
+
+  const { error } = await supabase.from('packages').update({
+    status: 'collected',
+    collected_at: new Date().toISOString(),
+    collected_by: user?.id,
+    collected_by_name: profile?.full_name ?? 'Unknown',
+  }).eq('id', id);
+  if (error) throw error;
+}

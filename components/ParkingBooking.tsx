@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Calendar, Car, ChevronLeft, Download, Share2, Moon, Sun, CheckCircle2 } from 'lucide-react';
 import { Booking, FacilityType } from '../types';
@@ -78,6 +78,36 @@ export const ParkingBooking: React.FC = () => {
       loadSlots();
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const qrContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleSavePass = () => {
+    const svg = qrContainerRef.current?.querySelector('svg');
+    if (!svg) return;
+    const serialized = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([serialized], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `parking-pass-${generatedBooking?.id ?? 'pass'}.svg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleSharePass = async () => {
+    const text = `Nadayu28 Parking Pass\nSpot: ${generatedBooking?.details?.split('•')[1]?.trim() ?? '-'}\nVehicle: ${generatedBooking?.details?.split('•')[0] ?? '-'}\nDate: ${generatedBooking?.date} ${generatedBooking?.startTime}\nBooking ID: ${generatedBooking?.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Nadayu28 Parking Pass', text });
+      } catch {
+        // user cancelled the share sheet — nothing to do
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
     }
   };
 
@@ -298,7 +328,7 @@ export const ParkingBooking: React.FC = () => {
             </div>
             <div className="p-6 text-center">
               <div className="border-2 border-dashed border-nadayu-border inline-block mb-5 p-4 rounded-2xl">
-                <div className="bg-white p-2 rounded-lg">
+                <div className="bg-white p-2 rounded-lg" ref={qrContainerRef}>
                   {generatedBooking?.qrCode && (
                     <QRCodeSVG
                       value={generatedBooking.qrCode}
@@ -343,10 +373,10 @@ export const ParkingBooking: React.FC = () => {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button className="flex-1 bg-nadayu-accent text-white py-3.5 rounded-xl font-bold text-sm hover:brightness-95 transition-all flex items-center justify-center gap-2">
+                <button onClick={handleSharePass} className="flex-1 bg-nadayu-accent text-white py-3.5 rounded-xl font-bold text-sm hover:brightness-95 transition-all flex items-center justify-center gap-2">
                   <Share2 size={15} /> Share
                 </button>
-                <button className="flex-1 bg-nadayu-cream text-nadayu-panel py-3.5 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+                <button onClick={handleSavePass} className="flex-1 bg-nadayu-cream text-nadayu-panel py-3.5 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
                   <Download size={15} /> Save
                 </button>
               </div>

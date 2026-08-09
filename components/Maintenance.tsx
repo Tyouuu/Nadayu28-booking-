@@ -85,6 +85,14 @@ export const Maintenance: React.FC = () => {
               {isOpen && (
                 <div className="px-6 pb-5 space-y-4">
                   <p className="text-sm text-gray-600">{r.description}</p>
+                  {r.images && r.images.length > 0 && (
+                    <div className="flex flex-wrap gap-3">
+                      {r.images.map((img, idx) => (
+                        <img key={idx} src={img} alt={`Report photo ${idx + 1}`}
+                          className="w-24 h-24 object-cover rounded-xl border border-nadayu-border" />
+                      ))}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-bold text-nadayu-muted uppercase tracking-wider">Assigned To</label>

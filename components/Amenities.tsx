@@ -23,7 +23,7 @@ export const Amenities: React.FC = () => {
   const [bookingTime, setBookingTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'available' | 'popular'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'available'>('all');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { t } = useI18n();
@@ -91,8 +91,11 @@ export const Amenities: React.FC = () => {
   const categoryFilters: { id: typeof selectedCategory; label: string }[] = [
     { id: 'all', label: t.amenities.allFacilities },
     { id: 'available', label: t.amenities.availableNow },
-    { id: 'popular', label: t.amenities.popularFacilities },
   ];
+
+  const visibleFacilities = FACILITIES
+    .filter(f => f.id !== FacilityType.PARKING)
+    .filter(f => selectedCategory === 'all' || getFacilityStatus(f.id).available);
 
   const closeModal = () => {
     setSelectedFacility(null);
@@ -188,8 +191,11 @@ export const Amenities: React.FC = () => {
             ))}
          </div>
 
+         {visibleFacilities.length === 0 && (
+            <p className="text-sm text-nadayu-muted text-center py-12">No facilities available right now.</p>
+         )}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FACILITIES.filter(f => f.id !== FacilityType.PARKING).map((facility, idx) => (
+            {visibleFacilities.map((facility, idx) => (
                <div 
                   key={facility.id} 
                   onClick={() => {

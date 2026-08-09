@@ -64,6 +64,7 @@ export interface Report {
   assignedToName?: string;
   resolutionNotes?: string;
   createdAt?: string;
+  images?: string[];
 }
 
 export interface User {

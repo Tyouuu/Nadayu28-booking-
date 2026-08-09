@@ -62,6 +62,7 @@ function toReport(row: Record<string, unknown>): Report {
     assignedToName: row.assigned_to_name as string | undefined,
     resolutionNotes: row.resolution_notes as string | undefined,
     createdAt: row.created_at as string | undefined,
+    images: (row.images as string[]) ?? [],
   };
 }
 

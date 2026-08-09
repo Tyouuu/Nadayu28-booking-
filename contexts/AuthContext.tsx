@@ -49,6 +49,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
+    let settled = false;
+
+    // Safety net: supabase.auth.getSession() can hang indefinitely if its
+    // internal token-refresh network call stalls (observed intermittently
+    // on cold Vercel edge requests). Without this, isLoading would never
+    // resolve and the whole app freezes on the loading spinner forever.
+    const timeout = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        setIsLoading(false);
+      }
+    }, 6000);
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       try {
         if (session?.user) {
@@ -61,9 +74,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch {
         // profile fetch failed — fall through to unauthenticated state below
       } finally {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timeout);
+          setIsLoading(false);
+        }
+      }
+    }).catch(() => {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timeout);
         setIsLoading(false);
       }
-    }).catch(() => setIsLoading(false));
+    });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -84,7 +107,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = useCallback(async (role: UserRole) => {

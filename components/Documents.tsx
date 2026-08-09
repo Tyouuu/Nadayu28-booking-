@@ -100,7 +100,7 @@ export const Documents: React.FC = () => {
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 className="w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:font-bold file:bg-nadayu-panel file:text-white hover:file:bg-[#222222]" />
             </div>
-            {uploadError && <p className="text-sm text-red-500 px-4 py-2 rounded-xl bg-red-50">{uploadError}</p>}
+            {uploadError && <p className="text-sm text-nadayu-danger px-4 py-2 rounded-xl bg-nadayu-danger/10">{uploadError}</p>}
             <button type="submit" disabled={isUploading}
               className="px-6 py-3 rounded-xl font-bold text-white bg-nadayu-panel hover:brightness-110 transition-all disabled:opacity-50">
               {isUploading ? 'Uploading...' : 'Upload'}
@@ -122,7 +122,12 @@ export const Documents: React.FC = () => {
 
       <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden divide-y divide-gray-50">
         {documents.length === 0 && (
-          <p className="text-sm text-nadayu-muted text-center py-12">No documents in this category.</p>
+          <div className="py-12 text-center">
+            <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center mx-auto mb-3">
+              <FolderOpen size={18} className="text-gray-300" />
+            </div>
+            <p className="text-sm text-nadayu-muted">No documents in this category.</p>
+          </div>
         )}
         {documents.map(doc => (
           <div key={doc.id} className="flex items-center justify-between px-6 py-4 hover:bg-nadayu-cream/50 transition-colors">
@@ -142,7 +147,7 @@ export const Documents: React.FC = () => {
               </button>
               {isManagement && (
                 <button onClick={() => handleDelete(doc.id)} disabled={deletingId === doc.id}
-                  className="p-2 rounded-lg text-nadayu-muted hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50">
+                  className="p-2 rounded-lg text-nadayu-muted hover:text-nadayu-danger hover:bg-nadayu-danger/10 transition-colors disabled:opacity-50">
                   <Trash2 size={16} />
                 </button>
               )}

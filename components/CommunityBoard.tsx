@@ -11,10 +11,11 @@ export const CommunityBoard: React.FC = () => {
   const isManagement = currentUserRole === UserRole.MANAGEMENT;
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loadError, setLoadError] = useState(false);
   const [selectedTimeFilter, setSelectedTimeFilter] = useState<'7days' | '30days' | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const load = () => { fetchAnnouncements().then(setAnnouncements).catch(() => {}); };
+  const load = () => { setLoadError(false); fetchAnnouncements().then(setAnnouncements).catch(() => setLoadError(true)); };
   useEffect(() => { load(); }, []);
 
   const [isPosting, setIsPosting] = useState(false);
@@ -62,7 +63,7 @@ export const CommunityBoard: React.FC = () => {
   });
 
   const priorityStyle = (priority: Announcement['priority']) =>
-    priority === 'high' ? 'bg-red-50 border-red-200 text-red-600'
+    priority === 'high' ? 'bg-nadayu-danger/10 border-nadayu-danger/30 text-nadayu-danger'
       : priority === 'medium' ? 'bg-nadayu-cream border-nadayu-border text-gray-700'
       : 'bg-nadayu-cream border-nadayu-border text-nadayu-muted';
 
@@ -91,8 +92,14 @@ export const CommunityBoard: React.FC = () => {
           </div>
         </div>
 
+        {loadError && (
+          <div className="px-6 py-4 mb-5 rounded-2xl bg-nadayu-danger/10 text-nadayu-danger text-sm font-medium flex items-center gap-2">
+            Couldn't load announcements — please refresh.
+          </div>
+        )}
+
         {isPosting && (
-          <div className="bg-white p-6 rounded-2xl shadow-xl border border-nadayu-border mb-5">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-nadayu-border mb-5">
             <div className="flex items-center justify-between mb-4">
               <h4 className="font-bold text-gray-900 text-lg">New Announcement</h4>
               <button onClick={() => setIsPosting(false)} className="text-nadayu-muted hover:text-gray-900"><X size={20} /></button>
@@ -171,7 +178,7 @@ export const CommunityBoard: React.FC = () => {
         {filtered.length > 0 ? (
           <div className="space-y-4">
             {filtered.map(a => (
-              <div key={a.id} className="bg-white border border-nadayu-border rounded-2xl p-6 hover:shadow-md transition-all duration-300">
+              <div key={a.id} className="bg-white border border-nadayu-border rounded-2xl p-6 hover:shadow-sm transition-all duration-300">
                 <div className="flex items-center gap-2 mb-3">
                   <span className={`text-xs font-bold uppercase px-3 py-1 rounded-full border ${priorityStyle(a.priority)}`}>
                     {a.priority}

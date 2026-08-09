@@ -203,7 +203,7 @@ export const Reporting: React.FC = () => {
             {/* Dark Header Banner */}
             <div className="bg-nadayu-panel rounded-3xl p-8 mb-6 flex items-center justify-between">
               <div>
-                <h2 className="text-4xl font-bold text-white mb-2">{t.reporting.title}</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-white mb-2">{t.reporting.title}</h2>
                 <p className="text-nadayu-muted text-base">{t.reporting.subtitle}</p>
               </div>
               <div className="w-16 h-16 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -302,7 +302,7 @@ export const Reporting: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-bold text-nadayu-muted uppercase tracking-widest">{t.reporting.description}</label>
-                  <span className={`text-xs font-bold ${description.length > 200 ? 'text-red-500' : 'text-nadayu-muted'}`}>
+                  <span className={`text-xs font-bold ${description.length > 200 ? 'text-nadayu-danger' : 'text-nadayu-muted'}`}>
                     {description.length}/200 characters
                   </span>
                 </div>
@@ -311,9 +311,9 @@ export const Reporting: React.FC = () => {
                   onChange={(e) => { setDescription(e.target.value.slice(0, 200)); setFieldErrors(prev => ({ ...prev, description: '' })); }}
                   rows={4}
                   placeholder="Describe the issue in detail. Include any observations that might help our team..."
-                  className={`w-full px-6 py-4 bg-nadayu-cream border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors resize-none ${fieldErrors.description ? 'border-red-400' : 'border-nadayu-border'}`}
+                  className={`w-full px-6 py-4 bg-nadayu-cream border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors resize-none ${fieldErrors.description ? 'border-nadayu-danger' : 'border-nadayu-border'}`}
                 />
-                {fieldErrors.description && <p className="text-red-500 text-xs mt-1">{fieldErrors.description}</p>}
+                {fieldErrors.description && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.description}</p>}
               </div>
 
               {/* Image Upload - REQUIRED */}
@@ -360,7 +360,7 @@ export const Reporting: React.FC = () => {
                         />
                         <button
                           onClick={() => setUploadedImages(uploadedImages.filter((_, i) => i !== idx))}
-                          className="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                          className="absolute top-2 right-2 w-7 h-7 bg-nadayu-danger hover:brightness-110 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                         >
                           <X size={16} className="text-white" />
                         </button>

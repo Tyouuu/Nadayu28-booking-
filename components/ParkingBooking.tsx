@@ -187,7 +187,7 @@ export const ParkingBooking: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-6 gap-2 mb-5" style={{ gridAutoRows: '1fr' }}>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-5" style={{ gridAutoRows: '1fr' }}>
                   {SLOTS_DATA[zone].map((slot) => {
                     const isOccupied = slot.status === 'occupied';
                     const isSelected = selectedSlot === slot.id;
@@ -262,7 +262,7 @@ export const ParkingBooking: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-nadayu-muted uppercase tracking-wider">{t.parking.date}</label>
                   <CustomDatePicker required value={date} onChange={(v) => { setDate(v); setFieldErrors(prev => ({ ...prev, date: '' })); }} />
-                  {fieldErrors.date && <p className="text-red-500 text-xs mt-1">{fieldErrors.date}</p>}
+                  {fieldErrors.date && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.date}</p>}
                 </div>
                 <div className="flex gap-3">
                   <div className="space-y-2 flex-1">
@@ -290,13 +290,13 @@ export const ParkingBooking: React.FC = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-nadayu-muted uppercase tracking-wider">{t.parking.vehiclePlate}</label>
                   <input type="text" placeholder="WNB 1234"
-                    className={`w-full px-4 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/30 focus:border-nadayu-accent outline-none font-bold uppercase text-gray-900 placeholder:font-normal placeholder:normal-case placeholder:text-nadayu-muted transition-all ${fieldErrors.plateNumber ? 'border-red-400' : 'border-nadayu-border'}`}
+                    className={`w-full px-4 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/30 focus:border-nadayu-accent outline-none font-bold uppercase text-gray-900 placeholder:font-normal placeholder:normal-case placeholder:text-nadayu-muted transition-all ${fieldErrors.plateNumber ? 'border-nadayu-danger' : 'border-nadayu-border'}`}
                     value={plateNumber} onChange={(e) => { setPlateNumber(e.target.value); setFieldErrors(prev => ({ ...prev, plateNumber: '' })); }} />
-                  {fieldErrors.plateNumber && <p className="text-red-500 text-xs mt-1">{fieldErrors.plateNumber}</p>}
+                  {fieldErrors.plateNumber && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.plateNumber}</p>}
                 </div>
-                {fieldErrors.selectedSlot && <p className="text-red-500 text-xs mt-1">{fieldErrors.selectedSlot}</p>}
+                {fieldErrors.selectedSlot && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.selectedSlot}</p>}
                 {apiError && (
-                  <p className="text-sm text-red-500 text-center px-4 py-2 rounded-xl bg-red-50">{apiError}</p>
+                  <p className="text-sm text-nadayu-danger text-center px-4 py-2 rounded-xl bg-nadayu-danger/10">{apiError}</p>
                 )}
                 <button type="submit"
                   disabled={!selectedSlot || isLoading || !date || !startTime || !plateNumber}

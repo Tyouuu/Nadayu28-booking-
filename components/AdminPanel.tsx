@@ -10,6 +10,7 @@ export const AdminPanel: React.FC = () => {
   const [violations, setViolations] = useState<Violation[]>([]);
   const [violationsError, setViolationsError] = useState(false);
   const [selectedViolation, setSelectedViolation] = useState<Violation | null>(null);
+  const [overviewLoading, setOverviewLoading] = useState(true);
 
   useEffect(() => {
     fetchViolations().then(setViolations).catch(() => setViolationsError(true));
@@ -18,8 +19,10 @@ export const AdminPanel: React.FC = () => {
   const [visitors, setVisitors] = useState<Visitor[]>([]);
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
   useEffect(() => {
-    fetchVisitors().then(setVisitors).catch(() => {});
-    fetchBookings().then(setAllBookings).catch(() => {});
+    Promise.all([
+      fetchVisitors().then(setVisitors).catch(() => {}),
+      fetchBookings().then(setAllBookings).catch(() => {}),
+    ]).finally(() => setOverviewLoading(false));
   }, []);
   const parkingData = useMemo(() => computeVisitorTraffic(visitors, violations), [visitors, violations]);
   const facilityUsage = useMemo(() => computeFacilityUsage(allBookings), [allBookings]);
@@ -117,15 +120,10 @@ export const AdminPanel: React.FC = () => {
 
   return (
     <div className="space-y-5 pb-12">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">Administration</p>
-          <h2 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Management Dashboard</h2>
-          <p className="text-nadayu-muted text-sm mt-1">Resource utilization overview and enforcement tracking.</p>
-        </div>
-        <button className="flex items-center gap-2 bg-nadayu-panel text-white px-5 py-3 rounded-xl font-bold text-sm hover:brightness-110 transition-colors">
-          <Download size={16} /> Export Report
-        </button>
+      <header>
+        <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">Administration</p>
+        <h2 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Management Dashboard</h2>
+        <p className="text-nadayu-muted text-sm mt-1">Resource utilization overview and enforcement tracking.</p>
       </header>
 
       <div className="flex gap-2">
@@ -142,11 +140,11 @@ export const AdminPanel: React.FC = () => {
       {activeTab === 'overview' && (
         <>
       <div className="bg-white border border-nadayu-border rounded-2xl p-6 flex items-center gap-4">
-        <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
-          <Clock size={20} className="text-orange-500" />
+        <div className="w-12 h-12 bg-nadayu-warning/10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <Clock size={20} className="text-nadayu-warning" />
         </div>
         <div>
-          <p className="text-2xl font-bold text-gray-900 leading-none">{overdueCount}</p>
+          {overviewLoading ? <div className="h-7 w-8 bg-nadayu-cream rounded animate-pulse mb-1" /> : <p className="text-2xl font-bold text-gray-900 leading-none">{overdueCount}</p>}
           <p className="text-xs text-nadayu-muted mt-1">Reports overdue (received &gt;24h ago, unactioned)</p>
         </div>
       </div>
@@ -163,6 +161,7 @@ export const AdminPanel: React.FC = () => {
             <button className="p-2 rounded-xl text-nadayu-muted hover:bg-nadayu-cream transition-colors"><MoreHorizontal size={18} /></button>
           </div>
           <div className="h-64">
+            {overviewLoading ? <div className="w-full h-full bg-nadayu-cream rounded-xl animate-pulse" /> : (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={parkingData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
@@ -180,18 +179,19 @@ export const AdminPanel: React.FC = () => {
                   }}
                 />
                 <Line type="monotone" dataKey="visitors" stroke="#2563EB" strokeWidth={3} dot={{ r: 4, fill: '#2563EB', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 7 }} />
-                <Line type="monotone" dataKey="violations" stroke="#ff6b6b" strokeWidth={3} dot={{ r: 4, fill: '#ff6b6b', strokeWidth: 2, stroke: '#fff' }} />
+                <Line type="monotone" dataKey="violations" stroke="#DC2626" strokeWidth={3} dot={{ r: 4, fill: '#DC2626', strokeWidth: 2, stroke: '#fff' }} />
               </LineChart>
             </ResponsiveContainer>
+            )}
           </div>
           <div className="flex justify-center gap-4 mt-4">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-nadayu-accent/15">
               <div className="w-2 h-2 rounded-full bg-nadayu-accent"></div>
               <span className="text-[11px] font-bold text-nadayu-accent">Visitors</span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/15">
-              <div className="w-2 h-2 rounded-full bg-red-400"></div>
-              <span className="text-[11px] font-bold text-red-400">Violations</span>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-nadayu-danger/15">
+              <div className="w-2 h-2 rounded-full bg-nadayu-danger"></div>
+              <span className="text-[11px] font-bold text-nadayu-danger">Violations</span>
             </div>
           </div>
         </div>
@@ -206,6 +206,7 @@ export const AdminPanel: React.FC = () => {
             <button className="p-2 rounded-xl text-nadayu-muted hover:bg-nadayu-cream transition-colors"><Filter size={18} /></button>
           </div>
           <div className="h-64">
+            {overviewLoading ? <div className="w-full h-full bg-nadayu-cream rounded-xl animate-pulse" /> : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={facilityUsage}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
@@ -215,6 +216,7 @@ export const AdminPanel: React.FC = () => {
                 <Bar dataKey="hours" fill="#2563EB" radius={[8, 8, 8, 8]} barSize={48} />
               </BarChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
@@ -228,7 +230,7 @@ export const AdminPanel: React.FC = () => {
           </div>
         </div>
         {violationsError && (
-          <div className="px-6 py-4 bg-red-50 text-red-600 text-sm font-medium flex items-center gap-2">
+          <div className="px-6 py-4 bg-nadayu-danger/10 text-nadayu-danger text-sm font-medium flex items-center gap-2">
             <AlertTriangle size={16} /> Couldn't load violations — please refresh.
           </div>
         )}
@@ -255,7 +257,7 @@ export const AdminPanel: React.FC = () => {
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                       v.status === 'paid'
                         ? 'bg-nadayu-success/15 text-nadayu-success'
-                        : 'bg-orange-50 text-orange-500'
+                        : 'bg-nadayu-warning/15 text-nadayu-warning'
                     }`}>
                       {v.status}
                     </span>
@@ -303,7 +305,7 @@ export const AdminPanel: React.FC = () => {
               <div className="flex items-center gap-3 pt-2">
                 <span className="text-[11px] font-bold text-nadayu-muted uppercase tracking-wider">Status:</span>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                  selectedViolation.status === 'paid' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-orange-50 text-orange-500'
+                  selectedViolation.status === 'paid' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-nadayu-warning/15 text-nadayu-warning'
                 }`}>{selectedViolation.status}</span>
               </div>
             </div>
@@ -336,6 +338,9 @@ export const AdminPanel: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
+                {users.length === 0 && (
+                  <tr><td colSpan={4} className="px-6 py-12 text-center text-sm text-nadayu-muted">No users found.</td></tr>
+                )}
                 {users.map(u => (
                   <tr key={u.id} className="hover:bg-nadayu-cream/50 transition-colors">
                     <td className="px-6 py-4 font-bold text-gray-900">{u.name}</td>
@@ -366,8 +371,8 @@ export const AdminPanel: React.FC = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div className="bg-white border border-nadayu-border rounded-2xl p-6 flex items-center gap-4">
-                  <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <DollarSign size={20} className="text-orange-500" />
+                  <div className="w-12 h-12 bg-nadayu-warning/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <DollarSign size={20} className="text-nadayu-warning" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900 leading-none">RM {totalOutstanding.toFixed(2)}</p>
@@ -375,8 +380,8 @@ export const AdminPanel: React.FC = () => {
                   </div>
                 </div>
                 <div className="bg-white border border-nadayu-border rounded-2xl p-6 flex items-center gap-4">
-                  <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <AlertTriangle size={20} className="text-orange-500" />
+                  <div className="w-12 h-12 bg-nadayu-warning/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle size={20} className="text-nadayu-warning" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900 leading-none">{arrearsReport.length}</p>
@@ -446,7 +451,7 @@ export const AdminPanel: React.FC = () => {
                             <td className="px-6 py-4 font-bold text-gray-900">{row.unit}</td>
                             <td className="px-6 py-4 text-gray-900">RM {row.totalOwed.toFixed(2)}</td>
                             <td className="px-6 py-4 text-nadayu-muted">{row.oldestDueDate}</td>
-                            <td className="px-6 py-4 text-orange-500 font-bold">{row.daysOverdue}</td>
+                            <td className="px-6 py-4 text-nadayu-warning font-bold">{row.daysOverdue}</td>
                             <td className="px-6 py-4 text-nadayu-muted">{row.overdueCount}</td>
                           </tr>
                         ))}
@@ -556,7 +561,7 @@ export const AdminPanel: React.FC = () => {
                       <td className="px-6 py-4 text-gray-900">RM {inv.amount.toFixed(2)}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
-                          inv.status === 'paid' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-orange-50 text-orange-500'
+                          inv.status === 'paid' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-nadayu-warning/15 text-nadayu-warning'
                         }`}>
                           {inv.status}
                         </span>

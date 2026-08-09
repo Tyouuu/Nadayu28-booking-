@@ -123,9 +123,9 @@ export const SecurityProfile: React.FC = () => {
                     <p className="text-xs font-semibold text-white/70 mb-2">Verified</p>
                     <p className="text-2xl font-bold text-white">{todayStats.verified}</p>
                   </div>
-                  <div className="bg-orange-50 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-orange-500 mb-2">Warnings</p>
-                    <p className="text-2xl font-bold text-orange-600">{todayStats.warnings}</p>
+                  <div className="bg-nadayu-warning/10 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-nadayu-warning mb-2">Warnings</p>
+                    <p className="text-2xl font-bold text-nadayu-warning">{todayStats.warnings}</p>
                   </div>
                   <div className="bg-yellow-50 rounded-xl p-4">
                     <p className="text-xs font-semibold text-yellow-600 mb-2">Pending</p>
@@ -181,7 +181,7 @@ export const SecurityProfile: React.FC = () => {
                 ) : (
                   todaysVisitors.filter(v => v.status === 'flagged').map((v, i) => (
                     <div key={v.id} className={`flex items-start gap-3 py-3 ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
-                      <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-red-400"></span>
+                      <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 bg-nadayu-danger"></span>
                       <p className="text-gray-600 text-xs flex-1 leading-relaxed">{v.visitorName} — Unit {v.residentUnit}</p>
                     </div>
                   ))
@@ -205,9 +205,9 @@ export const SecurityProfile: React.FC = () => {
                 )}
                 {todaysVisitors.map((v, i) => (
                   <div key={v.id} className={`flex items-center gap-4 px-6 py-4 hover:bg-nadayu-cream/50 transition-colors ${i !== 0 ? 'border-t border-gray-50' : ''}`}>
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${v.status === 'flagged' ? 'bg-red-50' : 'bg-nadayu-success/15'}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${v.status === 'flagged' ? 'bg-nadayu-danger/10' : 'bg-nadayu-success/15'}`}>
                       {v.status === 'flagged'
-                        ? <AlertTriangle size={18} className="text-red-400" />
+                        ? <AlertTriangle size={18} className="text-nadayu-danger" />
                         : <CheckCircle2 size={18} className="text-nadayu-success" />}
                     </div>
                     <div className="flex-1">
@@ -216,7 +216,7 @@ export const SecurityProfile: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-nadayu-muted">{new Date(v.actualArrival ?? v.expectedArrival).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
-                      <span className={`text-[10px] font-bold uppercase ${v.status === 'flagged' ? 'text-red-400' : 'text-nadayu-success'}`}>{v.status}</span>
+                      <span className={`text-[10px] font-bold uppercase ${v.status === 'flagged' ? 'text-nadayu-danger' : 'text-nadayu-success'}`}>{v.status}</span>
                     </div>
                   </div>
                 ))}

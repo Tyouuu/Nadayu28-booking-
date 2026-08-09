@@ -43,11 +43,11 @@ export const Billing: React.FC = () => {
       )}
 
       {current && (
-        <div className={`rounded-2xl p-6 mb-6 border ${isOverdue ? 'bg-red-50 border-red-200' : 'bg-white border-nadayu-border'}`}>
+        <div className={`rounded-2xl p-6 mb-6 border ${isOverdue ? 'bg-nadayu-danger/5 border-nadayu-danger/30' : 'bg-white border-nadayu-border'}`}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-bold uppercase tracking-widest text-nadayu-muted">Current Period · {current.period}</p>
             {isOverdue && (
-              <span className="flex items-center gap-1 text-xs font-bold text-red-600 uppercase">
+              <span className="flex items-center gap-1 text-xs font-bold text-nadayu-danger uppercase">
                 <AlertTriangle size={14} /> Overdue
               </span>
             )}

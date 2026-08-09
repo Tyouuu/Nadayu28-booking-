@@ -101,7 +101,12 @@ export const Packages: React.FC = () => {
 
       <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden divide-y divide-gray-50">
         {packages.length === 0 && (
-          <p className="text-sm text-nadayu-muted text-center py-12">No packages yet.</p>
+          <div className="py-12 text-center">
+            <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center mx-auto mb-3">
+              <PackageIcon size={18} className="text-gray-300" />
+            </div>
+            <p className="text-sm text-nadayu-muted">No packages yet.</p>
+          </div>
         )}
         {packages.map(pkg => (
           <div key={pkg.id} className="flex items-center justify-between px-6 py-4 hover:bg-nadayu-cream/50 transition-colors">
@@ -122,7 +127,7 @@ export const Packages: React.FC = () => {
             </div>
             <div className="flex items-center gap-3">
               <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
-                pkg.status === 'collected' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-orange-50 text-orange-500'
+                pkg.status === 'collected' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-nadayu-warning/15 text-nadayu-warning'
               }`}>
                 {pkg.status}
               </span>

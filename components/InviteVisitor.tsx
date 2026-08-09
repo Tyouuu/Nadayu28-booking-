@@ -116,7 +116,7 @@ export const InviteVisitor: React.FC = () => {
                 <CustomTimePicker value={departureTime} onChange={setDepartureTime} />
               </div>
             </div>
-            {apiError && <p className="text-sm text-red-500 text-center px-4 py-2 rounded-xl bg-red-50">{apiError}</p>}
+            {apiError && <p className="text-sm text-nadayu-danger text-center px-4 py-2 rounded-xl bg-nadayu-danger/10">{apiError}</p>}
             <button type="submit" disabled={isLoading}
               className="w-full py-4 rounded-xl font-bold text-white transition-all disabled:opacity-50 bg-nadayu-panel hover:brightness-110">
               {isLoading ? 'Creating...' : 'Generate Visitor QR'}

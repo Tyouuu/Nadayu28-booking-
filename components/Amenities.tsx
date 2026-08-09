@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FACILITIES } from '../constants';
-import { Clock, Check, X, Calendar, AlertCircle, ArrowRight, ArrowUpRight, Star } from 'lucide-react';
+import { Check, X, Calendar, ArrowRight, Star } from 'lucide-react';
 import { FacilityType } from '../types';
 import { CustomDatePicker } from './CustomPickers';
 import { amenityBookingSchema, validate } from '../services/validation';
@@ -128,63 +128,28 @@ export const Amenities: React.FC = () => {
   };
 
   return (
-    <div className="pb-12 space-y-6">
-      {/* Background Gradient */}
-      <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-[100px] -z-10" style={{backgroundColor: 'rgba(37, 99, 235, 0.03)'}}></div>
-      <div className="absolute top-96 right-0 w-96 h-96 rounded-full blur-[100px] -z-10" style={{backgroundColor: 'rgba(37, 99, 235, 0.03)'}}></div>
-      
-      {/* Hero Section - Premium Dark Theme */}
-      <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-sm mb-16 group">
-         <img 
-            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&h=600&fit=crop" 
-            alt="Community Amenities" 
-            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-[2s]"
-         />
-         <div className="absolute inset-0 bg-gradient-to-r backdrop-blur-[1px]" style={{backgroundImage: 'linear-gradient(to right, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.55), rgba(15, 23, 42, 0.1))'}}></div>
-
-         {/* Decorative Elements */}
-         <div className="absolute top-6 right-8 w-32 h-32 rounded-full blur-[80px] opacity-30 animate-pulse" style={{backgroundColor: '#2563EB'}}></div>
-
-         <div className="absolute bottom-0 left-0 p-12 md:p-16 max-w-3xl text-white z-10">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tight">
-               {t.amenities.title}
-            </h1>
-            <p className="text-lg mb-5 max-w-xl leading-relaxed" style={{color: '#B0B0B8'}}>
-               {t.amenities.subtitle}
-            </p>
-         </div>
+    <div className="pb-12">
+      <div className="bg-nadayu-panel rounded-2xl p-8 flex items-center gap-4 mb-5">
+        <div className="w-14 h-14 bg-nadayu-accent rounded-2xl flex items-center justify-center flex-shrink-0">
+          <Star size={28} className="text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-white">{t.amenities.title}</h1>
+          <p className="mt-1 text-sm text-nadayu-muted">{t.amenities.subtitle}</p>
+        </div>
       </div>
 
       {/* Facilities Grid */}
-      <div className=" px-4">
-         <div className="flex items-end justify-between mb-5">
-            <div className="flex items-center gap-4">
-               <div className="w-12 h-12 bg-nadayu-panel rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <Star size={24} className="text-nadayu-accent" />
-               </div>
-               <div>
-                  <h3 className="text-3xl font-bold text-gray-900">Community Amenities</h3>
-                  <p className="mt-1 text-gray-500">Select and book your preferred facility</p>
-               </div>
-            </div>
-         </div>
-
+      <div>
          {/* Category Filter Bar */}
-         <div className="flex gap-3 mb-12 overflow-x-auto pb-2">
+         <div className="flex gap-2 mb-5">
             {categoryFilters.map(filter => (
                <button
                   key={filter.id}
                   onClick={() => setSelectedCategory(filter.id)}
-                  className="px-6 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap flex-shrink-0"
-                  style={selectedCategory === filter.id ? {
-                     backgroundColor: '#0F172A',
-                     color: '#ffffff',
-                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                  } : {
-                     backgroundColor: '#ffffff',
-                     color: '#64748B',
-                     border: '2px solid #E2E8F0'
-                  }}
+                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-colors ${
+                     selectedCategory === filter.id ? 'bg-nadayu-panel text-white' : 'bg-nadayu-cream text-gray-500 hover:bg-gray-200'
+                  }`}
                >
                   {filter.label}
                </button>
@@ -225,17 +190,17 @@ export const Amenities: React.FC = () => {
                      <div className="flex items-center gap-2 mb-3">
                         <span className={`text-xs font-bold px-3 py-1 rounded-full border transition-colors ${
                            getFacilityStatus(facility.id).available
-                              ? 'border-nadayu-success text-nadayu-success'
-                              : 'border-nadayu-muted text-nadayu-muted'
-                        }`} style={{backgroundColor: getFacilityStatus(facility.id).available ? 'rgba(22, 163, 74, 0.15)' : 'rgba(100, 116, 139, 0.15)'}}>
+                              ? 'border-nadayu-success text-nadayu-success bg-nadayu-success/15'
+                              : 'border-nadayu-muted text-nadayu-muted bg-nadayu-muted/15'
+                        }`}>
                            {getFacilityStatus(facility.id).status}
                         </span>
                      </div>
                      <h3 className="text-xl font-bold text-white mb-2">{facility.name}</h3>
-                     <p className="text-xs mb-4" style={{color: '#B0B0B8'}}>
+                     <p className="text-xs mb-4 text-slate-300">
                         {getFacilityDescription(facility.id)}
                      </p>
-                     <div className="flex items-center gap-2 font-bold text-sm group-hover:translate-x-1 transition-transform" style={{color: '#2563EB'}}>
+                     <div className="flex items-center gap-2 font-bold text-sm text-nadayu-accent group-hover:translate-x-1 transition-transform">
                         {t.amenities.bookNow} <ArrowRight size={16} />
                      </div>
                   </div>
@@ -246,9 +211,9 @@ export const Amenities: React.FC = () => {
 
       {/* Booking Modal */}
       {selectedFacility && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl " style={{backgroundColor: 'rgba(0, 0, 0, 0.6)'}}>
-          <div className="rounded-2xl shadow-sm w-full max-w-2xl overflow-hidden relative" style={{backgroundColor: '#ffffff'}}>
-            
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl bg-black/60">
+          <div className="rounded-2xl shadow-sm w-full max-w-2xl overflow-hidden relative bg-white">
+
             {!bookingSuccess && (
               <button onClick={closeModal} className="absolute top-6 right-6 p-2.5 rounded-full z-50 transition-colors bg-nadayu-cream hover:bg-nadayu-border text-gray-500">
                 <X size={24} />
@@ -258,10 +223,10 @@ export const Amenities: React.FC = () => {
             {bookingSuccess ? (
               // Success State
               <div className="p-16 flex flex-col items-center justify-center text-center bg-white">
-                <div className="w-24 h-24 text-white rounded-full flex items-center justify-center mb-5 shadow-xl animate-bounce" style={{backgroundColor: '#16A34A'}}>
+                <div className="w-24 h-24 text-white rounded-full flex items-center justify-center mb-5 shadow-xl animate-bounce bg-nadayu-success">
                   <Check size={48} />
                 </div>
-                <h3 className="text-4xl font-bold mb-4 text-gray-900">{t.amenities.bookingConfirmed}</h3>
+                <h3 className="text-3xl font-bold mb-4 text-gray-900">{t.amenities.bookingConfirmed}</h3>
                 <p className="text-lg mb-5 max-w-md leading-relaxed text-gray-500">
                   You're all set for <span className="font-bold text-nadayu-panel">{selectedFacility.name}</span>
                   <br/>
@@ -275,12 +240,12 @@ export const Amenities: React.FC = () => {
               // Booking Form
               <div className="relative">
                 {/* Header with Image */}
-                <div className="relative h-56 overflow-hidden" style={{backgroundColor: '#0F172A'}}>
+                <div className="relative h-56 overflow-hidden bg-nadayu-panel">
                    <img src={getFacilityImage(selectedFacility.id)} className="w-full h-full object-cover opacity-80" alt="Facility" />
-                   <div className="absolute inset-0 bg-gradient-to-r" style={{backgroundImage: 'linear-gradient(to right, rgba(15, 23, 42, 1), rgba(58, 50, 38, 0.8), transparent)'}}></div>
+                   <div className="absolute inset-0 bg-gradient-to-r from-nadayu-panel via-nadayu-panel/70 to-transparent"></div>
                    <div className="absolute bottom-8 left-8 text-white z-10">
                       <h3 className="text-xl font-bold mb-2">{selectedFacility.name}</h3>
-                      <p className="flex items-center gap-2" style={{color: '#B0B0B8'}}>
+                      <p className="flex items-center gap-2 text-slate-300">
                         <Calendar size={16} /> Select your preferred time slot
                       </p>
                    </div>
@@ -297,7 +262,7 @@ export const Amenities: React.FC = () => {
                           value={bookingDate}
                           onChange={(v) => { setBookingDate(v); setFieldErrors(prev => ({ ...prev, bookingDate: '' })); }}
                         />
-                        {fieldErrors.bookingDate && <p className="text-red-500 text-xs mt-1">{fieldErrors.bookingDate}</p>}
+                        {fieldErrors.bookingDate && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.bookingDate}</p>}
                       </div>
 
                       {/* Time Slots */}
@@ -314,42 +279,30 @@ export const Amenities: React.FC = () => {
                                 type="button"
                                 disabled={isTaken}
                                 onClick={() => { setBookingTime(time); setFieldErrors(prev => ({ ...prev, bookingTime: '' })); }}
-                                className={`py-4 rounded-xl text-sm font-bold transition-all duration-300`}
-                                style={isTaken ? {
-                                  backgroundColor: '#F1F5F9',
-                                  borderColor: '#E2E8F0',
-                                  border: '2px solid',
-                                  color: '#64748B',
-                                  cursor: 'not-allowed',
-                                  textDecoration: 'line-through'
-                                } : bookingTime === time ? {
-                                  backgroundColor: '#0F172A',
-                                  color: '#ffffff',
-                                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                  border: '2px solid #0F172A'
-                                } : {
-                                  backgroundColor: '#F1F5F9',
-                                  borderColor: '#E2E8F0',
-                                  border: '2px solid',
-                                  color: '#0F172A'
-                                }}
+                                className={`py-4 rounded-xl text-sm font-bold border-2 transition-all duration-300 ${
+                                  isTaken
+                                    ? 'bg-nadayu-cream border-nadayu-border text-nadayu-muted line-through cursor-not-allowed'
+                                    : bookingTime === time
+                                    ? 'bg-nadayu-panel border-nadayu-panel text-white shadow-lg'
+                                    : 'bg-nadayu-cream border-nadayu-border text-nadayu-panel hover:border-nadayu-panel'
+                                }`}
                               >
                                 {time}{isTaken ? ' · Taken' : ''}
                               </button>
                             );
                           })}
                         </div>
-                        {fieldErrors.bookingTime && <p className="text-red-500 text-xs mt-1">{fieldErrors.bookingTime}</p>}
+                        {fieldErrors.bookingTime && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.bookingTime}</p>}
                       </div>
 
                       {submitError && (
-                        <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#fef2f2', borderColor: '#ef4444', color: '#991b1b'}}>
+                        <div className="border-l-4 border-nadayu-danger bg-nadayu-danger/10 text-nadayu-danger p-4 rounded-lg">
                           <p className="text-sm font-medium">{submitError}</p>
                         </div>
                       )}
 
                       {/* Info Alert */}
-                      <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#F1F5F9', borderColor: '#0F172A', color: '#0F172A'}}>
+                      <div className="border-l-4 border-nadayu-panel bg-nadayu-cream text-nadayu-panel p-4 rounded-lg">
                         <p className="text-sm font-medium">
                           {t.amenities.instantQr}
                         </p>
@@ -359,14 +312,7 @@ export const Amenities: React.FC = () => {
                       <button
                         type="submit"
                         disabled={isSubmitting || !bookingDate || !bookingTime}
-                        className="w-full font-bold py-5 rounded-xl transition-all shadow-lg text-lg transform hover:-translate-y-1 disabled:transform-none text-white"
-                        style={{
-                          backgroundColor: '#0F172A',
-                          opacity: (isSubmitting || !bookingDate || !bookingTime) ? 0.5 : 1,
-                          cursor: (isSubmitting || !bookingDate || !bookingTime) ? 'not-allowed' : 'pointer'
-                        }}
-                        onMouseEnter={(e) => !isSubmitting && (e.currentTarget.style.backgroundColor = '#1E293B')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#0F172A')}
+                        className="w-full font-bold py-5 rounded-xl transition-all shadow-lg text-lg transform hover:-translate-y-1 disabled:transform-none text-white bg-nadayu-panel hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                       >
                         {isSubmitting ? 'Processing...' : 'Confirm Booking'}
                       </button>

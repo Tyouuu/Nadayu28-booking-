@@ -148,7 +148,7 @@ export const SmartAssistant: React.FC = () => {
             onClick={() => setIsOpen(true)}
             className="group relative bg-nadayu-panel text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-nadayu-accent hover:text-white flex items-center justify-center ring-4 ring-white"
           >
-            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-nadayu-danger rounded-full border-2 border-white animate-pulse"></span>
             <MessageCircle size={28} />
             <span className="absolute right-full mr-4 px-4 py-2 rounded-xl text-xs font-bold shadow-xl bg-nadayu-panel text-white opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 whitespace-nowrap pointer-events-none">
               Need Help?

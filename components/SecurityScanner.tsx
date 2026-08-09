@@ -223,7 +223,7 @@ export const SecurityScanner: React.FC = () => {
               <p className="font-semibold text-white text-lg mb-1">Ready to Scan</p>
               <p className="text-sm text-gray-500 mb-6">Point camera at a {mode === 'visitor' ? 'visitor' : 'booking'} QR code</p>
               {errorMsg && (
-                <p className="text-sm mb-4 px-4 py-2 rounded-xl bg-red-500/10 text-red-400">{errorMsg}</p>
+                <p className="text-sm mb-4 px-4 py-2 rounded-xl bg-nadayu-danger/10 text-nadayu-danger">{errorMsg}</p>
               )}
               <button onClick={startScanner}
                 className="bg-nadayu-accent text-white px-8 py-4 rounded-xl font-bold text-sm transition-all hover:brightness-95 active:scale-95 flex items-center gap-2">
@@ -283,7 +283,7 @@ export const SecurityScanner: React.FC = () => {
           {/* Visitor success state */}
           {result === 'success' && mode === 'visitor' && scannedVisitor && (
             <div className="z-20 text-center w-full flex flex-col items-center">
-              <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${visitorFlagged ? 'bg-orange-400' : 'bg-nadayu-success'}`}>
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${visitorFlagged ? 'bg-nadayu-warning' : 'bg-nadayu-success'}`}>
                 {visitorFlagged
                   ? <AlertTriangle className="w-10 h-10 text-white" strokeWidth={3} />
                   : <CheckCircle className="w-10 h-10 text-white" strokeWidth={3} />}
@@ -337,11 +337,11 @@ export const SecurityScanner: React.FC = () => {
           {/* Fail state */}
           {result === 'fail' && (
             <div className="z-20 text-center w-full flex flex-col items-center">
-              <div className="w-20 h-20 bg-red-500/15 border-2 border-red-500/30 rounded-full flex items-center justify-center mb-5">
-                <XCircle className="w-10 h-10 text-red-400" strokeWidth={3} />
+              <div className="w-20 h-20 bg-nadayu-danger/15 border-2 border-nadayu-danger/30 rounded-full flex items-center justify-center mb-5">
+                <XCircle className="w-10 h-10 text-nadayu-danger" strokeWidth={3} />
               </div>
               <h3 className="text-xl font-bold text-white mb-1">Access Denied</h3>
-              <p className="text-sm text-red-400 mb-6">{errorMsg || 'Invalid or expired code'}</p>
+              <p className="text-sm text-nadayu-danger mb-6">{errorMsg || 'Invalid or expired code'}</p>
               <button onClick={handleReset}
                 className="bg-white/10 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/15 transition-colors">
                 Try Again

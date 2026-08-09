@@ -280,7 +280,7 @@ export const Profile: React.FC = () => {
 
             {/* Logout Button */}
             <div className="pt-4 border-t border-nadayu-border">
-              <button onClick={logout} className="w-full px-5 py-4 rounded-xl text-sm font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 border border-red-500/20">
+              <button onClick={logout} className="w-full px-5 py-4 rounded-xl text-sm font-bold text-nadayu-danger hover:bg-nadayu-danger/10 transition-all flex items-center justify-center gap-2 border border-nadayu-danger/20">
                 <LogOut size={18} /> Sign Out
               </button>
             </div>
@@ -426,7 +426,7 @@ export const Profile: React.FC = () => {
 
             {/* Add Vehicle Form */}
             {isAddingVehicle && (
-              <div className="bg-white p-6 rounded-2xl shadow-xl border border-nadayu-border ">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-nadayu-border ">
                 <h4 className="font-bold text-gray-900 mb-6 text-lg flex items-center gap-2">
                   <Plus className={accountRole === 'owner' ? 'text-nadayu-panel' : 'text-nadayu-panel'} size={20} />
                   Register New Vehicle
@@ -440,10 +440,10 @@ export const Profile: React.FC = () => {
                         value={newVehicle.plate}
                         onChange={(e) => { setNewVehicle({...newVehicle, plate: e.target.value}); setFieldErrors(prev => ({ ...prev, plate: '' })); }}
                         placeholder="e.g. ABC 1234"
-                        className={`w-full px-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none uppercase font-bold transition-colors ${fieldErrors.plate ? 'border-red-400' : 'border-nadayu-border'}`}
+                        className={`w-full px-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none uppercase font-bold transition-colors ${fieldErrors.plate ? 'border-nadayu-danger' : 'border-nadayu-border'}`}
                         autoFocus
                       />
-                      {fieldErrors.plate && <p className="text-red-500 text-xs mt-1">{fieldErrors.plate}</p>}
+                      {fieldErrors.plate && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.plate}</p>}
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-nadayu-muted uppercase">{t.profile.model}</label>
@@ -480,7 +480,7 @@ export const Profile: React.FC = () => {
             <div className="grid grid-cols-1 gap-4">
               {vehicles.length > 0 ? (
                 vehicles.map((vehicle) => (
-                  <div key={vehicle.id} className="bg-white p-6 rounded-2xl shadow-xl border border-nadayu-border hover:border-nadayu-border transition-colors group">
+                  <div key={vehicle.id} className="bg-white p-6 rounded-2xl shadow-sm border border-nadayu-border hover:border-nadayu-border transition-colors group">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-5">
                         <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-xl border-2 transition-all group-hover:shadow-lg ${
@@ -498,7 +498,7 @@ export const Profile: React.FC = () => {
                       <button
                         onClick={() => handleDeleteVehicle(vehicle.id)}
                         disabled={isDeletingVehicleId === vehicle.id}
-                        className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all border border-transparent hover:border-red-500/30 disabled:opacity-50"
+                        className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-400 hover:text-nadayu-danger hover:bg-nadayu-danger/10 transition-all border border-transparent hover:border-nadayu-danger/30 disabled:opacity-50"
                       >
                         <Trash2 size={20} />
                       </button>
@@ -542,7 +542,7 @@ export const Profile: React.FC = () => {
 
             {/* Add Tenant Form */}
             {isAddingTenant && (
-              <div className="bg-white p-6 rounded-2xl shadow-xl border border-nadayu-border ">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-nadayu-border ">
                 <h4 className="font-bold text-gray-900 mb-6 text-lg flex items-center gap-2">
                   <Plus className="text-nadayu-panel" size={20} />
                   Add New Tenant
@@ -556,9 +556,9 @@ export const Profile: React.FC = () => {
                         value={newTenant.name}
                         onChange={(e) => { setNewTenant({...newTenant, name: e.target.value}); setFieldErrors(prev => ({ ...prev, name: '' })); }}
                         placeholder="e.g. John Smith"
-                        className={`w-full px-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors ${fieldErrors.name ? 'border-red-400' : 'border-nadayu-border'}`}
+                        className={`w-full px-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors ${fieldErrors.name ? 'border-nadayu-danger' : 'border-nadayu-border'}`}
                       />
-                      {fieldErrors.name && <p className="text-red-500 text-xs mt-1">{fieldErrors.name}</p>}
+                      {fieldErrors.name && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.name}</p>}
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-nadayu-muted uppercase">Unit Number</label>
@@ -580,10 +580,10 @@ export const Profile: React.FC = () => {
                         value={newTenant.email}
                         onChange={(e) => { setNewTenant({...newTenant, email: e.target.value}); setFieldErrors(prev => ({ ...prev, email: '' })); }}
                         placeholder="e.g. john@example.com"
-                        className={`w-full pl-12 pr-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors ${fieldErrors.email ? 'border-red-400' : 'border-nadayu-border'}`}
+                        className={`w-full pl-12 pr-5 py-4 bg-white border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors ${fieldErrors.email ? 'border-nadayu-danger' : 'border-nadayu-border'}`}
                       />
                     </div>
-                    {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
+                    {fieldErrors.email && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.email}</p>}
                   </div>
                   <div className="flex gap-3 justify-end pt-4 border-t border-nadayu-border">
                     <button 
@@ -608,7 +608,7 @@ export const Profile: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {tenants.length > 0 ? (
                 tenants.map((tenant) => (
-                  <div key={tenant.id} className="bg-white p-6 rounded-2xl shadow-xl border border-nadayu-border hover:border-nadayu-border transition-all group">
+                  <div key={tenant.id} className="bg-white p-6 rounded-2xl shadow-sm border border-nadayu-border hover:border-nadayu-border transition-all group">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full bg-nadayu-panel flex items-center justify-center text-white font-bold text-lg">
@@ -624,7 +624,7 @@ export const Profile: React.FC = () => {
                       <div className={`px-3 py-1 rounded-full text-xs font-bold border ${
                         tenant.status === 'active'
                           ? 'bg-nadayu-success/10 text-nadayu-success border-nadayu-success/30'
-                          : 'bg-red-500/10 text-red-400 border-red-500/30'
+                          : 'bg-nadayu-danger/10 text-nadayu-danger border-nadayu-danger/30'
                       }`}>
                         {tenant.status === 'active' ? '✓ Active' : '✗ Inactive'}
                       </div>
@@ -646,7 +646,7 @@ export const Profile: React.FC = () => {
                       </button>
                       <button 
                         onClick={() => handleDeleteTenant(tenant.id)}
-                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all border border-red-500/30 hover:border-red-500/50 flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2 rounded-xl font-bold text-sm text-nadayu-danger hover:bg-nadayu-danger/10 transition-all border border-nadayu-danger/30 hover:border-nadayu-danger/50 flex items-center justify-center gap-2"
                       >
                         <Trash2 size={16} /> Delete
                       </button>
@@ -711,7 +711,7 @@ export const Profile: React.FC = () => {
                       className="w-full px-5 py-4 bg-white border border-nadayu-border rounded-xl text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none font-medium transition-colors"
                     />
                   </div>
-                  {passwordMsg && <p className={`text-sm font-medium ${passwordMsg === 'Password updated.' ? 'text-nadayu-success' : 'text-red-500'}`}>{passwordMsg}</p>}
+                  {passwordMsg && <p className={`text-sm font-medium ${passwordMsg === 'Password updated.' ? 'text-nadayu-success' : 'text-nadayu-danger'}`}>{passwordMsg}</p>}
                   <button
                     onClick={handleUpdatePassword}
                     disabled={isSavingPassword || !newPassword || !confirmPassword}
@@ -803,7 +803,7 @@ export const Profile: React.FC = () => {
                           <p className="font-bold text-gray-900 text-sm">{r.category}</p>
                           <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                             r.status === 'Resolved' ? 'bg-nadayu-success/15 text-nadayu-success' :
-                            r.status === 'In Progress' ? 'bg-blue-50 text-blue-500' : 'bg-orange-50 text-orange-500'
+                            r.status === 'In Progress' ? 'bg-nadayu-accent/15 text-nadayu-accent' : 'bg-nadayu-warning/15 text-nadayu-warning'
                           }`}>{r.status}</span>
                         </div>
                         <p className="text-xs text-gray-500 mb-1">{r.description}</p>

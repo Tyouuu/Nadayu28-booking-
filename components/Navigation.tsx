@@ -72,7 +72,7 @@ export const Navigation: React.FC = () => {
               }`}
             >
               <item.icon size={17} strokeWidth={active ? 2.5 : 1.8} className="flex-shrink-0" />
-              <span className="text-[13px] font-medium flex-1">{item.label}</span>
+              <span className="text-sm font-medium flex-1">{item.label}</span>
               {active && <ChevronRight size={13} className="flex-shrink-0" />}
             </button>
           );
@@ -134,8 +134,8 @@ export const Navigation: React.FC = () => {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden md:block w-48 flex-shrink-0">
-        <div className="fixed inset-y-0 left-0 w-48">
+      <div className="hidden md:block w-60 flex-shrink-0">
+        <div className="fixed inset-y-0 left-0 w-60">
           <Sidebar />
         </div>
       </div>

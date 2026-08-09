@@ -1,20 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, BarChart2, Clock, CheckCircle2, AlertTriangle, FileText, Briefcase, Calendar, Megaphone, Scale, ClipboardList, Edit2, Save } from 'lucide-react';
+import { User, Mail, Phone, BarChart2, Clock, Briefcase, Megaphone, Scale, Edit2, Save } from 'lucide-react';
 import { useAppNavigate } from '../hooks/useAppNavigate';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchViolations, fetchReports, fetchBookings, fetchAuditLog, computeArrearsReport, fetchAllInvoices, updateProfile, AuditLogEntry } from '../services/dataService';
-
-interface Approval {
-  id: number;
-  type: string;
-  unit: string;
-  desc: string;
-  date: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'pending' | 'approved' | 'rejected';
-}
 
 function formatTimeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -36,7 +26,7 @@ function describeActivity(entry: AuditLogEntry): string {
 export const ManagementProfile: React.FC = () => {
   const setCurrentView = useAppNavigate();
   const { userProfile } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'approvals' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'settings'>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [phoneInput, setPhoneInput] = useState('');
@@ -57,9 +47,6 @@ export const ManagementProfile: React.FC = () => {
     }
   };
 
-  const [approvals, setApprovals] = useState<Approval[]>([]);
-  const pendingCount = approvals.filter(a => a.status === 'pending').length;
-
   const [stats, setStats] = useState({ pendingViolations: 0, unreadComplaints: 0, todayBookings: 0, unitsInArrears: 0 });
   const [recentActivity, setRecentActivity] = useState<AuditLogEntry[]>([]);
 
@@ -74,13 +61,8 @@ export const ManagementProfile: React.FC = () => {
     fetchAuditLog().then(entries => setRecentActivity(entries.slice(0, 4))).catch(() => {});
   }, []);
 
-  const handleApproval = (id: number, action: 'approved' | 'rejected') => {
-    setApprovals(prev => prev.map(a => a.id === id ? { ...a, status: action } : a));
-  };
-
   const tabs = [
     { id: 'overview' as const, label: 'Overview', icon: BarChart2 },
-    { id: 'approvals' as const, label: 'Approvals', icon: ClipboardList },
     { id: 'settings' as const, label: 'My Details', icon: User },
   ];
 
@@ -120,9 +102,6 @@ export const ManagementProfile: React.FC = () => {
                     activeTab === tab.id ? 'bg-nadayu-panel text-white' : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
                   }`}>
                   <tab.icon size={16} /> {tab.label}
-                  {tab.id === 'approvals' && pendingCount > 0 && (
-                    <span className="ml-auto text-[10px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full">{pendingCount}</span>
-                  )}
                 </button>
               ))}
             </div>
@@ -140,13 +119,13 @@ export const ManagementProfile: React.FC = () => {
                   <span className="text-nadayu-muted text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 </div>
                 <div className="grid grid-cols-4 gap-3">
-                  <div className="bg-orange-50 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-orange-500 mb-2">Pending Violations</p>
-                    <p className="text-2xl font-bold text-orange-600">{stats.pendingViolations}</p>
+                  <div className="bg-nadayu-warning/10 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-nadayu-warning mb-2">Pending Violations</p>
+                    <p className="text-2xl font-bold text-nadayu-warning">{stats.pendingViolations}</p>
                   </div>
-                  <div className="bg-red-50 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-red-500 mb-2">Unread Complaints</p>
-                    <p className="text-2xl font-bold text-red-600">{stats.unreadComplaints}</p>
+                  <div className="bg-nadayu-danger/10 rounded-xl p-4">
+                    <p className="text-xs font-semibold text-nadayu-danger mb-2">Unread Complaints</p>
+                    <p className="text-2xl font-bold text-nadayu-danger">{stats.unreadComplaints}</p>
                   </div>
                   <div className="bg-nadayu-accent rounded-xl p-4">
                     <p className="text-xs font-semibold text-white/70 mb-2">Today's Bookings</p>
@@ -202,67 +181,6 @@ export const ManagementProfile: React.FC = () => {
                 )}
               </div>
             </>
-          )}
-
-          {/* Approvals - functional approve/reject */}
-          {activeTab === 'approvals' && (
-            <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
-              <div className="px-6 pt-5 pb-4 border-b border-gray-50 flex justify-between items-center">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900">Pending Approvals</h3>
-                  <p className="text-xs text-nadayu-muted mt-0.5">{pendingCount} items need your attention</p>
-                </div>
-              </div>
-              <div className="divide-y divide-gray-50">
-                {approvals.length === 0 && (
-                  <p className="px-6 py-12 text-center text-sm text-nadayu-muted">No pending approvals.</p>
-                )}
-                {approvals.map(item => (
-                  <div key={item.id} className={`px-6 py-5 transition-colors ${item.status !== 'pending' ? 'opacity-60' : 'hover:bg-nadayu-cream/50'}`}>
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          item.priority === 'high' ? 'bg-red-50' : item.priority === 'medium' ? 'bg-orange-50' : 'bg-nadayu-cream'
-                        }`}>
-                          {item.type === 'Refund Request'
-                            ? <FileText size={18} className={item.priority === 'high' ? 'text-red-400' : 'text-orange-400'} />
-                            : <Calendar size={18} className="text-nadayu-muted" />}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-gray-900">{item.type}</p>
-                          <p className="text-xs text-nadayu-muted">Unit {item.unit} · {item.date}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {item.status !== 'pending' && (
-                          <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${
-                            item.status === 'approved' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-red-50 text-red-500'
-                          }`}>{item.status}</span>
-                        )}
-                        {item.status === 'pending' && (
-                          <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${
-                            item.priority === 'high' ? 'bg-red-50 text-red-500' : item.priority === 'medium' ? 'bg-orange-50 text-orange-500' : 'bg-nadayu-cream text-nadayu-muted'
-                          }`}>{item.priority}</span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-3 ml-[52px]">{item.desc}</p>
-                    {item.status === 'pending' && (
-                      <div className="flex gap-2 ml-[52px]">
-                        <button onClick={() => handleApproval(item.id, 'approved')}
-                          className="px-4 py-2 bg-nadayu-panel text-white rounded-lg text-xs font-bold hover:brightness-110 transition-colors flex items-center gap-1.5">
-                          <CheckCircle2 size={13} /> Approve
-                        </button>
-                        <button onClick={() => handleApproval(item.id, 'rejected')}
-                          className="px-4 py-2 bg-white border border-nadayu-border text-gray-500 rounded-lg text-xs font-bold hover:border-red-300 hover:text-red-500 hover:bg-red-50 transition-colors">
-                          Reject
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
           )}
 
           {/* My Details with edit feature */}

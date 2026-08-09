@@ -61,7 +61,12 @@ export const Maintenance: React.FC = () => {
 
       <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden divide-y divide-gray-50">
         {filtered.length === 0 && (
-          <p className="text-sm text-nadayu-muted text-center py-12">No reports in this status.</p>
+          <div className="py-12 text-center">
+            <div className="w-10 h-10 bg-nadayu-cream rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Wrench size={18} className="text-gray-300" />
+            </div>
+            <p className="text-sm text-nadayu-muted">No reports in this status.</p>
+          </div>
         )}
         {filtered.map(r => {
           const isOpen = expandedId === r.id;
@@ -77,7 +82,7 @@ export const Maintenance: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                     r.status === 'Resolved' ? 'bg-nadayu-success/15 text-nadayu-success' :
-                    r.status === 'In Progress' ? 'bg-blue-50 text-blue-500' : 'bg-orange-50 text-orange-500'
+                    r.status === 'In Progress' ? 'bg-nadayu-accent/15 text-nadayu-accent' : 'bg-nadayu-warning/15 text-nadayu-warning'
                   }`}>{r.status}</span>
                   {isOpen ? <ChevronUp size={16} className="text-nadayu-muted" /> : <ChevronDown size={16} className="text-nadayu-muted" />}
                 </div>

@@ -401,10 +401,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                               value={loginEmail}
                               onChange={(e) => { setLoginEmail(e.target.value); setFieldErrors(prev => ({ ...prev, email: '' })); }}
                               placeholder={getLoginPlaceholder()}
-                              className={`w-full pl-12 pr-4 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.email ? 'border-red-400' : 'border-nadayu-border/50'}`}
+                              className={`w-full pl-12 pr-4 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.email ? 'border-nadayu-danger' : 'border-nadayu-border/50'}`}
                             />
                           </div>
-                          {fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
+                          {fieldErrors.email && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.email}</p>}
                         </div>
 
                         <div className="space-y-2">
@@ -416,7 +416,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                               value={loginPassword}
                               onChange={(e) => { setLoginPassword(e.target.value); setFieldErrors(prev => ({ ...prev, password: '' })); }}
                               placeholder="••••••••"
-                              className={`w-full pl-12 pr-12 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.password ? 'border-red-400' : 'border-nadayu-border/50'}`}
+                              className={`w-full pl-12 pr-12 py-3 bg-nadayu-cream border rounded-xl focus:ring-2 focus:ring-nadayu-accent/20 focus:border-nadayu-accent outline-none transition-all font-medium text-gray-900 placeholder-gray-400 ${fieldErrors.password ? 'border-nadayu-danger' : 'border-nadayu-border/50'}`}
                             />
                             <button
                               type="button"
@@ -426,7 +426,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
                               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                           </div>
-                          {fieldErrors.password && <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>}
+                          {fieldErrors.password && <p className="text-nadayu-danger text-xs mt-1">{fieldErrors.password}</p>}
                           <div className="flex justify-end">
                             <button
                               type="button"
@@ -496,14 +496,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                         {/* OTP Error */}
                         {otpError && (
-                          <p className="text-sm text-center px-4 py-2 rounded-xl text-red-600 bg-red-50">{otpError}</p>
+                          <p className="text-sm text-center px-4 py-2 rounded-xl text-nadayu-danger bg-nadayu-danger/10">{otpError}</p>
                         )}
                       </div>
                     )}
 
                     {/* Auth error */}
                     {authError && (
-                      <p className="text-sm text-center px-4 py-2 rounded-xl text-red-600 bg-red-50">{authError}</p>
+                      <p className="text-sm text-center px-4 py-2 rounded-xl text-nadayu-danger bg-nadayu-danger/10">{authError}</p>
                     )}
 
                     {/* Submit Button */}
@@ -624,15 +624,17 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                     {/* Auth error */}
                     {authError && (
-                      <p className="text-sm text-center px-4 py-2 rounded-xl text-red-600 bg-red-50">{authError}</p>
+                      <p className="text-sm text-center px-4 py-2 rounded-xl text-nadayu-danger bg-nadayu-danger/10">{authError}</p>
                     )}
 
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all mt-8 disabled:opacity-50"
+                      className="w-full bg-nadayu-accent hover:brightness-95 text-white py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
                     >
-                      {isLoading ? 'Processing...' : t.login.createAccount}
+                      {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-nadayu-panel/30 border-t-nadayu-panel rounded-full animate-spin" />
+                      ) : t.login.createAccount}
                     </button>
                   </form>
                 )}

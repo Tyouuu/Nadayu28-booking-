@@ -16,13 +16,16 @@ export const Dashboard: React.FC = () => {
   const [activeBookings, setActiveBookings] = useState<Booking[]>(USE_MOCK_DATA ? MOCK_BOOKINGS.filter(b => b.status === "active") : []);
   const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>(USE_MOCK_DATA ? MOCK_ANNOUNCEMENTS.slice(0, 3) : []);
   const [waitingPackages, setWaitingPackages] = useState<Package[]>([]);
+  const [isLoading, setIsLoading] = useState(!USE_MOCK_DATA);
 
   useEffect(() => {
-    fetchBookings().then(data => setActiveBookings(data.filter(b => b.status === "active"))).catch(() => {});
-    fetchAnnouncements().then(data => setRecentAnnouncements(data.slice(0, 3))).catch(() => {});
-    if (userProfile?.unit) {
-      fetchPackages(userProfile.unit).then(pkgs => setWaitingPackages(pkgs.filter(p => p.status === 'waiting'))).catch(() => {});
-    }
+    Promise.all([
+      fetchBookings().then(data => setActiveBookings(data.filter(b => b.status === "active"))).catch(() => {}),
+      fetchAnnouncements().then(data => setRecentAnnouncements(data.slice(0, 3))).catch(() => {}),
+      userProfile?.unit
+        ? fetchPackages(userProfile.unit).then(pkgs => setWaitingPackages(pkgs.filter(p => p.status === 'waiting'))).catch(() => {})
+        : Promise.resolve(),
+    ]).finally(() => setIsLoading(false));
   }, [userProfile?.unit]);
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t.dashboard.goodMorning : hour < 18 ? t.dashboard.goodAfternoon : t.dashboard.goodEvening;
@@ -68,7 +71,7 @@ export const Dashboard: React.FC = () => {
               <span className="text-nadayu-muted text-xs font-semibold">{t.dashboard.activeBookings}</span>
               <ArrowUpRight size={14} className="text-nadayu-muted" />
             </div>
-            <p className="text-gray-900 text-[1.6rem] font-bold leading-none mb-1">{activeBookings.length}</p>
+            {isLoading ? <div className="h-8 w-10 bg-nadayu-border rounded animate-pulse mb-1" /> : <p className="text-gray-900 text-[1.6rem] font-bold leading-none mb-1">{activeBookings.length}</p>}
             <p className="text-nadayu-muted text-xs mt-2">{t.dashboard.facilitiesReserved}</p>
           </div>
           <div className="bg-nadayu-cream rounded-xl p-5 cursor-pointer hover:bg-nadayu-border transition-all" onClick={() => setCurrentView("community")}>
@@ -76,7 +79,7 @@ export const Dashboard: React.FC = () => {
               <span className="text-nadayu-muted text-xs font-semibold">{t.dashboard.announcements}</span>
               <ArrowUpRight size={14} className="text-nadayu-muted" />
             </div>
-            <p className="text-gray-900 text-[1.6rem] font-bold leading-none mb-1">{recentAnnouncements.length}</p>
+            {isLoading ? <div className="h-8 w-10 bg-nadayu-border rounded animate-pulse mb-1" /> : <p className="text-gray-900 text-[1.6rem] font-bold leading-none mb-1">{recentAnnouncements.length}</p>}
             <p className="text-nadayu-muted text-xs mt-2">{t.dashboard.communityUpdates}</p>
           </div>
         </div>
@@ -103,7 +106,11 @@ export const Dashboard: React.FC = () => {
               <h2 className="text-gray-900 font-semibold text-sm">{t.dashboard.yourSchedule}</h2>
               <button onClick={() => setCurrentView("amenities")} className="text-[11px] text-nadayu-accent font-bold bg-nadayu-panel px-3 py-1.5 rounded-full hover:brightness-110 transition-colors">{t.dashboard.newBooking}</button>
             </div>
-            {activeBookings.length > 0 ? (
+            {isLoading ? (
+              <div className="p-5 space-y-3">
+                {[0, 1].map(i => <div key={i} className="h-11 bg-nadayu-cream rounded-xl animate-pulse" />)}
+              </div>
+            ) : activeBookings.length > 0 ? (
               <div>
                 {activeBookings.map((booking, idx) => (
                   <div key={booking.id} className={"flex items-center gap-4 px-5 py-3.5 hover:bg-nadayu-cream/70 transition-colors cursor-pointer" + (idx !== 0 ? " border-t border-gray-50" : "")}>
@@ -150,7 +157,12 @@ export const Dashboard: React.FC = () => {
               )}
             </div>
             <div>
-              {waitingPackages.length === 0 && (
+              {isLoading && (
+                <div className="space-y-2 py-1">
+                  {[0, 1].map(i => <div key={i} className="h-4 bg-nadayu-cream rounded animate-pulse" />)}
+                </div>
+              )}
+              {!isLoading && waitingPackages.length === 0 && (
                 <p className="text-gray-400 text-xs py-3">No new notifications.</p>
               )}
               {waitingPackages.map((pkg, i) => (
@@ -172,6 +184,15 @@ export const Dashboard: React.FC = () => {
             <button onClick={() => setCurrentView("community")} className="text-nadayu-muted hover:text-gray-700 transition-colors"><ArrowUpRight size={15} /></button>
           </div>
           <div className="space-y-3">
+            {isLoading && (
+              [0, 1].map(i => <div key={i} className="h-20 bg-white border border-nadayu-border rounded-xl animate-pulse" />)
+            )}
+            {!isLoading && recentAnnouncements.length === 0 && (
+              <div className="bg-white border border-nadayu-border rounded-xl p-6 text-center">
+                <Bell size={20} className="text-gray-300 mx-auto mb-2" />
+                <p className="text-nadayu-muted text-xs">No announcements yet.</p>
+              </div>
+            )}
             {recentAnnouncements.map((ann, idx) => {
               const pc = ann.priority === "high" ? "bg-nadayu-panel text-nadayu-accent" : ann.priority === "medium" ? "bg-nadayu-cream text-gray-600" : "bg-nadayu-cream text-nadayu-muted";
               return (
@@ -186,7 +207,7 @@ export const Dashboard: React.FC = () => {
                 </div>
               );
             })}
-            <button onClick={() => setCurrentView("report")} className="w-full bg-nadayu-panel rounded-xl p-4 text-left hover:bg-[#181818] transition-colors group">
+            <button onClick={() => setCurrentView("report")} className="w-full bg-nadayu-panel rounded-xl p-4 text-left hover:brightness-125 transition-all group">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-nadayu-accent text-xs font-semibold">{t.dashboard.reportAnIssue}</span>
                 <ArrowUpRight size={12} className="text-gray-600 group-hover:text-nadayu-accent transition-colors" />

@@ -50,15 +50,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id, session.user.email ?? null);
-        const role = mapRole(profile?.role);
-        setCurrentUserRole(role);
-        setUserProfile(profile);
-        setIsLoggedIn(true);
+      try {
+        if (session?.user) {
+          const profile = await fetchProfile(session.user.id, session.user.email ?? null);
+          const role = mapRole(profile?.role);
+          setCurrentUserRole(role);
+          setUserProfile(profile);
+          setIsLoggedIn(true);
+        }
+      } catch {
+        // profile fetch failed — fall through to unauthenticated state below
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    });
+    }).catch(() => setIsLoading(false));
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -67,11 +72,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrentUserRole(UserRole.RESIDENT);
       }
       if (event === 'SIGNED_IN' && session?.user) {
-        const profile = await fetchProfile(session.user.id, session.user.email ?? null);
-        const role = mapRole(profile?.role);
-        setCurrentUserRole(role);
-        setUserProfile(profile);
-        setIsLoggedIn(true);
+        try {
+          const profile = await fetchProfile(session.user.id, session.user.email ?? null);
+          const role = mapRole(profile?.role);
+          setCurrentUserRole(role);
+          setUserProfile(profile);
+          setIsLoggedIn(true);
+        } catch {
+          // ignore — user stays on the login screen if profile fetch fails
+        }
       }
     });
 
@@ -81,8 +90,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = useCallback(async (role: UserRole) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
-      const profile = await fetchProfile(session.user.id, session.user.email ?? null);
-      setUserProfile(profile);
+      try {
+        const profile = await fetchProfile(session.user.id, session.user.email ?? null);
+        setUserProfile(profile);
+      } catch {
+        // ignore — role/login state below still proceeds
+      }
     }
     setCurrentUserRole(role);
     setIsLoggedIn(true);

@@ -37,7 +37,7 @@ export const Dashboard: React.FC = () => {
   const isOverdue = currentInvoice?.status === 'unpaid' && new Date(currentInvoice.dueDate) < new Date();
 
   return (
-    <div className="min-h-screen bg-nadayu-bg pb-12">
+    <div className="pb-12">
       <div className="flex items-end justify-between mb-6">
         <div>
           <p className="text-[11px] text-nadayu-muted uppercase tracking-widest font-semibold mb-1">{today}</p>

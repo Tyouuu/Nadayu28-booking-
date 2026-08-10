@@ -140,7 +140,7 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-nadayu-bg pb-12">
+    <div className="pb-12">
       {/* Background Gradients */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] -z-10"></div>
@@ -179,103 +179,25 @@ export const Profile: React.FC = () => {
 
             {/* Menu Items */}
             <div className="space-y-2 pt-4 border-t border-nadayu-border">
-              {accountRole === 'owner' ? (
-                <>
-                  <button
-                    onClick={() => setActiveTab('details')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'details'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <User size={18} /> {t.profile.details}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('vehicles')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'vehicles'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <Car size={18} /> {t.profile.vehicles}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('tenants')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'tenants'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <Users size={18} /> {t.profile.tenants} ({tenants.length})
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('security')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'security'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <Lock size={18} /> {t.profile.securityTab}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('history')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'history'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <History size={18} /> {t.profile.history}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setActiveTab('details')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'details'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <User size={18} /> {t.profile.title}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('vehicles')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'vehicles'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <Car size={18} /> {t.profile.vehicles}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('security')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'security'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <Lock size={18} /> {t.profile.securityTab}
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('history')}
-                    className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
-                      activeTab === 'history'
-                        ? 'bg-nadayu-panel text-white'
-                        : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
-                    }`}
-                  >
-                    <History size={18} /> {t.profile.history}
-                  </button>
-                </>
-              )}
+              {([
+                { id: 'details' as const, label: accountRole === 'owner' ? t.profile.details : t.profile.title, icon: User },
+                { id: 'vehicles' as const, label: t.profile.vehicles, icon: Car },
+                ...(accountRole === 'owner' ? [{ id: 'tenants' as const, label: `${t.profile.tenants} (${tenants.length})`, icon: Users }] : []),
+                { id: 'security' as const, label: t.profile.securityTab, icon: Lock },
+                { id: 'history' as const, label: t.profile.history, icon: History },
+              ]).map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`w-full text-left px-5 py-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-3 ${
+                    activeTab === item.id
+                      ? 'bg-nadayu-panel text-white'
+                      : 'text-nadayu-muted hover:text-gray-900 hover:bg-nadayu-cream'
+                  }`}
+                >
+                  <item.icon size={18} /> {item.label}
+                </button>
+              ))}
             </div>
 
             {/* Logout Button */}
@@ -719,23 +641,6 @@ export const Profile: React.FC = () => {
                   >
                     <CheckCircle2 size={18} /> {isSavingPassword ? 'Updating...' : 'Update Password'}
                   </button>
-                </div>
-              </div>
-
-              {/* Active Sessions */}
-              <div className="space-y-4">
-                <h4 className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                  <CheckCircle2 size={18} className={accountRole === 'owner' ? 'text-nadayu-panel' : 'text-nadayu-panel'} />
-                  Active Sessions
-                </h4>
-                <div className="space-y-3">
-                  <div className="bg-nadayu-cream p-6 rounded-2xl border border-nadayu-border flex justify-between items-center">
-                    <div>
-                      <p className="text-gray-900 font-bold">This Device</p>
-                      <p className="text-sm text-nadayu-muted mt-1">Current browser session • Active now</p>
-                    </div>
-                    <span className="text-xs font-bold text-nadayu-success">ACTIVE</span>
-                  </div>
                 </div>
               </div>
             </div>

@@ -155,7 +155,7 @@ export const Reporting: React.FC = () => {
     const selectedCat = issueCategories.find(c => c.id === selectedCategory);
     
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-nadayu-bg">
+      <div className="h-full flex items-center justify-center">
         <div className="absolute top-0 left-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
 
@@ -191,7 +191,7 @@ export const Reporting: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-nadayu-bg p-4">
+    <div className="pb-12">
       <div className="absolute top-0 left-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-nadayu-accent/5 rounded-full blur-[100px] -z-10"></div>
 
@@ -371,7 +371,7 @@ export const Reporting: React.FC = () => {
               )}
 
               {submitError && (
-                <div className="border-l-4 p-4 rounded-lg" style={{backgroundColor: '#fef2f2', borderColor: '#ef4444', color: '#991b1b'}}>
+                <div className="border-l-4 border-nadayu-danger bg-nadayu-danger/10 text-nadayu-danger p-4 rounded-lg">
                   <p className="text-sm font-medium">{submitError}</p>
                 </div>
               )}

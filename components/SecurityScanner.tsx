@@ -185,10 +185,12 @@ export const SecurityScanner: React.FC = () => {
           <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">Access Control</h1>
           <p className="text-nadayu-muted text-sm mt-1">Scan visitor QR codes for entry verification.</p>
         </div>
-        <div className="hidden md:flex items-center gap-2 bg-nadayu-panel text-white px-4 py-2 rounded-full text-xs font-medium">
-          <Shield size={12} className="text-nadayu-accent" />
-          Scanner Active
-        </div>
+        {scanning && (
+          <div className="hidden md:flex items-center gap-2 bg-nadayu-panel text-white px-4 py-2 rounded-full text-xs font-medium">
+            <span className="w-1.5 h-1.5 bg-nadayu-accent rounded-full animate-pulse"></span>
+            Camera Active
+          </div>
+        )}
       </div>
 
       <div className="max-w-md mx-auto">

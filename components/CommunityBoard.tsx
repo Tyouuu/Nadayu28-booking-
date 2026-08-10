@@ -68,8 +68,7 @@ export const CommunityBoard: React.FC = () => {
       : 'bg-nadayu-cream border-nadayu-border text-nadayu-muted';
 
   return (
-    <div className="min-h-screen bg-nadayu-bg">
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+    <div className="pb-12">
         <div className="mb-5">
           <div className="bg-nadayu-panel rounded-2xl p-8 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -207,7 +206,6 @@ export const CommunityBoard: React.FC = () => {
             </button>
           </div>
         )}
-      </div>
     </div>
   );
 };

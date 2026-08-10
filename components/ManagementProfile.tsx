@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, BarChart2, Clock, Briefcase, Megaphone, Scale, Edit2, Save } from 'lucide-react';
+import { User, Mail, Phone, BarChart2, Clock, Briefcase, Scale, Edit2, Save } from 'lucide-react';
 import { useAppNavigate } from '../hooks/useAppNavigate';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchViolations, fetchReports, fetchBookings, fetchAuditLog, computeArrearsReport, fetchAllInvoices, updateProfile, AuditLogEntry } from '../services/dataService';
@@ -112,50 +112,32 @@ export const ManagementProfile: React.FC = () => {
         <div className="lg:col-span-3 space-y-5">
           {activeTab === 'overview' && (
             <>
-              {/* Stats - fixed readability */}
-              <div className="bg-white border border-nadayu-border rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-5">
+              {/* Stats - each cell is a real link to where that number lives */}
+              <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-50">
                   <h2 className="text-gray-900 font-semibold text-sm">Today's Overview</h2>
                   <span className="text-nadayu-muted text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 </div>
-                <div className="grid grid-cols-4 gap-3">
-                  <div className="bg-nadayu-warning/10 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-warning mb-2">Pending Violations</p>
-                    <p className="text-2xl font-bold text-nadayu-warning">{stats.pendingViolations}</p>
-                  </div>
-                  <div className="bg-nadayu-danger/10 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-danger mb-2">Unread Complaints</p>
-                    <p className="text-2xl font-bold text-nadayu-danger">{stats.unreadComplaints}</p>
-                  </div>
-                  <div className="bg-nadayu-accent rounded-xl p-4">
-                    <p className="text-xs font-semibold text-white/70 mb-2">Today's Bookings</p>
-                    <p className="text-2xl font-bold text-white">{stats.todayBookings}</p>
-                  </div>
-                  <div className="bg-nadayu-cream rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-muted mb-2">Units in Arrears</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.unitsInArrears}</p>
-                  </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-gray-50">
+                  {[
+                    { label: 'Pending Violations', value: stats.pendingViolations, warn: stats.pendingViolations > 0, action: () => setCurrentView('management') },
+                    { label: 'Unread Complaints', value: stats.unreadComplaints, warn: stats.unreadComplaints > 0, action: () => setCurrentView('maintenance') },
+                    { label: "Today's Bookings", value: stats.todayBookings, warn: false, action: null },
+                    { label: 'Units in Arrears', value: stats.unitsInArrears, warn: stats.unitsInArrears > 0, action: () => setCurrentView('management?tab=billing') },
+                  ].map(s => (
+                    s.action ? (
+                      <button key={s.label} onClick={s.action} className="text-left px-6 py-4 hover:bg-nadayu-cream/50 transition-colors">
+                        <p className="text-xs font-semibold text-nadayu-muted mb-1.5">{s.label}</p>
+                        <p className={`text-2xl font-bold ${s.warn ? 'text-nadayu-warning' : 'text-gray-900'}`}>{s.value}</p>
+                      </button>
+                    ) : (
+                      <div key={s.label} className="px-6 py-4">
+                        <p className="text-xs font-semibold text-nadayu-muted mb-1.5">{s.label}</p>
+                        <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                      </div>
+                    )
+                  ))}
                 </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { label: 'View Reports', desc: 'Analytics dashboard', icon: BarChart2, action: () => setCurrentView('management') },
-                  { label: 'Handle Violations', desc: 'Review pending', icon: Scale, action: () => setCurrentView('management') },
-                  { label: 'Post Announcement', desc: 'Community updates', icon: Megaphone, action: () => setCurrentView('management') },
-                ].map(a => (
-                  <button key={a.label} onClick={a.action}
-                    className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
-                    <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                      <a.icon size={16} className="text-gray-500 group-hover:text-white transition-colors" />
-                    </div>
-                    <div>
-                      <p className="text-gray-900 text-xs font-semibold">{a.label}</p>
-                      <p className="text-nadayu-muted text-[10px]">{a.desc}</p>
-                    </div>
-                  </button>
-                ))}
               </div>
 
               {/* Recent Activity */}

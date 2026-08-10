@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { fetchViolations, fetchReports, fetchUsers, updateUserRole, fetchAuditLog, AuditLogEntry, updateViolationStatus, fetchAllInvoices, fetchAllFeeSchedules, setFeeSchedule, recordInvoicePayment, computeArrearsReport, computeCollectionTrend, arrearsToCSV, computeVisitorTraffic, computeFacilityUsage, fetchVisitors, fetchBookings, Visitor, Invoice, FeeSchedule } from '../services/dataService';
 import { Violation, Report, User, UserRole, Booking } from '../types';
@@ -36,7 +37,11 @@ export const AdminPanel: React.FC = () => {
     r.status === 'Received' && r.createdAt && (Date.now() - new Date(r.createdAt).getTime()) > 24 * 60 * 60 * 1000
   ).length;
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'billing' | 'audit'>('overview');
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'billing' | 'audit'>(
+    initialTab === 'billing' || initialTab === 'users' || initialTab === 'audit' ? initialTab : 'overview'
+  );
 
   const [users, setUsers] = useState<User[]>([]);
   const [savingUserId, setSavingUserId] = useState<string | null>(null);

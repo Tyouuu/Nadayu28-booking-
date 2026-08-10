@@ -60,10 +60,6 @@ export const SecurityProfile: React.FC = () => {
           <h1 className="text-[2rem] font-bold text-gray-900 leading-tight tracking-tight">My Profile</h1>
           <p className="text-nadayu-muted text-sm mt-1">Access Control</p>
         </div>
-        <div className="hidden md:flex items-center gap-2 bg-nadayu-accent text-white px-4 py-2 rounded-full text-xs font-bold">
-          <span className="w-1.5 h-1.5 bg-nadayu-panel rounded-full animate-pulse"></span>
-          On Duty
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-5">
@@ -108,64 +104,32 @@ export const SecurityProfile: React.FC = () => {
         <div className="lg:col-span-3 space-y-5">
           {activeTab === 'overview' && (
             <>
-              {/* Stats - fixed readability */}
-              <div className="bg-white border border-nadayu-border rounded-2xl p-6">
-                <div className="flex items-center justify-between mb-5">
+              {/* Stats - each cell is a real link to where that number lives */}
+              <div className="bg-white border border-nadayu-border rounded-2xl overflow-hidden">
+                <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-50">
                   <h2 className="text-gray-900 font-semibold text-sm">Today's Stats</h2>
                   <span className="text-nadayu-muted text-xs">{new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                 </div>
-                <div className="grid grid-cols-4 gap-3">
-                  <div className="bg-nadayu-cream rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-muted mb-2">Total Scans</p>
-                    <p className="text-2xl font-bold text-gray-900">{todayStats.scansToday}</p>
-                  </div>
-                  <div className="bg-nadayu-accent rounded-xl p-4">
-                    <p className="text-xs font-semibold text-white/70 mb-2">Verified</p>
-                    <p className="text-2xl font-bold text-white">{todayStats.verified}</p>
-                  </div>
-                  <div className="bg-nadayu-warning/10 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-nadayu-warning mb-2">Warnings</p>
-                    <p className="text-2xl font-bold text-nadayu-warning">{todayStats.warnings}</p>
-                  </div>
-                  <div className="bg-yellow-50 rounded-xl p-4">
-                    <p className="text-xs font-semibold text-yellow-600 mb-2">Pending</p>
-                    <p className="text-2xl font-bold text-yellow-700">{todayStats.pending}</p>
-                  </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-gray-50">
+                  {[
+                    { label: 'Total Scans', value: todayStats.scansToday, action: () => setActiveTab('log') },
+                    { label: 'Verified', value: todayStats.verified, action: () => setActiveTab('log') },
+                    { label: 'Warnings', value: todayStats.warnings, warn: todayStats.warnings > 0 },
+                    { label: 'Pending', value: todayStats.pending, action: () => setActiveTab('log') },
+                  ].map(s => (
+                    s.action ? (
+                      <button key={s.label} onClick={s.action} className="text-left px-6 py-4 hover:bg-nadayu-cream/50 transition-colors">
+                        <p className="text-xs font-semibold text-nadayu-muted mb-1.5">{s.label}</p>
+                        <p className={`text-2xl font-bold ${s.warn ? 'text-nadayu-warning' : 'text-gray-900'}`}>{s.value}</p>
+                      </button>
+                    ) : (
+                      <div key={s.label} className="px-6 py-4">
+                        <p className="text-xs font-semibold text-nadayu-muted mb-1.5">{s.label}</p>
+                        <p className={`text-2xl font-bold ${s.warn ? 'text-nadayu-warning' : 'text-gray-900'}`}>{s.value}</p>
+                      </div>
+                    )
+                  ))}
                 </div>
-              </div>
-
-              {/* Quick Actions - Visitor Log now goes to scan log tab */}
-              <div className="grid grid-cols-3 gap-3">
-                <button onClick={() => setCurrentView('security')}
-                  className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
-                  <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                    <Camera size={16} className="text-gray-500 group-hover:text-white transition-colors" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-xs font-semibold">Quick Scan</p>
-                    <p className="text-nadayu-muted text-[10px]">Scan QR code</p>
-                  </div>
-                </button>
-                <button onClick={() => setActiveTab('log')}
-                  className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
-                  <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                    <FileText size={16} className="text-gray-500 group-hover:text-white transition-colors" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-xs font-semibold">Visitor Log</p>
-                    <p className="text-nadayu-muted text-[10px]">View entries</p>
-                  </div>
-                </button>
-                <button onClick={() => setCurrentView('report')}
-                  className="group flex items-center gap-3 bg-white border border-nadayu-border rounded-xl px-4 py-3 text-left hover:border-nadayu-accent hover:shadow-sm transition-all">
-                  <div className="w-9 h-9 bg-nadayu-cream group-hover:bg-nadayu-accent rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                    <AlertTriangle size={16} className="text-gray-500 group-hover:text-white transition-colors" />
-                  </div>
-                  <div>
-                    <p className="text-gray-900 text-xs font-semibold">Report Issue</p>
-                    <p className="text-nadayu-muted text-[10px]">Submit report</p>
-                  </div>
-                </button>
               </div>
 
               {/* Flagged visitors */}

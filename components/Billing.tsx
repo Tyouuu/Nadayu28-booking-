@@ -57,7 +57,7 @@ export const Billing: React.FC = () => {
               </span>
             )}
           </div>
-          <p className="text-4xl font-bold text-gray-900 mb-1">RM {current.amount.toFixed(2)}</p>
+          <p className="text-4xl font-bold text-gray-900 mb-1 tabular-nums">RM {current.amount.toFixed(2)}</p>
           <p className="text-sm text-nadayu-muted">Due {new Date(current.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
       )}
@@ -69,7 +69,7 @@ export const Billing: React.FC = () => {
             <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
               <tr>
                 <th className="px-6 py-4">Period</th>
-                <th className="px-6 py-4">Amount</th>
+                <th className="px-6 py-4 text-right">Amount</th>
                 <th className="px-6 py-4">Paid Date</th>
                 <th className="px-6 py-4">Method</th>
               </tr>
@@ -81,7 +81,7 @@ export const Billing: React.FC = () => {
               {history.map(inv => (
                 <tr key={inv.id}>
                   <td className="px-6 py-4 font-bold text-gray-900">{inv.period}</td>
-                  <td className="px-6 py-4 text-gray-900">RM {inv.amount.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-right text-gray-900 tabular-nums">RM {inv.amount.toFixed(2)}</td>
                   <td className="px-6 py-4 text-nadayu-muted">{inv.paidDate ? new Date(inv.paidDate).toLocaleDateString('en-GB') : '-'}</td>
                   <td className="px-6 py-4 text-nadayu-muted capitalize">{inv.paymentMethod?.replace('_', ' ') ?? '-'}</td>
                 </tr>

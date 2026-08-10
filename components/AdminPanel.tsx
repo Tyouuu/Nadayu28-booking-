@@ -246,7 +246,7 @@ export const AdminPanel: React.FC = () => {
                 <th className="px-6 py-4">Unit</th>
                 <th className="px-6 py-4">Type</th>
                 <th className="px-6 py-4">Date</th>
-                <th className="px-6 py-4">Amount</th>
+                <th className="px-6 py-4 text-right">Amount</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-right">Action</th>
               </tr>
@@ -257,7 +257,7 @@ export const AdminPanel: React.FC = () => {
                   <td className="px-6 py-4 font-bold text-gray-900">{v.unit}</td>
                   <td className="px-6 py-4 text-gray-500">{v.type}</td>
                   <td className="px-6 py-4 text-nadayu-muted">{v.date}</td>
-                  <td className="px-6 py-4 font-bold text-gray-900">RM {v.amount}</td>
+                  <td className="px-6 py-4 text-right font-bold text-gray-900 tabular-nums">RM {v.amount}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                       v.status === 'paid'
@@ -444,20 +444,20 @@ export const AdminPanel: React.FC = () => {
                       <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
                         <tr>
                           <th className="px-6 py-4">Unit</th>
-                          <th className="px-6 py-4">Amount Owed</th>
+                          <th className="px-6 py-4 text-right">Amount Owed</th>
                           <th className="px-6 py-4">Oldest Due Date</th>
-                          <th className="px-6 py-4">Days Overdue</th>
-                          <th className="px-6 py-4">Overdue Invoices</th>
+                          <th className="px-6 py-4 text-right">Days Overdue</th>
+                          <th className="px-6 py-4 text-right">Overdue Invoices</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
                         {arrearsReport.map(row => (
                           <tr key={row.unit}>
                             <td className="px-6 py-4 font-bold text-gray-900">{row.unit}</td>
-                            <td className="px-6 py-4 text-gray-900">RM {row.totalOwed.toFixed(2)}</td>
+                            <td className="px-6 py-4 text-right text-gray-900 tabular-nums">RM {row.totalOwed.toFixed(2)}</td>
                             <td className="px-6 py-4 text-nadayu-muted">{row.oldestDueDate}</td>
-                            <td className="px-6 py-4 text-nadayu-warning font-bold">{row.daysOverdue}</td>
-                            <td className="px-6 py-4 text-nadayu-muted">{row.overdueCount}</td>
+                            <td className="px-6 py-4 text-right text-nadayu-warning font-bold tabular-nums">{row.daysOverdue}</td>
+                            <td className="px-6 py-4 text-right text-nadayu-muted tabular-nums">{row.overdueCount}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -478,7 +478,7 @@ export const AdminPanel: React.FC = () => {
                 <thead className="uppercase text-[10px] tracking-widest font-bold text-nadayu-muted bg-nadayu-cream/50">
                   <tr>
                     <th className="px-6 py-4">Unit</th>
-                    <th className="px-6 py-4">Monthly Amount</th>
+                    <th className="px-6 py-4 text-right">Monthly Amount</th>
                     <th className="px-6 py-4 text-right">Action</th>
                   </tr>
                 </thead>
@@ -486,13 +486,13 @@ export const AdminPanel: React.FC = () => {
                   {feeSchedules.map(fs => (
                     <tr key={fs.unit}>
                       <td className="px-6 py-4 font-bold text-gray-900">{fs.unit}</td>
-                      <td className="px-6 py-4 text-gray-900">
+                      <td className="px-6 py-4 text-right text-gray-900 tabular-nums">
                         {editingRateUnit === fs.unit ? (
                           <input
                             type="number"
                             value={rateInput}
                             onChange={e => setRateInput(e.target.value)}
-                            className="w-28 px-2 py-1 border border-nadayu-border rounded-lg text-sm"
+                            className="w-28 px-2 py-1 border border-nadayu-border rounded-lg text-sm text-right"
                             autoFocus
                           />
                         ) : (
@@ -553,7 +553,7 @@ export const AdminPanel: React.FC = () => {
                   <tr>
                     <th className="px-6 py-4">Unit</th>
                     <th className="px-6 py-4">Period</th>
-                    <th className="px-6 py-4">Amount</th>
+                    <th className="px-6 py-4 text-right">Amount</th>
                     <th className="px-6 py-4">Status</th>
                     <th className="px-6 py-4 text-right">Action</th>
                   </tr>
@@ -563,7 +563,7 @@ export const AdminPanel: React.FC = () => {
                     <tr key={inv.id}>
                       <td className="px-6 py-4 font-bold text-gray-900">{inv.unit}</td>
                       <td className="px-6 py-4 text-nadayu-muted">{inv.period}</td>
-                      <td className="px-6 py-4 text-gray-900">RM {inv.amount.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-right text-gray-900 tabular-nums">RM {inv.amount.toFixed(2)}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${
                           inv.status === 'paid' ? 'bg-nadayu-success/15 text-nadayu-success' : 'bg-nadayu-warning/15 text-nadayu-warning'

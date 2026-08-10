@@ -119,7 +119,7 @@ export const Dashboard: React.FC = () => {
                     {currentInvoice.status === 'paid' ? 'Paid' : isOverdue ? `Overdue since ${new Date(currentInvoice.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : `Due ${new Date(currentInvoice.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`}
                   </p>
                 </div>
-                <span className="text-gray-900 text-sm font-bold flex-shrink-0">RM {currentInvoice.amount.toFixed(2)}</span>
+                <span className="text-gray-900 text-sm font-bold flex-shrink-0 tabular-nums">RM {currentInvoice.amount.toFixed(2)}</span>
                 <ChevronRight size={13} className="text-gray-300 flex-shrink-0" />
               </button>
             </div>

@@ -9,6 +9,18 @@ interface LoginProps {
   onLogin: (role: UserRole) => void;
 }
 
+// Supabase auth calls can stall indefinitely on a flaky network without ever
+// resolving or rejecting - a try/catch/finally alone doesn't protect against
+// that, since finally only runs once the promise settles. Race it instead.
+function withTimeout<T>(promise: PromiseLike<T>, ms = 10000): Promise<T> {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('Request timed out. Please check your connection and try again.')), ms)
+    ),
+  ]);
+}
+
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [role, setRole] = useState<'OWNER' | 'TENANT' | 'SECURITY' | 'MANAGEMENT'>('OWNER');
@@ -54,17 +66,15 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     if (!result.success) { setFieldErrors(result.errors); return; }
     setIsLoading(true);
     try {
-      const { data, error } = await signIn(loginEmail, loginPassword);
+      const { data, error } = await withTimeout(signIn(loginEmail, loginPassword));
       if (error) throw error;
 
       // Read profile role from Supabase
       let appRole = role === 'TENANT' ? UserRole.TENANT : UserRole.RESIDENT;
       if (data.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
+        const { data: profile } = await withTimeout(
+          supabase.from('profiles').select('role').eq('id', data.user.id).single()
+        );
         if (profile?.role === 'SECURITY')        appRole = UserRole.SECURITY;
         else if (profile?.role === 'MANAGEMENT') appRole = UserRole.MANAGEMENT;
         else if (profile?.role === 'TENANT')     appRole = UserRole.TENANT;
@@ -91,12 +101,12 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     try {
       const fullName = `${regFirstName} ${regLastName}`.trim();
       const mappedRole = role === 'OWNER' ? 'RESIDENT' : role;
-      const { error } = await signUp(regEmail, regPassword, {
+      const { error } = await withTimeout(signUp(regEmail, regPassword, {
         full_name: fullName,
         role: mappedRole,
         unit: regUnit || undefined,
         phone: regPhone || undefined,
-      });
+      }));
       if (error) throw error;
       setRegSuccess(true);
     } catch (err: unknown) {
@@ -114,7 +124,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     if (!result.success) { setOtpError(result.errors.phone); return; }
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({ phone: phoneNumber });
+      const { error } = await withTimeout(supabase.auth.signInWithOtp({ phone: phoneNumber }));
       if (error) throw error;
       setOtpSent(true);
     } catch (err: unknown) {
@@ -133,21 +143,19 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     if (!result.success) { setOtpError(result.errors.code); return; }
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
+      const { data, error } = await withTimeout(supabase.auth.verifyOtp({
         phone: phoneNumber,
         token: otpCode,
         type: 'sms',
-      });
+      }));
       if (error) throw error;
 
       // Read profile role from Supabase
       let appRole = UserRole.RESIDENT;
       if (data.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single();
+        const { data: profile } = await withTimeout(
+          supabase.from('profiles').select('role').eq('id', data.user.id).single()
+        );
         if (profile?.role === 'SECURITY')        appRole = UserRole.SECURITY;
         else if (profile?.role === 'MANAGEMENT') appRole = UserRole.MANAGEMENT;
         else if (profile?.role === 'TENANT')     appRole = UserRole.TENANT;
@@ -167,9 +175,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     if (!result.success) { setFieldErrors(result.errors); return; }
     setResetStatus('sending');
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      const { error } = await withTimeout(supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: window.location.origin + '/?reset=true',
-      });
+      }));
       if (error) throw error;
       setResetStatus('sent');
     } catch {

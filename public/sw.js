@@ -1,52 +1,21 @@
-const CACHE_NAME = 'nadayu28-v1';
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-];
-
-// Install: cache static assets
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-  );
+// This service worker previously cached the old Vite build's app shell.
+// After the Next.js migration, any browser that still has the old version
+// installed keeps serving that stale, now-broken shell forever (it
+// references a hashed JS bundle path that no longer exists post-migration).
+// This version self-destructs: it wipes all caches, unregisters itself,
+// and forces every open tab to reload straight from the network.
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
-// Activate: clean old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
-});
-
-// Fetch: network-first for API, cache-first for static
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-
-  // Skip non-GET and cross-origin
-  if (request.method !== 'GET') return;
-
-  // API / Supabase calls: network only
-  if (request.url.includes('/api/') || request.url.includes('supabase.co')) return;
-
-  // Static assets: stale-while-revalidate
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      const fetchPromise = fetch(request)
-        .then((response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-
-      return cached || fetchPromise;
-    })
+    caches.keys()
+      .then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
+      .then(() => self.registration.unregister())
+      .then(() => self.clients.matchAll({ type: 'window' }))
+      .then((clients) => {
+        clients.forEach((client) => client.navigate(client.url));
+      })
   );
 });

@@ -116,11 +116,22 @@ mismatch there is real, not just cosmetic:
   to its inherited value — the browser/Tailwind-preflight system font stack,
   not Inter. The app silently stops using the font it was built and shipped
   with. No error anywhere.
-- The 5 `--animate-*` tokens Nadayu28 defined (`--animate-slide-up`,
-  `--animate-pulse-slow`, `--animate-shimmer`, `--animate-glow`, and
-  `--animate-fade-in`) are **not** used anywhere as Tailwind utility classes
-  in any `.tsx` file (checked with a repo-wide grep) — so losing them is a
-  non-event in this codebase specifically, not a general safety net.
+- Of the 5 `--animate-*` tokens Nadayu28 defined, 4
+  (`--animate-slide-up`, `--animate-pulse-slow`, `--animate-shimmer`,
+  `--animate-glow`) are genuinely **not** used anywhere as Tailwind utility
+  classes in any `.tsx` file (confirmed with a repo-wide grep). The 5th,
+  `--animate-fade-in`, is **not** in that category — `animate-fade-in` is
+  used 9 times, across `components/Login.tsx` and
+  `components/CustomPickers.tsx`. Losing the tokenized `--animate-fade-in`
+  is still a non-event in this codebase, but for a different reason than
+  "unused": Nadayu28 separately hand-defines a literal
+  `.animate-fade-in { animation: fadeIn 0.8s ease-in-out; }` class in
+  `app/globals.css` (~lines 337-339), entirely outside the `@theme`
+  mechanism. That hardcoded rule is untouched by the token swap and keeps
+  backing every `animate-fade-in` usage regardless of what happens to the
+  `--animate-fade-in` custom property. So the practical verdict holds — no
+  visible breakage — but it holds because of a pre-existing fallback class,
+  not because the class name is dead.
 
 ## A second, independent problem: source-order collisions, not just missing tokens
 
@@ -138,7 +149,7 @@ body{-webkit-font-smoothing:antialiased;...;background:#fff;...}  /* Nadayu28's 
 
 :focus-visible{box-shadow:0 0 0 2px var(--color-ink-900), 0 0 0 4px var(--color-primary);border-radius:4px;outline:none}  /* Ledger's ring */
 :focus-visible{outline-offset:2px;outline:2px solid #0f172a}      /* Nadayu28's — outline wins, but... */
-:focus-visible{outline-offset:0;outline:2px solid #0f172a}
+button:focus-visible{outline-offset:0;outline:2px solid #0f172a}
 ```
 
 `outline` is overridden back to Nadayu28's old literal navy
